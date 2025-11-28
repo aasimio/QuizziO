@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:omr_spike/services/image_preprocessor.dart';
 import 'package:omr_spike/services/marker_detector.dart';
+import 'package:omr_spike/services/perspective_transformer.dart';
+import 'package:omr_spike/models/template_config.dart';
+import 'package:opencv_dart/opencv_dart.dart' as cv;
+import 'package:path_provider/path_provider.dart';
 import 'dart:typed_data';
+import 'dart:io';
 
 void main() {
   runApp(const MyApp());
@@ -36,6 +41,7 @@ class _AssetTestPageState extends State<AssetTestPage> {
   bool _isLoading = false;
   final ImagePreprocessor _preprocessor = ImagePreprocessor();
   final MarkerDetector _markerDetector = MarkerDetector();
+  final PerspectiveTransformer _perspectiveTransformer = PerspectiveTransformer();
 
   Future<void> _testAssetLoading() async {
     setState(() {
@@ -197,6 +203,104 @@ ${result.isValid ? 'All markers detected successfully! ✓' : 'Warning: Some mar
     }
   }
 
+  Future<void> _testPerspectiveTransform() async {
+    setState(() {
+      _isLoading = true;
+      _statusMessage = 'Testing perspective transform...';
+    });
+
+    try {
+      final stopwatch = Stopwatch()..start();
+
+      // 1. Load marker template
+      final markerData = await rootBundle.load('assets/marker.png');
+      final markerBytes = markerData.buffer.asUint8List();
+      await _markerDetector.loadMarkerTemplate(markerBytes);
+      print('✓ Marker template loaded');
+
+      // 2. Load test image (filled sheet)
+      final imageData = await rootBundle.load('assets/test_sheet_filled.png');
+      final imageBytes = imageData.buffer.asUint8List();
+      print('✓ Test image loaded: ${imageBytes.length} bytes');
+
+      // 3. Preprocess image
+      final mat = _preprocessor.uint8ListToMat(imageBytes);
+      final processed = await _preprocessor.preprocess(mat);
+      mat.dispose();
+      print('✓ Image preprocessed: ${processed.rows}x${processed.cols}');
+
+      // 4. Detect markers
+      final markerResult = await _markerDetector.detect(processed);
+      print('✓ Markers detected: ${markerResult.allMarkersFound ? '4/4' : 'Failed'}');
+
+      if (!markerResult.isValid) {
+        processed.dispose();
+        setState(() {
+          _statusMessage = '❌ Failed: Could not detect all 4 markers';
+          _isLoading = false;
+        });
+        return;
+      }
+
+      // Store input dimensions before disposal
+      final inputRows = processed.rows;
+      final inputCols = processed.cols;
+
+      // 5. Transform perspective
+      final warped = await _perspectiveTransformer.transform(
+        processed,
+        markerResult.markerCenters,
+        kTemplateWidth,
+        kTemplateHeight,
+      );
+      processed.dispose();
+      print('✓ Perspective transform applied: ${warped.rows}x${warped.cols}');
+
+      // 6. Save warped output to device
+      final directory = await getApplicationDocumentsDirectory();
+      final outputPath = '${directory.path}/warped_output.png';
+      final success = await cv.imwriteAsync(outputPath, warped);
+      print('✓ Warped image saved to: $outputPath (success: $success)');
+
+      // Verify file exists
+      final file = File(outputPath);
+      final fileExists = await file.exists();
+      final fileSize = fileExists ? await file.length() : 0;
+
+      warped.dispose();
+      stopwatch.stop();
+
+      setState(() {
+        _statusMessage = '''
+✅ Perspective Transform Successful!
+
+Total processing time: ${stopwatch.elapsedMilliseconds}ms
+Markers detected: 4/4
+Average confidence: ${(markerResult.avgConfidence * 100).toStringAsFixed(1)}%
+
+Transform details:
+• Input: ${inputRows}x${inputCols} pixels
+• Output: ${kTemplateWidth}x${kTemplateHeight} pixels
+• Output file: warped_output.png
+• File size: ${(fileSize / 1024).toStringAsFixed(1)} KB
+• File location: $outputPath
+
+${fileExists ? '✓ Output file saved successfully!' : '⚠️ Warning: Output file not found'}
+
+You can manually verify the warped image is correctly aligned by checking the saved file.
+''';
+        _isLoading = false;
+      });
+    } catch (e, stackTrace) {
+      setState(() {
+        _statusMessage = '❌ Error during perspective transform:\n$e';
+        _isLoading = false;
+      });
+      print('Error during perspective transform: $e');
+      print('Stack trace: $stackTrace');
+    }
+  }
+
   @override
   void dispose() {
     _markerDetector.dispose();
@@ -249,6 +353,12 @@ ${result.isValid ? 'All markers detected successfully! ✓' : 'Warning: Some mar
                       onPressed: _testMarkerDetection,
                       icon: const Icon(Icons.center_focus_strong),
                       label: const Text('Test Marker Detection'),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton.icon(
+                      onPressed: _testPerspectiveTransform,
+                      icon: const Icon(Icons.transform),
+                      label: const Text('Test Perspective Transform'),
                     ),
                   ],
                 ),

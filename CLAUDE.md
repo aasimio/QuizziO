@@ -429,4 +429,11 @@ When adding new dependencies, run `flutter pub get` to install them.
 - Added test UI button
 - ✅ Test verified: 4/4 markers detected, 100% confidence, 198ms processing time
 
-**Next: Task 4.0** - Implement Perspective Transform
+**Task 4.0: Perspective Transform**
+- Implemented perspective_transformer.dart: 4-point perspective warp using cv.getPerspectiveTransform
+- Point ordering algorithm: sort by sum (TL/BR) and diff (TR/BL) for consistent orientation
+- Added test UI button to verify full pipeline: preprocess → detect → transform → save
+- Outputs warped 800x1100 image saved to device using path_provider
+- ✅ Build successful, integration test ready
+
+**Next: Task 5.0** - Implement Bubble Reading

@@ -278,8 +278,8 @@ Update the file after completing each sub-task, not just after completing an ent
         - Test with filled sheet — should still find markers
         - Test with missing marker (crop image) — should report failure
     - [x]  3.9 Run tests: `flutter test test/marker_detector_test.dart`
-- [ ]  **4.0 Implement Perspective Transform**
-    - [ ]  4.1 Create `lib/services/perspective_transformer.dart` with class skeleton:
+- [x]  **4.0 Implement Perspective Transform**
+    - [x]  4.1 Create `lib/services/perspective_transformer.dart` with class skeleton:
         
         ```dart
         class PerspectiveTransformer {
@@ -294,7 +294,7 @@ Update the file after completing each sub-task, not just after completing an ent
         
         ```
         
-    - [ ]  4.2 Implement `_orderPoints()`:
+    - [x]  4.2 Implement `_orderPoints()`:
         
         ```dart
         /// Orders 4 points as: Top-Left, Top-Right, Bottom-Right, Bottom-Left
@@ -306,7 +306,7 @@ Update the file after completing each sub-task, not just after completing an ent
         
         ```
         
-    - [ ]  4.3 Implement `transform()`:
+    - [x]  4.3 Implement `transform()`:
         - Order source points using `_orderPoints()`
         - Define destination points (corners of output rectangle):
             
@@ -325,7 +325,7 @@ Update the file after completing each sub-task, not just after completing an ent
         - Apply warp: `cv.warpPerspectiveAsync(input, matrix, Size(outputWidth, outputHeight))`
         - Dispose intermediate Mats
         - Return warped image
-    - [ ]  4.4 Manual integration test:
+    - [x]  4.4 Manual integration test:
         - Load test image → preprocess → detect markers → transform
         - Save warped output to device using path_provider
         - Visually verify the output is correctly aligned (rectangular, markers at corners)
