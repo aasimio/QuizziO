@@ -194,8 +194,8 @@ Update the file after completing each sub-task, not just after completing an ent
         - Normalize: `cv.normalizeAsync(mat, 0, 255, cv.NORM_MINMAX)`
     - [x]  2.5 Add proper disposal of intermediate Mat objects
     - [x]  2.6 Test preprocessing on test image — verify output is grayscale and contrast-enhanced
-- [ ]  **3.0 Implement Marker Detection**
-    - [ ]  3.1 Create `lib/models/detection_result.dart` with data classes:
+- [x]  **3.0 Implement Marker Detection**
+    - [x]  3.1 Create `lib/models/detection_result.dart` with data classes:
         
         ```dart
         import 'package:opencv_dart/opencv_dart.dart' as cv;
@@ -216,8 +216,8 @@ Update the file after completing each sub-task, not just after completing an ent
         }
         
         ```
-        
-    - [ ]  3.2 Create `lib/services/marker_detector.dart` with class skeleton:
+
+    - [x]  3.2 Create `lib/services/marker_detector.dart` with class skeleton:
         
         ```dart
         class MarkerDetector {
@@ -236,12 +236,12 @@ Update the file after completing each sub-task, not just after completing an ent
         }
         
         ```
-        
-    - [ ]  3.3 Implement `loadMarkerTemplate()`:
+
+    - [x]  3.3 Implement `loadMarkerTemplate()`:
         - Decode bytes to cv.Mat
         - Convert to grayscale if needed
         - Store in `_markerTemplate`
-    - [ ]  3.4 Implement `_getQuadrantRegion()` helper:
+    - [x]  3.4 Implement `_getQuadrantRegion()` helper:
         
         ```dart
         /// Returns ROI rect for each corner quadrant
@@ -257,8 +257,8 @@ Update the file after completing each sub-task, not just after completing an ent
         }
         
         ```
-        
-    - [ ]  3.5 Implement `_searchInQuadrant()`:
+
+    - [x]  3.5 Implement `_searchInQuadrant()`:
         - Extract ROI from image using quadrant rect
         - For each scale in `scales`:
             - Resize marker template
@@ -267,17 +267,17 @@ Update the file after completing each sub-task, not just after completing an ent
         - Keep best result across all scales
         - **Translate local coordinates to full image coordinates** (add quadrant offset)
         - Return center point and confidence
-    - [ ]  3.6 Implement `detect()`:
+    - [x]  3.6 Implement `detect()`:
         - Search for marker in each quadrant (TL, TR, BR, BL)
         - Collect all 4 results
         - Calculate average confidence
         - Return `MarkerDetectionResult`
-    - [ ]  3.7 Implement `dispose()` to clean up `_markerTemplate`
-    - [ ]  3.8 Create `test/marker_detector_test.dart`:
+    - [x]  3.7 Implement `dispose()` to clean up `_markerTemplate`
+    - [x]  3.8 Create `test/marker_detector_test.dart`:
         - Test with blank sheet — should find all 4 markers with confidence > 0.3
         - Test with filled sheet — should still find markers
         - Test with missing marker (crop image) — should report failure
-    - [ ]  3.9 Run tests: `flutter test test/marker_detector_test.dart`
+    - [x]  3.9 Run tests: `flutter test test/marker_detector_test.dart`
 - [ ]  **4.0 Implement Perspective Transform**
     - [ ]  4.1 Create `lib/services/perspective_transformer.dart` with class skeleton:
         

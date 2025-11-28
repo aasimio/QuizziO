@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:omr_spike/services/image_preprocessor.dart';
+import 'package:omr_spike/services/marker_detector.dart';
 import 'dart:typed_data';
 
 void main() {
@@ -34,6 +35,7 @@ class _AssetTestPageState extends State<AssetTestPage> {
   String _statusMessage = 'Press button to test asset loading';
   bool _isLoading = false;
   final ImagePreprocessor _preprocessor = ImagePreprocessor();
+  final MarkerDetector _markerDetector = MarkerDetector();
 
   Future<void> _testAssetLoading() async {
     setState(() {
@@ -126,6 +128,81 @@ contrast-enhanced with CLAHE, and normalized.
     }
   }
 
+  Future<void> _testMarkerDetection() async {
+    setState(() {
+      _isLoading = true;
+      _statusMessage = 'Testing marker detection...';
+    });
+
+    try {
+      final stopwatch = Stopwatch()..start();
+
+      // 1. Load marker template
+      final markerData = await rootBundle.load('assets/marker.png');
+      final markerBytes = markerData.buffer.asUint8List();
+      await _markerDetector.loadMarkerTemplate(markerBytes);
+      print('✓ Marker template loaded: ${markerBytes.length} bytes');
+
+      // 2. Load test image (filled sheet)
+      final imageData = await rootBundle.load('assets/test_sheet_filled.png');
+      final imageBytes = imageData.buffer.asUint8List();
+      print('✓ Test image loaded: ${imageBytes.length} bytes');
+
+      // 3. Preprocess image
+      final mat = _preprocessor.uint8ListToMat(imageBytes);
+      final processed = await _preprocessor.preprocess(mat);
+      mat.dispose();
+      print('✓ Image preprocessed: ${processed.rows}x${processed.cols}');
+
+      // 4. Detect markers
+      final result = await _markerDetector.detect(processed);
+      processed.dispose();
+      stopwatch.stop();
+
+      print('✓ Marker detection completed in ${stopwatch.elapsedMilliseconds}ms');
+      print('  Result: $result');
+
+      // Format confidence values
+      final confidenceStr = result.perMarkerConfidence
+          .asMap()
+          .entries
+          .map((e) => '  ${['TL', 'TR', 'BR', 'BL'][e.key]}: ${(e.value * 100).toStringAsFixed(1)}%')
+          .join('\n');
+
+      setState(() {
+        _statusMessage = '''
+${result.isValid ? '✅' : '❌'} Marker Detection ${result.isValid ? 'Successful' : 'Failed'}!
+
+Detection time: ${stopwatch.elapsedMilliseconds}ms
+Markers found: ${result.allMarkersFound ? '4/4' : '${result.perMarkerConfidence.where((c) => c >= _markerDetector.minConfidence).length}/4'}
+Average confidence: ${(result.avgConfidence * 100).toStringAsFixed(1)}%
+
+Per-marker confidence:
+$confidenceStr
+
+Marker centers (TL, TR, BR, BL):
+${result.markerCenters.map((p) => '  (${p.x.toStringAsFixed(1)}, ${p.y.toStringAsFixed(1)})').join('\n')}
+
+${result.isValid ? 'All markers detected successfully! ✓' : 'Warning: Some markers have low confidence.'}
+''';
+        _isLoading = false;
+      });
+    } catch (e, stackTrace) {
+      setState(() {
+        _statusMessage = '❌ Error during marker detection:\n$e';
+        _isLoading = false;
+      });
+      print('Error during marker detection: $e');
+      print('Stack trace: $stackTrace');
+    }
+  }
+
+  @override
+  void dispose() {
+    _markerDetector.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -166,6 +243,12 @@ contrast-enhanced with CLAHE, and normalized.
                       onPressed: _testPreprocessing,
                       icon: const Icon(Icons.image_outlined),
                       label: const Text('Test Image Preprocessing'),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton.icon(
+                      onPressed: _testMarkerDetection,
+                      icon: const Icon(Icons.center_focus_strong),
+                      label: const Text('Test Marker Detection'),
                     ),
                   ],
                 ),

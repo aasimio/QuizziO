@@ -23,10 +23,10 @@
 		<dict>
 			<key>cdhash</key>
 			<data>
-			nauD+MW8sWMjml757f1F0HcLXaM=
+			EH1G915j/G2vxh6C6Pjdx0XF01Y=
 			</data>
 			<key>requirement</key>
-			<string>cdhash H"9dab83f8c5bcb163239a5ef9edfd45d0770b5da3"</string>
+			<string>cdhash H"107d46f75e63fc6dafc61e82e8f8ddc745c5d356"</string>
 		</dict>
 		<key>Frameworks/DartCvMacOS.framework</key>
 		<dict>
