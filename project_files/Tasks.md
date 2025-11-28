@@ -49,11 +49,11 @@ Update the file after completing each sub-task, not just after completing an ent
 
 ## Tasks
 
-- [ ]  **0.0 Create POC Flutter Project**
-    - [ ]  0.1 Create new Flutter project: `flutter create omr_spike`
-    - [ ]  0.2 Navigate into project: `cd omr_spike`
-    - [ ]  0.3 Add dependencies to `pubspec.yaml`:
-        
+- [x]  **0.0 Create POC Flutter Project**
+    - [x]  0.1 Create new Flutter project: `flutter create omr_spike`
+    - [x]  0.2 Navigate into project: `cd omr_spike`
+    - [x]  0.3 Add dependencies to `pubspec.yaml`:
+
         ```yaml
         dependencies:
           flutter:
@@ -62,18 +62,18 @@ Update the file after completing each sub-task, not just after completing an ent
           image: ^4.3.0
           path_provider: ^2.1.5
           image_picker: ^1.1.2  # For testing with gallery photos
-        
+
         ```
-        
-    - [ ]  0.4 Run `flutter pub get`
-    - [ ]  0.5 Check opencv_dart minimum SDK requirements in their documentation
-    - [ ]  0.6 Configure Android `minSdkVersion` in `android/app/build.gradle`:
+
+    - [x]  0.4 Run `flutter pub get`
+    - [x]  0.5 Check opencv_dart minimum SDK requirements in their documentation
+    - [x]  0.6 Configure Android `minSdkVersion` in `android/app/build.gradle`:
         - Set to 24 (or higher if opencv_dart requires)
         - Note: This may conflict with PRD's API 23 target — document this finding
-    - [ ]  0.7 Build and run on Android emulator/device — verify no opencv_dart build errors
-    - [ ]  0.8 Build and run on iOS simulator/device — verify no opencv_dart build errors
-    - [ ]  0.9 Create folder structure:
-        
+    - [x]  0.7 Build and run on Android emulator/device — verify no opencv_dart build errors
+    - [x]  0.8 Build and run on iOS simulator/device — verify no opencv_dart build errors
+    - [x]  0.9 Create folder structure:
+
         ```
         lib/
         ├── main.dart
@@ -82,11 +82,11 @@ Update the file after completing each sub-task, not just after completing an ent
         ├── utils/
         assets/
         test/
-        
+
         ```
-        
-    - [ ]  0.10 Create `lib/utils/cv_utils.dart` with helper for safe Mat disposal:
-        
+
+    - [x]  0.10 Create `lib/utils/cv_utils.dart` with helper for safe Mat disposal:
+
         ```dart
         /// Always use this to safely dispose cv.Mat objects
         void disposeMats(List<cv.Mat> mats) {
@@ -94,11 +94,11 @@ Update the file after completing each sub-task, not just after completing an ent
             mat.dispose();
           }
         }
-        
+
         ```
         
-- [ ]  **1.0 Prepare Test Assets & Template Configuration**
-    - [ ]  1.1 Define test template dimensions (reference size after perspective warp):
+- [x]  **1.0 Prepare Test Assets & Template Configuration**
+    - [x]  1.1 Define test template dimensions (reference size after perspective warp):
         
         ```dart
         // lib/models/template_config.dart
@@ -108,11 +108,11 @@ Update the file after completing each sub-task, not just after completing an ent
         
         ```
         
-    - [ ]  1.2 Create `marker.png`:
+    - [x]  1.2 Create `marker.png`:
         - Solid black square (#000000)
         - Size: 50x50 pixels (matches kMarkerSize)
         - Save to `assets/marker.png`
-    - [ ]  1.3 Define bubble positions for 5-question test template in `lib/models/template_config.dart`:
+    - [x]  1.3 Define bubble positions for 5-question test template in `lib/models/template_config.dart`:
         
         ```dart
         // Bubble positions relative to warped template (800x1100)
@@ -129,17 +129,17 @@ Update the file after completing each sub-task, not just after completing an ent
         
         ```
         
-    - [ ]  1.4 Create test answer sheet design (using Figma, Canva, or any design tool):
+    - [x]  1.4 Create test answer sheet design (using Figma, Canva, or any design tool):
         - Canvas size: 800x1100 pixels
         - 4 corner markers (50x50 black squares) positioned 20px from edges
         - "Name: ___________" region at top (y: 100-200)
         - 5 questions with bubbles A, B, C, D, E matching positions defined in 1.3
         - Bubble style: Empty circles with thin black outline
-    - [ ]  1.5 Export as `test_sheet_blank.png` and save to `assets/`
-    - [ ]  1.6 Create `test_sheet_filled.png` — **Two options:**
+    - [x]  1.5 Export as `test_sheet_blank.png` and save to `assets/`
+    - [x]  1.6 Create `test_sheet_filled.png` — **Two options:**
         - **Option A (Preferred):** Print blank sheet, fill bubbles with dark pen, photograph with phone, crop to just the sheet
         - **Option B (Digital fallback):** Use image editor to digitally fill some bubbles with dark gray/black
-    - [ ]  1.7 Record the "correct answers" for your filled test sheet:
+    - [x]  1.7 Record the "correct answers" for your filled test sheet:
         
         ```dart
         // What you filled in (for verification)
@@ -147,7 +147,7 @@ Update the file after completing each sub-task, not just after completing an ent
         
         ```
         
-    - [ ]  1.8 Add assets to `pubspec.yaml`:
+    - [x]  1.8 Add assets to `pubspec.yaml`:
         
         ```yaml
         flutter:
@@ -159,7 +159,7 @@ Update the file after completing each sub-task, not just after completing an ent
         
         ```
         
-    - [ ]  1.9 Create simple test in `main.dart` to verify assets load correctly:
+    - [x]  1.9 Create simple test in `main.dart` to verify assets load correctly:
         
         ```dart
         final byteData = await rootBundle.load('assets/marker.png');
@@ -167,8 +167,8 @@ Update the file after completing each sub-task, not just after completing an ent
         
         ```
         
-- [ ]  **2.0 Implement Image Preprocessor** *(NEW — from PRD requirements)*
-    - [ ]  2.1 Create `lib/services/image_preprocessor.dart` with class skeleton:
+- [x]  **2.0 Implement Image Preprocessor** *(NEW — from PRD requirements)*
+    - [x]  2.1 Create `lib/services/image_preprocessor.dart` with class skeleton:
         
         ```dart
         class ImagePreprocessor {
@@ -184,16 +184,16 @@ Update the file after completing each sub-task, not just after completing an ent
         
         ```
         
-    - [ ]  2.2 Implement `uint8ListToMat()`:
+    - [x]  2.2 Implement `uint8ListToMat()`:
         - Use `cv.imdecode()` to convert bytes to Mat
-    - [ ]  2.3 Implement `matToUint8List()`:
+    - [x]  2.3 Implement `matToUint8List()`:
         - Use `cv.imencode()` to convert Mat to bytes
-    - [ ]  2.4 Implement `preprocess()`:
+    - [x]  2.4 Implement `preprocess()`:
         - Convert to grayscale: `cv.cvtColorAsync(mat, cv.COLOR_BGR2GRAY)`
         - Apply CLAHE: `cv.createCLAHE()` then `clahe.applyAsync()`
         - Normalize: `cv.normalizeAsync(mat, 0, 255, cv.NORM_MINMAX)`
-    - [ ]  2.5 Add proper disposal of intermediate Mat objects
-    - [ ]  2.6 Test preprocessing on test image — verify output is grayscale and contrast-enhanced
+    - [x]  2.5 Add proper disposal of intermediate Mat objects
+    - [x]  2.6 Test preprocessing on test image — verify output is grayscale and contrast-enhanced
 - [ ]  **3.0 Implement Marker Detection**
     - [ ]  3.1 Create `lib/models/detection_result.dart` with data classes:
         

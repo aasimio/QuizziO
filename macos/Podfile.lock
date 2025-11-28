@@ -1,0 +1,74 @@
+PODS:
+  - DartCvMacOS (4.12.0.2):
+    - DartCvMacOS/calib3d (= 4.12.0.2)
+    - DartCvMacOS/contrib (= 4.12.0.2)
+    - DartCvMacOS/core (= 4.12.0.2)
+    - DartCvMacOS/features2d (= 4.12.0.2)
+    - DartCvMacOS/imgproc (= 4.12.0.2)
+    - DartCvMacOS/objdetect (= 4.12.0.2)
+    - DartCvMacOS/photo (= 4.12.0.2)
+    - DartCvMacOS/stitching (= 4.12.0.2)
+    - DartCvMacOS/video (= 4.12.0.2)
+  - DartCvMacOS/calib3d (4.12.0.2):
+    - DartCvMacOS/core
+  - DartCvMacOS/contrib (4.12.0.2):
+    - DartCvMacOS/core
+  - DartCvMacOS/core (4.12.0.2)
+  - DartCvMacOS/dnn (4.12.0.2):
+    - DartCvMacOS/core
+  - DartCvMacOS/features2d (4.12.0.2):
+    - DartCvMacOS/core
+  - DartCvMacOS/imgproc (4.12.0.2):
+    - DartCvMacOS/core
+  - DartCvMacOS/objdetect (4.12.0.2):
+    - DartCvMacOS/core
+  - DartCvMacOS/photo (4.12.0.2):
+    - DartCvMacOS/core
+  - DartCvMacOS/stitching (4.12.0.2):
+    - DartCvMacOS/core
+  - DartCvMacOS/video (4.12.0.2):
+    - DartCvMacOS/core
+  - DartCvMacOS/videoio (4.12.0.2):
+    - DartCvMacOS/core
+  - FlutterMacOS (1.0.0)
+  - opencv_dart (0.0.1):
+    - DartCvMacOS (= 4.12.0.2)
+    - DartCvMacOS/dnn (= 4.12.0.2)
+    - DartCvMacOS/videoio (= 4.12.0.2)
+    - FlutterMacOS
+  - path_provider_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
+  - printing (1.0.0):
+    - FlutterMacOS
+
+DEPENDENCIES:
+  - FlutterMacOS (from `Flutter/ephemeral`)
+  - opencv_dart (from `Flutter/ephemeral/.symlinks/plugins/opencv_dart/macos`)
+  - path_provider_foundation (from `Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/darwin`)
+  - printing (from `Flutter/ephemeral/.symlinks/plugins/printing/macos`)
+
+SPEC REPOS:
+  trunk:
+    - DartCvMacOS
+
+EXTERNAL SOURCES:
+  FlutterMacOS:
+    :path: Flutter/ephemeral
+  opencv_dart:
+    :path: Flutter/ephemeral/.symlinks/plugins/opencv_dart/macos
+  path_provider_foundation:
+    :path: Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/darwin
+  printing:
+    :path: Flutter/ephemeral/.symlinks/plugins/printing/macos
+
+SPEC CHECKSUMS:
+  DartCvMacOS: 10e8f6cd2d6e968a967cec0b5d67682a00f28c9e
+  FlutterMacOS: d0db08ddef1a9af05a5ec4b724367152bb0500b1
+  opencv_dart: 8a5da02f57a563fc9d3cc2513a1cf02325ce18f7
+  path_provider_foundation: bb55f6dbba17d0dccd6737fe6f7f34fbd0376880
+  printing: c4cf83c78fd684f9bc318e6aadc18972aa48f617
+
+PODFILE CHECKSUM: 54d867c82ac51cbd61b565781b9fada492027009
+
+COCOAPODS: 1.16.2

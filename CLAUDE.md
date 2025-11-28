@@ -390,18 +390,45 @@ Follow the technical implementation standards in the sections above, including:
 
 ## Dependencies
 
-Current dependencies:
+All required dependencies are installed:
 - `cupertino_icons` - iOS style icons
-- `flutter_lints` - Recommended lints (dev dependency)
-
-**Required dependencies** to be added as features are implemented:
 - `flutter_bloc` + `equatable` - State management
 - `get_it` + `injectable` - Dependency injection
 - `hive` + `hive_flutter` - Local storage
 - `camera` - Camera access for OMR
-- `opencv_dart` - Image processing for OMR
+- `opencv_dart` ^1.4.3 - Image processing for OMR
 - `pdf` + `printing` - PDF generation
 - `path_provider` - File system paths
 - `permission_handler` - Camera/storage permissions
+- `flutter_lints` - Recommended lints (dev dependency)
+- `build_runner`, `injectable_generator`, `hive_generator` - Code generation (dev dependencies)
 
 When adding new dependencies, run `flutter pub get` to install them.
+
+# Progress
+
+## Session: 2025-11-28
+
+**Task 0.0 Completed: POC Flutter Project Created**
+- Created `omr_spike/` POC project with opencv_dart v1.4.3, image, path_provider, image_picker
+- Configured Android minSdkVersion to 24 (⚠️ opencv_dart requires API 24+, conflicts with PRD's API 23 target)
+- Verified iOS build (pods installed, Xcode build successful)
+- Created folder structure: `lib/{models,services,utils}/`, `assets/`, `test/`
+- Created `lib/utils/cv_utils.dart` helper for Mat disposal
+
+**Task 1.0 Completed: Test Assets & Template Configuration**
+- Created `lib/models/template_config.dart` with template dimensions (800x1100), bubble positions (5 questions x 5 options)
+- Generated `assets/marker.png` (50x50 solid black square)
+- Generated `assets/test_sheet_blank.png` (800x1100 with corner markers, name field, and 5 questions)
+- Generated `assets/test_sheet_filled.png` with answers: Q1=B, Q2=A, Q3=D, Q4=C, Q5=E
+- Recorded test answers in `kTestSheetAnswers` constant for verification
+- Added assets to `pubspec.yaml`
+- Created asset loading test UI in `main.dart`
+
+**Task 2.0 Completed: Image Preprocessor**
+- Implemented `lib/services/image_preprocessor.dart`: uint8ListToMat(), matToUint8List(), preprocess()
+- Preprocessing pipeline: grayscale → CLAHE → normalization with proper Mat disposal
+- Added test UI button in `main.dart`, verified macOS build succeeds
+- Note: opencv_dart tests require platform runtime (cannot use `flutter test`)
+
+**Next: Task 3.0** - Implement Marker Detection

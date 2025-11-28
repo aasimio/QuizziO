@@ -1,0 +1,35 @@
+dependencies: \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/dartcv/core/core.cpp \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/Target\ Support\ Files/DartCvMacOS/DartCvMacOS-prefix.pch \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/dartcv/core/core.h \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/dartcv/core/types.h \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/libopencv/include/opencv4/opencv2/core.hpp \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/libopencv/include/opencv4/opencv2/core/cvdef.h \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/libopencv/include/opencv4/opencv2/core/version.hpp \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/libopencv/include/opencv4/opencv2/core/hal/interface.h \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/libopencv/include/opencv4/opencv2/core/cv_cpu_dispatch.h \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/libopencv/include/opencv4/opencv2/core/base.hpp \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/libopencv/include/opencv4/opencv2/opencv_modules.hpp \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/libopencv/include/opencv4/opencv2/core/cvstd.hpp \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/libopencv/include/opencv4/opencv2/core/cvstd_wrapper.hpp \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/libopencv/include/opencv4/opencv2/core/neon_utils.hpp \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/libopencv/include/opencv4/opencv2/core/vsx_utils.hpp \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/libopencv/include/opencv4/opencv2/core/check.hpp \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/libopencv/include/opencv4/opencv2/core/traits.hpp \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/libopencv/include/opencv4/opencv2/core/matx.hpp \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/libopencv/include/opencv4/opencv2/core/saturate.hpp \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/libopencv/include/opencv4/opencv2/core/fast_math.hpp \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/libopencv/include/opencv4/opencv2/core/matx.inl.hpp \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/libopencv/include/opencv4/opencv2/core/types.hpp \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/libopencv/include/opencv4/opencv2/core/mat.hpp \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/libopencv/include/opencv4/opencv2/core/bufferpool.hpp \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/libopencv/include/opencv4/opencv2/core/mat.inl.hpp \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/libopencv/include/opencv4/opencv2/core/persistence.hpp \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/libopencv/include/opencv4/opencv2/core/operations.hpp \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/libopencv/include/opencv4/opencv2/core/cvstd.inl.hpp \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/libopencv/include/opencv4/opencv2/core/utility.hpp \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/libopencv/include/opencv4/opencv2/core/optim.hpp \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/libopencv/include/opencv4/opencv2/core/ovx.hpp \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/dartcv/core/lut.hpp \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/dartcv/core/vec.hpp \
+  /Users/aasimahmed/Cursor/QuizziO/macos/Pods/DartCvMacOS/dartcv/core/stdvec.h
