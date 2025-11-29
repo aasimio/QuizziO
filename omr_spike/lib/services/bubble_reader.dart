@@ -26,10 +26,22 @@ class BubbleReader {
   /// [bubblePositions] - Map of question IDs to list of bubble rectangles
   ///
   /// Returns [BubbleReadResult] with intensity values for each bubble
-  Future<BubbleReadResult> readAllBubbles(
+  ///
+  /// Throws [ArgumentError] if inputs are invalid
+  BubbleReadResult readAllBubbles(
     cv.Mat alignedImage,
     Map<String, List<Rect>> bubblePositions,
-  ) async {
+  ) {
+    // Validate aligned image is not empty or disposed
+    if (alignedImage.isEmpty) {
+      throw ArgumentError('Aligned image cannot be empty or disposed');
+    }
+
+    // Validate bubble positions map is not empty
+    if (bubblePositions.isEmpty) {
+      throw ArgumentError('Bubble positions cannot be empty');
+    }
+
     final bubbleValues = <String, List<double>>{};
     final allValues = <double>[];
 
@@ -42,7 +54,7 @@ class BubbleReader {
 
       // Read each bubble for this question
       for (final position in positions) {
-        final intensity = await _readSingleBubble(alignedImage, position);
+        final intensity = _readSingleBubble(alignedImage, position);
         questionValues.add(intensity);
         allValues.add(intensity);
       }
@@ -66,7 +78,7 @@ class BubbleReader {
   /// Higher values indicate lighter (unfilled) bubbles
   ///
   /// Throws [ArgumentError] if inputs are invalid
-  Future<double> _readSingleBubble(cv.Mat image, Rect position) async {
+  double _readSingleBubble(cv.Mat image, Rect position) {
     // Validate image is grayscale (single channel)
     if (image.channels != 1) {
       throw ArgumentError(
