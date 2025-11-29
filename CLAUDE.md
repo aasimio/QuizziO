@@ -436,4 +436,12 @@ When adding new dependencies, run `flutter pub get` to install them.
 - Outputs warped 800x1100 image saved to device using path_provider
 - ✅ Build successful, integration test ready
 
-**Next: Task 5.0** - Implement Bubble Reading
+**Task 5.0: Bubble Reading**
+- Implemented bubble_reader.dart: extracts mean intensity values from bubble ROIs
+- BubbleReadResult class stores per-question bubble values and flattened list for threshold calculation
+- _readSingleBubble() method: extracts ROI, calculates mean intensity (0-255), disposes Mat
+- readAllBubbles() method: iterates through all questions/bubbles, returns intensity values
+- Added test UI button to verify full pipeline: preprocess → detect → transform → read bubbles
+- ✅ Implementation complete, ready for testing
+
+**Next: Task 6.0** - Implement Threshold Calculator & Answer Extractor

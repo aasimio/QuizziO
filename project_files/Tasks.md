@@ -329,26 +329,26 @@ Update the file after completing each sub-task, not just after completing an ent
         - Load test image → preprocess → detect markers → transform
         - Save warped output to device using path_provider
         - Visually verify the output is correctly aligned (rectangular, markers at corners)
-- [ ]  **5.0 Implement Bubble Reading**
-    - [ ]  5.1 Create `lib/services/bubble_reader.dart` with class skeleton:
-        
+- [x]  **5.0 Implement Bubble Reading**
+    - [x]  5.1 Create `lib/services/bubble_reader.dart` with class skeleton:
+
         ```dart
         class BubbleReadResult {
           final Map<String, List<double>> bubbleValues; // {'q1': [45.2, 180.5, ...]}
           final List<double> allValues; // Flattened for threshold calculation
         }
-        
+
         class BubbleReader {
           Future<BubbleReadResult> readAllBubbles(
             cv.Mat alignedImage,
             Map<String, List<Rect>> bubblePositions,
           );
         }
-        
+
         ```
-        
-    - [ ]  5.2 Implement `_readSingleBubble()`:
-        
+
+    - [x]  5.2 Implement `_readSingleBubble()`:
+
         ```dart
         Future<double> _readSingleBubble(cv.Mat image, Rect position) async {
           // Extract ROI
@@ -358,23 +358,23 @@ Update the file after completing each sub-task, not just after completing an ent
             position.width.toInt(),
             position.height.toInt(),
           ));
-        
+
           // Calculate mean intensity
           final mean = await cv.meanAsync(roi);
           roi.dispose(); // Important!
-        
+
           return mean.val1; // Grayscale mean value (0-255)
         }
-        
+
         ```
-        
-    - [ ]  5.3 Implement `readAllBubbles()`:
+
+    - [x]  5.3 Implement `readAllBubbles()`:
         - Iterate through all questions and their bubble positions
         - Read each bubble's mean intensity
         - Collect into `bubbleValues` map
         - Flatten all values into `allValues` list
         - Return `BubbleReadResult`
-    - [ ]  5.4 Test bubble reading on aligned test image — verify values are captured
+    - [x]  5.4 Test bubble reading on aligned test image — verify values are captured
 - [ ]  **6.0 Implement Threshold Calculator & Answer Extractor**
     - [ ]  6.1 Create `lib/services/threshold_calculator.dart`:
         

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:omr_spike/services/image_preprocessor.dart';
 import 'package:omr_spike/services/marker_detector.dart';
 import 'package:omr_spike/services/perspective_transformer.dart';
+import 'package:omr_spike/services/bubble_reader.dart';
 import 'package:omr_spike/models/template_config.dart';
 import 'package:opencv_dart/opencv_dart.dart' as cv;
 import 'package:path_provider/path_provider.dart';
@@ -42,6 +43,7 @@ class _AssetTestPageState extends State<AssetTestPage> {
   final ImagePreprocessor _preprocessor = ImagePreprocessor();
   final MarkerDetector _markerDetector = MarkerDetector();
   final PerspectiveTransformer _perspectiveTransformer = PerspectiveTransformer();
+  final BubbleReader _bubbleReader = BubbleReader();
 
   Future<void> _testAssetLoading() async {
     setState(() {
@@ -301,6 +303,139 @@ You can manually verify the warped image is correctly aligned by checking the sa
     }
   }
 
+  Future<void> _testBubbleReading() async {
+    setState(() {
+      _isLoading = true;
+      _statusMessage = 'Testing bubble reading...';
+    });
+
+    try {
+      final stopwatch = Stopwatch()..start();
+
+      // 1. Load marker template
+      final markerData = await rootBundle.load('assets/marker.png');
+      final markerBytes = markerData.buffer.asUint8List();
+      await _markerDetector.loadMarkerTemplate(markerBytes);
+      print('✓ Marker template loaded');
+
+      // 2. Load test image (filled sheet)
+      final imageData = await rootBundle.load('assets/test_sheet_filled.png');
+      final imageBytes = imageData.buffer.asUint8List();
+      print('✓ Test image loaded: ${imageBytes.length} bytes');
+
+      // 3. Preprocess image
+      final mat = _preprocessor.uint8ListToMat(imageBytes);
+      final processed = await _preprocessor.preprocess(mat);
+      mat.dispose();
+      print('✓ Image preprocessed: ${processed.rows}x${processed.cols}');
+
+      // 4. Detect markers
+      final markerResult = await _markerDetector.detect(processed);
+      print('✓ Markers detected: ${markerResult.allMarkersFound ? '4/4' : 'Failed'}');
+
+      if (!markerResult.isValid) {
+        processed.dispose();
+        setState(() {
+          _statusMessage = '❌ Failed: Could not detect all 4 markers';
+          _isLoading = false;
+        });
+        return;
+      }
+
+      // 5. Transform perspective
+      final warped = await _perspectiveTransformer.transform(
+        processed,
+        markerResult.markerCenters,
+        kTemplateWidth,
+        kTemplateHeight,
+      );
+      processed.dispose();
+      print('✓ Perspective transform applied: ${warped.rows}x${warped.cols}');
+
+      // 6. Read all bubbles
+      final bubbleResult = await _bubbleReader.readAllBubbles(warped, kBubblePositions);
+      warped.dispose();
+      stopwatch.stop();
+
+      print('✓ Bubble reading completed in ${stopwatch.elapsedMilliseconds}ms');
+      print('  Total bubbles read: ${bubbleResult.allValues.length}');
+
+      // Format bubble values for each question
+      final options = ['A', 'B', 'C', 'D', 'E'];
+      final bubbleValuesStr = bubbleResult.bubbleValues.entries.map((entry) {
+        final question = entry.key;
+        final values = entry.value;
+        final valuesStr = values
+            .asMap()
+            .entries
+            .map((e) => '${options[e.key]}: ${e.value.toStringAsFixed(1)}')
+            .join(', ');
+        return '  $question: $valuesStr';
+      }).join('\n');
+
+      // Statistics
+      final allValues = bubbleResult.allValues;
+
+      // Guard against empty list to prevent StateError
+      if (allValues.isEmpty) {
+        setState(() {
+          _statusMessage = '''
+⚠️ Bubble Reading Warning
+
+Total processing time: ${stopwatch.elapsedMilliseconds}ms
+Questions: ${bubbleResult.bubbleValues.length}
+Total bubbles: 0
+
+No bubble values were read. This could indicate:
+• Empty bubble positions configuration
+• Template configuration error
+• Image processing failure
+
+Please check the template configuration.
+''';
+          _isLoading = false;
+        });
+        return;
+      }
+
+      final minValue = allValues.reduce((a, b) => a < b ? a : b);
+      final maxValue = allValues.reduce((a, b) => a > b ? a : b);
+      final avgValue = allValues.reduce((a, b) => a + b) / allValues.length;
+
+      setState(() {
+        _statusMessage = '''
+✅ Bubble Reading Successful!
+
+Total processing time: ${stopwatch.elapsedMilliseconds}ms
+Questions: ${bubbleResult.bubbleValues.length}
+Total bubbles: ${bubbleResult.allValues.length}
+
+Bubble intensity values (0=black, 255=white):
+$bubbleValuesStr
+
+Statistics:
+• Min intensity: ${minValue.toStringAsFixed(1)} (darkest)
+• Max intensity: ${maxValue.toStringAsFixed(1)} (lightest)
+• Average: ${avgValue.toStringAsFixed(1)}
+• Range: ${(maxValue - minValue).toStringAsFixed(1)}
+
+Lower values indicate filled (darker) bubbles.
+Higher values indicate unfilled (lighter) bubbles.
+
+Next step: Implement threshold calculator to determine which bubbles are filled.
+''';
+        _isLoading = false;
+      });
+    } catch (e, stackTrace) {
+      setState(() {
+        _statusMessage = '❌ Error during bubble reading:\n$e';
+        _isLoading = false;
+      });
+      print('Error during bubble reading: $e');
+      print('Stack trace: $stackTrace');
+    }
+  }
+
   @override
   void dispose() {
     _markerDetector.dispose();
@@ -359,6 +494,12 @@ You can manually verify the warped image is correctly aligned by checking the sa
                       onPressed: _testPerspectiveTransform,
                       icon: const Icon(Icons.transform),
                       label: const Text('Test Perspective Transform'),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton.icon(
+                      onPressed: _testBubbleReading,
+                      icon: const Icon(Icons.circle_outlined),
+                      label: const Text('Test Bubble Reading'),
                     ),
                   ],
                 ),
