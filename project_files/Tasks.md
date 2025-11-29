@@ -375,28 +375,28 @@ Update the file after completing each sub-task, not just after completing an ent
         - Flatten all values into `allValues` list
         - Return `BubbleReadResult`
     - [x]  5.4 Test bubble reading on aligned test image — verify values are captured
-- [ ]  **6.0 Implement Threshold Calculator & Answer Extractor**
-    - [ ]  6.1 Create `lib/services/threshold_calculator.dart`:
-        
+- [x]  **6.0 Implement Threshold Calculator & Answer Extractor**
+    - [x]  6.1 Create `lib/services/threshold_calculator.dart`:
+
         ```dart
         class ThresholdResult {
           final double threshold;
           final double confidence; // Based on gap size
           final double maxGap;
         }
-        
+
         class ThresholdCalculator {
           final int minJump;
           final int looseness;
-        
+
           ThresholdCalculator({this.minJump = 20, this.looseness = 4});
-        
+
           ThresholdResult calculate(List<double> allBubbleValues);
         }
-        
+
         ```
-        
-    - [ ]  6.2 Implement `calculate()` using gap-finding algorithm:
+
+    - [x]  6.2 Implement `calculate()` using gap-finding algorithm:
         
         ```dart
         ThresholdResult calculate(List<double> values) {
@@ -427,8 +427,8 @@ Update the file after completing each sub-task, not just after completing an ent
         }
         
         ```
-        
-    - [ ]  6.3 Implement answer extraction logic:
+
+    - [x]  6.3 Implement answer extraction logic:
         
         ```dart
         enum AnswerStatus { valid, blank, multipleMark }
@@ -473,13 +473,13 @@ Update the file after completing each sub-task, not just after completing an ent
         }
         
         ```
-        
-    - [ ]  6.4 Create `test/threshold_calculator_test.dart`:
+
+    - [x]  6.4 Create `test/threshold_calculator_test.dart`:
         - Test with clear bimodal distribution (e.g., [40, 45, 50, 180, 185, 190]) → should find threshold ~115
         - Test with all high values (no marks) → should handle gracefully
         - Test with all low values (all filled) → should handle gracefully
         - Test edge case: single value
-    - [ ]  6.5 Run tests: `flutter test test/threshold_calculator_test.dart`
+    - [x]  6.5 Run tests: `flutter test test/threshold_calculator_test.dart`
 - [ ]  **7.0 Build OMR Pipeline & Test UI**
     - [ ]  7.1 Create `lib/omr_pipeline.dart` that orchestrates all services:
         
