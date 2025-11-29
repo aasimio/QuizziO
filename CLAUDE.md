@@ -447,12 +447,13 @@ When adding new dependencies, run `flutter pub get` to install them.
 ## Session: 2025-11-29
 
 **Task 6.0: Threshold Calculator & Answer Extractor**
-- Implemented threshold_calculator.dart: gap-finding algorithm with smoothing
-- ThresholdResult class: stores threshold, confidence (based on gap size), maxGap
-- ExtractedAnswer class: answer value + status (valid/blank/multipleMark)
-- Calculate() method: sorts values, applies moving average smoothing, finds largest gap ≥ minJump
-- extractAnswers() method: identifies filled bubbles (intensity < threshold), detects valid/blank/multiple marks
-- Created comprehensive unit tests: 9/9 passing (bimodal distribution, edge cases, multi-question scenarios)
-- ✅ All tests passed
+- Implemented threshold_calculator.dart: gap-finding algorithm with moving average smoothing
+- extractAnswers() identifies filled bubbles (intensity < threshold), detects valid/blank/multiple marks
+- ✅ Unit tests: 9/9 passing
 
-**Next: Task 7.0** - Build OMR Pipeline & Test UI
+**Task 7.0: Build OMR Pipeline & Test UI**
+- Implemented omr_pipeline.dart: orchestrates preprocess → detect → transform → read → threshold → extract
+- Test UI: load images from assets/gallery, run full pipeline, display results with answer validation
+- ✅ App running on macOS, ready for end-to-end testing
+
+**Next: Task 8.0** - End-to-End Validation & Go/No-Go Decision
