@@ -23,10 +23,7 @@ class ExtractedAnswer {
   final String? value;
   final AnswerStatus status;
 
-  const ExtractedAnswer({
-    required this.value,
-    required this.status,
-  });
+  const ExtractedAnswer({required this.value, required this.status});
 
   @override
   String toString() {
@@ -38,18 +35,11 @@ class ThresholdCalculator {
   final int minJump;
   final int looseness;
 
-  ThresholdCalculator({
-    this.minJump = 20,
-    this.looseness = 4,
-  });
+  ThresholdCalculator({this.minJump = 20, this.looseness = 4});
 
   ThresholdResult calculate(List<double> allBubbleValues) {
     if (allBubbleValues.isEmpty) {
-      return const ThresholdResult(
-        threshold: 128,
-        confidence: 0,
-        maxGap: 0,
-      );
+      return const ThresholdResult(threshold: 128, confidence: 0, maxGap: 0);
     }
 
     // Sort values ascending
@@ -78,7 +68,9 @@ class ThresholdCalculator {
     // Expected input range: 0-255 (grayscale intensity from bubble_reader)
     // Using actual max makes code robust to input range changes and prevents confidence > 1.0
     final actualMax = sorted.isNotEmpty ? sorted.last : 0.0;
-    final divisor = actualMax > 0 ? actualMax : 1.0; // Fallback to 1.0 if max is zero
+    final divisor = actualMax > 0
+        ? actualMax
+        : 1.0; // Fallback to 1.0 if max is zero
     final confidence = (maxGap / divisor).clamp(0.0, 1.0);
 
     return ThresholdResult(
@@ -130,10 +122,20 @@ class ThresholdCalculator {
           status: AnswerStatus.blank,
         );
       } else if (filledIndices.length == 1) {
-        results[question] = ExtractedAnswer(
-          value: options[filledIndices.first],
-          status: AnswerStatus.valid,
-        );
+        final index = filledIndices.first;
+        // Validate index is within bounds of options array
+        if (index >= 0 && index < options.length && options.isNotEmpty) {
+          results[question] = ExtractedAnswer(
+            value: options[index],
+            status: AnswerStatus.valid,
+          );
+        } else {
+          // Invalid index - mark as blank to avoid crash
+          results[question] = const ExtractedAnswer(
+            value: null,
+            status: AnswerStatus.blank,
+          );
+        }
       } else {
         results[question] = const ExtractedAnswer(
           value: null,
