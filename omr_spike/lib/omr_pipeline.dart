@@ -141,14 +141,14 @@ class OmrPipeline {
       processed?.dispose();
       aligned?.dispose();
 
-      // Log error details securely (not exposed to user)
+      // Log error details for debugging (not exposed to user)
       print('Pipeline error: $e');
       print('Stack trace: $stackTrace');
 
       stopwatch.stop();
       return OmrResult(
         success: false,
-        errorMessage: 'Pipeline error: $e',
+        errorMessage: 'An error occurred while processing the image',
         processingTimeMs: stopwatch.elapsedMilliseconds,
       );
     }

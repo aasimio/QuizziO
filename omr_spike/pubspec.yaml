@@ -68,6 +68,7 @@ flutter:
     - assets/marker.png
     - assets/test_sheet_blank.png
     - assets/test_sheet_filled.png
+    - assets/gallery/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
