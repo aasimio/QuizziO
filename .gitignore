@@ -32,6 +32,10 @@ migrate_working_dir/
 .pub/
 /build/
 
+# Temporary files
+a.
+"Git Commits Complete.md"
+
 # Symbolication related
 app.*.symbols
 
