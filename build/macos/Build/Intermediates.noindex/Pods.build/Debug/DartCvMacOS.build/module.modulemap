@@ -1,6 +1,0 @@
-framework module DartCvMacOS {
-  umbrella header "DartCvMacOS-umbrella.h"
-
-  export *
-  module * { export * }
-}
