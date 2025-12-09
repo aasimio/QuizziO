@@ -69,10 +69,12 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             const Text(
               'Camera Integration Spike',
+              key: Key('home_title_text'),
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 32),
             ElevatedButton.icon(
+              key: Key('camera_test_button'),
               onPressed: () {
                 Navigator.push(
                   context,

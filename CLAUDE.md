@@ -405,38 +405,38 @@ All required dependencies are installed:
 
 When adding new dependencies, run `flutter pub get` to install them.
 
-# Progress
+# Progress (pre build testing)
 
 ## Session: 2025-11-28
 
-**Task 0.0: POC Project Setup**
+**POC Project Setup**
 - Created `omr_spike/` with opencv_dart v1.4.3, configured Android minSdkVersion 24
 - ⚠️ opencv_dart requires API 24+, conflicts with PRD's API 23 target
 - Verified iOS/macOS builds, created folder structure
 
-**Task 1.0: Test Assets & Template Configuration**
+**Test Assets & Template Configuration**
 - Created template_config.dart (800x1100, 5 questions × 5 options)
 - Generated marker.png, test_sheet_blank.png, test_sheet_filled.png
 - Answers: Q1=B, Q2=A, Q3=D, Q4=C, Q5=E
 
-**Task 2.0: Image Preprocessor**
+**Image Preprocessor**
 - Implemented image_preprocessor.dart: grayscale → CLAHE → normalization
 - Added test UI button, verified macOS build
 
-**Task 3.0: Marker Detection**
+**Marker Detection**
 - Implemented marker_detector.dart: multi-scale template matching (cv.TM_CCOEFF_NORMED)
 - Quadrant-based search (TL, TR, BR, BL) with scales [0.85, 1.0, 1.15]
 - Added test UI button
 - ✅ Test verified: 4/4 markers detected, 100% confidence, 198ms processing time
 
-**Task 4.0: Perspective Transform**
+**Perspective Transform**
 - Implemented perspective_transformer.dart: 4-point perspective warp using cv.getPerspectiveTransform
 - Point ordering algorithm: sort by sum (TL/BR) and diff (TR/BL) for consistent orientation
 - Added test UI button to verify full pipeline: preprocess → detect → transform → save
 - Outputs warped 800x1100 image saved to device using path_provider
 - ✅ Build successful, integration test ready
 
-**Task 5.0: Bubble Reading**
+**Bubble Reading**
 - Implemented bubble_reader.dart: extracts mean intensity values from bubble ROIs
 - BubbleReadResult class stores per-question bubble values and flattened list for threshold calculation
 - _readSingleBubble() method: extracts ROI, calculates mean intensity (0-255), disposes Mat
@@ -446,17 +446,17 @@ When adding new dependencies, run `flutter pub get` to install them.
 
 ## Session: 2025-11-29
 
-**Task 6.0: Threshold Calculator & Answer Extractor**
+**Threshold Calculator & Answer Extractor**
 - Implemented threshold_calculator.dart: gap-finding algorithm with moving average smoothing
 - extractAnswers() identifies filled bubbles (intensity < threshold), detects valid/blank/multiple marks
 - ✅ Unit tests: 9/9 passing
 
-**Task 7.0: Build OMR Pipeline & Test UI**
+**Build OMR Pipeline & Test UI**
 - Implemented omr_pipeline.dart: orchestrates preprocess → detect → transform → read → threshold → extract
 - Test UI: load images from assets/gallery, run full pipeline, display results with answer validation
 - ✅ App running on macOS, ready for end-to-end testing
 
-**Task 8.0: End-to-End Validation & Go/No-Go Decision**
+**End-to-End Validation & Go/No-Go Decision**
 - Created 7 test image variations: original, rotated (±10°/15°), dim/bright lighting, noisy, combined
 - Generated images using Python/Pillow script
 - Validated pipeline on all variations via UI testing
@@ -465,3 +465,4 @@ When adding new dependencies, run `flutter pub get` to install them.
 - Created comprehensive SPIKE_RESULTS.md documenting findings, metrics, and migration path
 - Key finding: Android API 24+ required (acceptable, 97% device coverage)
 - ✅ Spike complete - ready to port to main QuizziO project
+

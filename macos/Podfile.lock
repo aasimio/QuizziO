@@ -41,12 +41,15 @@ PODS:
     - FlutterMacOS
   - printing (1.0.0):
     - FlutterMacOS
+  - share_plus (0.0.1):
+    - FlutterMacOS
 
 DEPENDENCIES:
   - FlutterMacOS (from `Flutter/ephemeral`)
   - opencv_dart (from `Flutter/ephemeral/.symlinks/plugins/opencv_dart/macos`)
   - path_provider_foundation (from `Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/darwin`)
   - printing (from `Flutter/ephemeral/.symlinks/plugins/printing/macos`)
+  - share_plus (from `Flutter/ephemeral/.symlinks/plugins/share_plus/macos`)
 
 SPEC REPOS:
   trunk:
@@ -61,6 +64,8 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/darwin
   printing:
     :path: Flutter/ephemeral/.symlinks/plugins/printing/macos
+  share_plus:
+    :path: Flutter/ephemeral/.symlinks/plugins/share_plus/macos
 
 SPEC CHECKSUMS:
   DartCvMacOS: 10e8f6cd2d6e968a967cec0b5d67682a00f28c9e
@@ -68,6 +73,7 @@ SPEC CHECKSUMS:
   opencv_dart: 8a5da02f57a563fc9d3cc2513a1cf02325ce18f7
   path_provider_foundation: bb55f6dbba17d0dccd6737fe6f7f34fbd0376880
   printing: c4cf83c78fd684f9bc318e6aadc18972aa48f617
+  share_plus: 3c787998077d6b31e839225a282e9e27edf99274
 
 PODFILE CHECKSUM: 54d867c82ac51cbd61b565781b9fada492027009
 

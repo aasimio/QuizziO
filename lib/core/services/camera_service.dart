@@ -43,11 +43,11 @@ class CameraService {
       );
 
       // Create controller with high resolution (not max per CLAUDE.md)
+      // imageFormatGroup left as platform default (yuv420 on Android, bgra8888 on iOS)
       _controller = CameraController(
         camera,
         ResolutionPreset.high,
         enableAudio: false,
-        imageFormatGroup: ImageFormatGroup.yuv420, // Android default
       );
 
       // Initialize controller

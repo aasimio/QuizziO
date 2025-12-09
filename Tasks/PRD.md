@@ -114,6 +114,7 @@ We will build a **native Flutter OMR scanning engine** using `opencv_dart` for i
 3. Corner markers are clearly visible (not torn/covered)
 4. Camera has at least 8MP resolution
 5. Sheet is placed on contrasting background
+6. Template coordinates are fixed-pixel at 300 DPI reference; multi-scale marker detection (±15%) handles typical printing variance
 
 ### 3.4 Constraints
 
@@ -122,6 +123,7 @@ We will build a **native Flutter OMR scanning engine** using `opencv_dart` for i
 | `opencv_dart` API stability | May need updates | Pin version, abstract interfaces |
 | Mobile processing power | Affects scan speed | Optimize algorithms, test on low-end devices |
 | Camera quality variance | Affects detection | Adaptive thresholds, user guidance |
+| Print DPI variance | May cause marker detection issues | Multi-scale matching at 85%, 100%, 115% handles ±15% variance; DPI-agnostic coordinates deferred to v2.0 |
 
 ---
 

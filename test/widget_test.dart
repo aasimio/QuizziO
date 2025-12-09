@@ -15,9 +15,9 @@ void main() {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const MyApp());
 
-    // Verify that the app loads with the camera test button
-    expect(find.text('Camera Integration Spike'), findsOneWidget);
-    expect(find.text('Test Camera + Marker Detection'), findsOneWidget);
+    // Verify home screen elements: title text, camera test button, and icon
+    expect(find.byKey(const Key('home_title_text')), findsOneWidget);
+    expect(find.byKey(const Key('camera_test_button')), findsOneWidget);
     expect(find.byIcon(Icons.camera_alt), findsOneWidget);
   });
 }
