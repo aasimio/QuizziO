@@ -133,21 +133,21 @@
 
 ---
 
-- [ ] **0.2 Hive Setup**
-  - [ ] 0.2.1 Create `lib/core/constants/hive_boxes.dart`:
+- [x] **0.2 Hive Setup**
+  - [x] 0.2.1 Create `lib/core/constants/hive_boxes.dart`:
     ```dart
     class HiveBoxes {
       static const String quizzes = 'quizzes';
       static const String scanResults = 'scan_results';
     }
     ```
-  - [ ] 0.2.2 Initialize Hive in `main.dart`:
+  - [x] 0.2.2 Initialize Hive in `main.dart`:
     ```dart
     await Hive.initFlutter();
-    await Hive.openBox<QuizModel>(HiveBoxes.quizzes);
-    await Hive.openBox<ScanResultModel>(HiveBoxes.scanResults);
+    await Hive.openBox(HiveBoxes.quizzes);  // Untyped for now
+    await Hive.openBox(HiveBoxes.scanResults);  // Will be typed in Phase 1
     ```
-  - **Done when:** Hive boxes open without errors
+  - **Done when:** Hive boxes open without errors ✅
 
 ---
 
