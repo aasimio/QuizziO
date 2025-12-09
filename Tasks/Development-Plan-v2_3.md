@@ -151,12 +151,12 @@
 
 ---
 
-- [ ] **0.3 Dependency Injection**
-  - [ ] 0.3.1 Create `lib/injection.dart` with `@InjectableInit()` annotation
-  - [ ] 0.3.2 Configure services, repos, BLoCs with `@injectable`, `@singleton`, `@lazySingleton`
-  - [ ] 0.3.3 Register in `main.dart`: `configureDependencies()` before `runApp()`
-  - [ ] 0.3.4 Run: `dart run build_runner build --delete-conflicting-outputs`
-  - **Done when:** `injection.config.dart` generated, no DI errors
+- [x] **0.3 Dependency Injection**
+  - [x] 0.3.1 Create `lib/injection.dart` with `@InjectableInit()` annotation
+  - [x] 0.3.2 Configure services, repos, BLoCs with `@injectable`, `@singleton`, `@lazySingleton`
+  - [x] 0.3.3 Register in `main.dart`: `configureDependencies()` before `runApp()`
+  - [x] 0.3.4 Run: `dart run build_runner build --delete-conflicting-outputs`
+  - **Done when:** `injection.config.dart` generated, no DI errors ✅
 
 ---
 

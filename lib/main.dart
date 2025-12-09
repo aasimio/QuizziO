@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'core/constants/hive_boxes.dart';
+import 'injection.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Configure dependency injection
+  configureDependencies();
   
   // Initialize Hive
   await Hive.initFlutter();
