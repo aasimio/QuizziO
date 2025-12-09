@@ -45,5 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>QuizziO needs camera access to scan answer sheets for grading.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>QuizziO needs photo library access to save scanned answer sheets.</string>
 </dict>
 </plist>
