@@ -189,16 +189,16 @@
 
 ---
 
-- [ ] **0.6 Camera Integration Spike**
-  - [ ] 0.6.1 Create `lib/core/services/camera_service.dart`:
+- [x] **0.6 Camera Integration Spike**
+  - [x] 0.6.1 Create `lib/core/services/camera_service.dart`:
     - Init camera with `availableCameras()`
     - Expose `Stream<CameraImage>` for preview
     - Provide `captureImage()` for high-res still
-  - [ ] 0.6.2 Create minimal test page showing camera preview
-  - [ ] 0.6.3 Test on both Android (YUV420) and iOS (BGRA8888)
-  - [ ] 0.6.4 Convert `CameraImage` → `Uint8List` → feed to `MarkerDetector`
-  - [ ] 0.6.5 Verify marker detection works in real-time (10 FPS)
-  - **Done when:** Camera preview shows, markers detected live, prints coordinates
+  - [x] 0.6.2 Create minimal test page showing camera preview
+  - [x] 0.6.3 Test on both Android (YUV420) and iOS (BGRA8888)
+  - [x] 0.6.4 Convert `CameraImage` → `Uint8List` → feed to `MarkerDetector`
+  - [x] 0.6.5 Verify marker detection works in real-time (10 FPS)
+  - **Done when:** Camera preview shows, markers detected live, prints coordinates ✅
 
 ---
 
