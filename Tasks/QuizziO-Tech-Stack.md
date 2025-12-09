@@ -11,7 +11,7 @@ Based on my deep dive into your PRD, here's the complete tech stack breakdown wi
 | **Framework** | Flutter 3.24+ | Cross-platform (iOS + Android) from single codebase |
 | **UI System** | Material 3 (Material Design 3) | Modern, accessible, built-in theming |
 | **Min Android** | API 23 (Android 6.0) | ~95% market coverage per PRD |
-| **Min iOS** | iOS 12.0+ | ~95% market coverage per PRD |
+| **Min iOS** | iOS 17.0+ | ~95% market coverage per PRD |
 
 ```yaml
 # Material 3 is enabled in theme

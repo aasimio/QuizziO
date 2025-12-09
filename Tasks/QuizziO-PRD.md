@@ -425,7 +425,7 @@ TECHNICAL NOTES:
 | ID | Requirement | Target | Notes |
 | --- | --- | --- | --- |
 | NFR-C-01 | Android version | 6.0+ (API 23) | ~95% market coverage |
-| NFR-C-02 | iOS version | 12.0+ | ~95% market coverage |
+| NFR-C-02 | iOS version | 17.0+ | ~98% market coverage |
 | NFR-C-03 | Device camera | 8MP+ | Minimum resolution |
 | NFR-C-04 | Screen size | 4.7" - 12.9" | Phone and tablet |
 
@@ -1312,9 +1312,9 @@ lib/
 | --- | --- | --- | --- |
 | Pixel 4a | Android 13 | 12MP | P0 |
 | Samsung A52 | Android 12 | 64MP | P0 |
-| iPhone 12 | iOS 16 | 12MP | P0 |
+| iPhone 12 | iOS 17 | 12MP | P0 |
 | Xiaomi Redmi Note 10 | Android 11 | 48MP | P1 |
-| iPhone SE (2020) | iOS 15 | 12MP | P1 |
+| iPhone SE (2020) | iOS 17 | 12MP | P1 |
 | Low-end Android | Android 9 | 8MP | P2 |
 
 ---
