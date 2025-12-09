@@ -173,8 +173,8 @@
 
 ---
 
-- [ ] **0.5 Migrate Spike Services**
-  - [ ] 0.5.1 Copy OMR services from spike to `lib/features/omr/services/`:
+- [x] **0.5 Migrate Spike Services**
+  - [x] 0.5.1 Copy OMR services from spike to `lib/features/omr/services/`:
     - `image_preprocessor.dart`
     - `marker_detector.dart`
     - `perspective_transformer.dart`
@@ -182,10 +182,10 @@
     - `threshold_calculator.dart`
     - `answer_extractor.dart`
     - `omr_scanner_service.dart`
-  - [ ] 0.5.2 Update imports to use project structure
-  - [ ] 0.5.3 Add `@injectable` annotations to services
-  - [ ] 0.5.4 Run `build_runner build`
-  - **Done when:** Services compile, no import errors
+  - [x] 0.5.2 Update imports to use project structure
+  - [x] 0.5.3 Add `@injectable` annotations to services
+  - [x] 0.5.4 Run `build_runner build`
+  - **Done when:** Services compile, no import errors ✅
 
 ---
 
