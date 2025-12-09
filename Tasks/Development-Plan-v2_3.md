@@ -160,16 +160,16 @@
 
 ---
 
-- [ ] **0.4 Asset Verification**
-  - [ ] 0.4.1 Verify `assets/templates/marker.png` exists and is 150x150px @ 300dpi
-  - [ ] 0.4.2 Verify `template_{10q,20q,50q}.json` match PRD schema (Appendix B)
-  - [ ] 0.4.3 Add assets to `pubspec.yaml`:
+- [x] **0.4 Asset Verification**
+  - [x] 0.4.1 Verify `assets/templates/marker.png` exists and is 150x150px @ 300dpi
+  - [x] 0.4.2 Verify `template_{10q,20q,50q}.json` match PRD schema (Appendix B)
+  - [x] 0.4.3 Add assets to `pubspec.yaml`:
     ```yaml
     assets:
       - assets/templates/
       - assets/sheets/
     ```
-  - **Done when:** `flutter build` includes assets
+  - **Done when:** `flutter build` includes assets ✅
 
 ---
 

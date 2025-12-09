@@ -1,0 +1,42 @@
+{
+  "$schema": "OmrTemplate",
+  "id": "std_10q",
+  "name": "10 Questions",
+  "version": "1.0",
+  "questionCount": 10,
+  "pageDimensions": {
+    "width": 2550,
+    "height": 3300,
+    "dpi": 300
+  },
+  "bubbleDimensions": {
+    "width": 40,
+    "height": 40
+  },
+  "markerConfig": {
+    "imagePath": "marker.png",
+    "sheetToMarkerRatio": 17,
+    "scales": [0.85, 1.0, 1.15],
+    "minConfidence": 0.3
+  },
+  "nameRegion": {
+    "x": 100,
+    "y": 150,
+    "width": 800,
+    "height": 200
+  },
+  "fieldBlocks": [
+    {
+      "name": "questions_1_10",
+      "origin": {
+        "x": 400,
+        "y": 600
+      },
+      "options": ["A", "B", "C", "D", "E"],
+      "bubblesGap": 60,
+      "labelsGap": 80,
+      "questionLabels": ["q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q10"],
+      "direction": "vertical"
+    }
+  ]
+}

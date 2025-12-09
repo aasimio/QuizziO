@@ -1,0 +1,54 @@
+{
+  "$schema": "OmrTemplate",
+  "id": "std_20q",
+  "name": "20 Questions",
+  "version": "1.0",
+  "questionCount": 20,
+  "pageDimensions": {
+    "width": 2550,
+    "height": 3300,
+    "dpi": 300
+  },
+  "bubbleDimensions": {
+    "width": 40,
+    "height": 40
+  },
+  "markerConfig": {
+    "imagePath": "marker.png",
+    "sheetToMarkerRatio": 17,
+    "scales": [0.85, 1.0, 1.15],
+    "minConfidence": 0.3
+  },
+  "nameRegion": {
+    "x": 100,
+    "y": 150,
+    "width": 800,
+    "height": 200
+  },
+  "fieldBlocks": [
+    {
+      "name": "questions_1_10",
+      "origin": {
+        "x": 200,
+        "y": 500
+      },
+      "options": ["A", "B", "C", "D", "E"],
+      "bubblesGap": 60,
+      "labelsGap": 80,
+      "questionLabels": ["q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q10"],
+      "direction": "vertical"
+    },
+    {
+      "name": "questions_11_20",
+      "origin": {
+        "x": 700,
+        "y": 500
+      },
+      "options": ["A", "B", "C", "D", "E"],
+      "bubblesGap": 60,
+      "labelsGap": 80,
+      "questionLabels": ["q11", "q12", "q13", "q14", "q15", "q16", "q17", "q18", "q19", "q20"],
+      "direction": "vertical"
+    }
+  ]
+}
