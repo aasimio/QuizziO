@@ -1,135 +1,81 @@
-import 'dart:typed_data';
 import 'package:injectable/injectable.dart';
 import 'package:opencv_dart/opencv_dart.dart' as cv;
-import '../../../core/constants/omr_constants.dart';
 import '../models/detection_result.dart';
+
+/// ArUco marker IDs for each corner of the OMR sheet
+class ArucoMarkerIds {
+  static const int topLeft = 0;
+  static const int topRight = 1;
+  static const int bottomRight = 2;
+  static const int bottomLeft = 3;
+  
+  static const List<int> all = [topLeft, topRight, bottomRight, bottomLeft];
+}
 
 @lazySingleton
 class MarkerDetector {
-  cv.Mat? _markerTemplate;
-  final double minConfidence = OmrConstants.markerMinConfidence;
-  final List<double> scales = OmrConstants.markerScales;
+  cv.ArucoDetector? _detector;
+  cv.ArucoDictionary? _dictionary;
+  cv.ArucoDetectorParameters? _params;
 
   MarkerDetector();
 
-  /// Load marker template from image bytes
-  Future<void> loadMarkerTemplate(Uint8List bytes) async {
-    // Decode bytes to cv.Mat
-    final mat = cv.imdecode(bytes, cv.IMREAD_GRAYSCALE);
-
-    // Store in _markerTemplate
-    _markerTemplate = mat;
+  /// Initialize the ArUco detector with DICT_4X4_50 dictionary
+  Future<void> initialize() async {
+    _dictionary = cv.ArucoDictionary.predefined(cv.PredefinedDictionaryType.DICT_4X4_50);
+    _params = cv.ArucoDetectorParameters.empty();
+    _detector = cv.ArucoDetector.create(_dictionary!, _params!);
   }
 
-  /// Returns ROI rect for each corner quadrant
-  cv.Rect _getQuadrantRegion(cv.Mat image, String corner) {
-    final w = image.width ~/ 2;
-    final h = image.height ~/ 2;
-
-    switch (corner) {
-      case 'TL':
-        return cv.Rect(0, 0, w, h);
-      case 'TR':
-        return cv.Rect(w, 0, w, h);
-      case 'BR':
-        return cv.Rect(w, h, w, h);
-      case 'BL':
-        return cv.Rect(0, h, w, h);
-      default:
-        throw ArgumentError('Invalid corner: $corner');
-    }
+  /// Legacy method for compatibility - now just calls initialize()
+  Future<void> loadMarkerTemplate(dynamic bytes) async {
+    await initialize();
   }
 
-  /// Search for marker in a specific quadrant
-  Future<({Point center, double confidence})> _searchInQuadrant(
-    cv.Mat image,
-    String corner,
-  ) async {
-    if (_markerTemplate == null) {
-      throw StateError('Marker template not loaded. Call loadMarkerTemplate() first.');
+  /// Detect ArUco markers in the image
+  /// Returns detection result with marker centers and confidence
+  Future<MarkerDetectionResult> detect(cv.Mat image) async {
+    if (_detector == null) {
+      await initialize();
     }
 
-    // Get quadrant region
-    final quadrantRect = _getQuadrantRegion(image, corner);
+    // Detect markers
+    final (corners, ids, _) = _detector!.detectMarkers(image);
 
-    // Extract ROI from image
-    final roi = image.region(quadrantRect);
-
-    try {
-      double bestConfidence = 0.0;
-      cv.Point bestLocation = cv.Point(0, 0);
-
-      // Try different scales
-      for (final scale in scales) {
-        // Resize marker template
-        final newWidth = (_markerTemplate!.width * scale).round();
-        final newHeight = (_markerTemplate!.height * scale).round();
-
-        final scaledTemplate = await cv.resizeAsync(
-          _markerTemplate!,
-          (newWidth, newHeight),
-          interpolation: cv.INTER_LINEAR,
-        );
-
-        try {
-          // Run template matching
-          final result = await cv.matchTemplateAsync(
-            roi,
-            scaledTemplate,
-            cv.TM_CCOEFF_NORMED,
-          );
-
-          try {
-            // Get best match location and confidence
-            final (minVal, maxVal, minLoc, maxLoc) = await cv.minMaxLocAsync(result);
-
-            if (maxVal > bestConfidence) {
-              bestConfidence = maxVal;
-              // Center of matched region
-              bestLocation = cv.Point(
-                maxLoc.x + (scaledTemplate.width ~/ 2),
-                maxLoc.y + (scaledTemplate.height ~/ 2),
-              );
-            }
-          } finally {
-            result.dispose();
-          }
-        } finally {
-          scaledTemplate.dispose();
-        }
+    // Map detected markers to their positions
+    final detectedMarkers = <int, List<cv.Point2f>>{};
+    for (int i = 0; i < ids.length; i++) {
+      final markerId = ids[i];
+      if (ArucoMarkerIds.all.contains(markerId)) {
+        detectedMarkers[markerId] = corners[i].toList();
       }
-
-      // Translate local coordinates to full image coordinates (add quadrant offset)
-      final globalX = quadrantRect.x + bestLocation.x;
-      final globalY = quadrantRect.y + bestLocation.y;
-
-      return (
-        center: Point(globalX.toDouble(), globalY.toDouble()),
-        confidence: bestConfidence,
-      );
-    } finally {
-      roi.dispose();
     }
-  }
 
-  /// Detect all 4 corner markers
-  Future<MarkerDetectionResult> detect(cv.Mat grayscaleImage) async {
-    final corners = ['TL', 'TR', 'BR', 'BL'];
+    // Build result with marker centers
     final markerCenters = <Point>[];
     final confidences = <double>[];
 
-    // Search for marker in each quadrant
-    for (final corner in corners) {
-      final result = await _searchInQuadrant(grayscaleImage, corner);
-      markerCenters.add(result.center);
-      confidences.add(result.confidence);
+    for (final expectedId in ArucoMarkerIds.all) {
+      if (detectedMarkers.containsKey(expectedId)) {
+        // Calculate center from the 4 corner points
+        final markerCorners = detectedMarkers[expectedId]!;
+        final centerX = markerCorners.map((p) => p.x).reduce((a, b) => a + b) / 4;
+        final centerY = markerCorners.map((p) => p.y).reduce((a, b) => a + b) / 4;
+        markerCenters.add(Point(centerX, centerY));
+        confidences.add(1.0); // ArUco detection is binary - either found or not
+      } else {
+        // Marker not found - add placeholder
+        markerCenters.add(const Point(0, 0));
+        confidences.add(0.0);
+      }
     }
 
-    // Calculate average confidence
-    final avgConfidence = confidences.reduce((a, b) => a + b) / confidences.length;
+    // Calculate average confidence (proportion of markers found)
+    final avgConfidence = confidences.where((c) => c > 0).length / 4.0;
 
-    // Check if all markers found (confidence above minimum)
-    final allMarkersFound = confidences.every((c) => c >= minConfidence);
+    // All markers found if we have all 4 expected IDs
+    final allMarkersFound = detectedMarkers.length == 4 &&
+        ArucoMarkerIds.all.every((id) => detectedMarkers.containsKey(id));
 
     return MarkerDetectionResult(
       markerCenters: markerCenters,
@@ -139,9 +85,50 @@ class MarkerDetector {
     );
   }
 
-  /// Clean up marker template
+  /// Get the corner points for perspective transform (outer corners of markers)
+  /// Returns null if not all markers are detected
+  List<Point>? getCornerPointsForTransform(cv.Mat image) {
+    if (_detector == null) return null;
+
+    final (corners, ids, _) = _detector!.detectMarkers(image);
+
+    // Map detected markers
+    final detectedMarkers = <int, List<cv.Point2f>>{};
+    for (int i = 0; i < ids.length; i++) {
+      final markerId = ids[i];
+      if (ArucoMarkerIds.all.contains(markerId)) {
+        detectedMarkers[markerId] = corners[i].toList();
+      }
+    }
+
+    // Need all 4 markers
+    if (detectedMarkers.length != 4) return null;
+
+    // Return the outer corners of each marker for perspective transform
+    // TL marker: use top-left corner (index 0)
+    // TR marker: use top-right corner (index 1)
+    // BR marker: use bottom-right corner (index 2)
+    // BL marker: use bottom-left corner (index 3)
+    final tlCorner = detectedMarkers[ArucoMarkerIds.topLeft]![0];
+    final trCorner = detectedMarkers[ArucoMarkerIds.topRight]![1];
+    final brCorner = detectedMarkers[ArucoMarkerIds.bottomRight]![2];
+    final blCorner = detectedMarkers[ArucoMarkerIds.bottomLeft]![3];
+
+    return [
+      Point(tlCorner.x, tlCorner.y),
+      Point(trCorner.x, trCorner.y),
+      Point(brCorner.x, brCorner.y),
+      Point(blCorner.x, blCorner.y),
+    ];
+  }
+
+  /// Clean up resources
   void dispose() {
-    _markerTemplate?.dispose();
-    _markerTemplate = null;
+    _detector?.dispose();
+    _dictionary?.dispose();
+    _params?.dispose();
+    _detector = null;
+    _dictionary = null;
+    _params = null;
   }
 }

@@ -5,7 +5,6 @@ import '../../../../core/services/camera_service.dart';
 import '../../../../injection.dart';
 import '../../services/image_preprocessor.dart';
 import '../../services/marker_detector.dart';
-import 'package:flutter/services.dart' show rootBundle;
 
 /// Test page for validating camera integration with marker detection
 ///
@@ -33,7 +32,6 @@ class _CameraTestPageState extends State<CameraTestPage> {
   // Detection state
   bool _isDetecting = false;
   int _markersDetected = 0;
-  double _avgConfidence = 0.0;
   int _frameCount = 0;
   DateTime? _lastFrameTime;
   double _currentFps = 0.0;
@@ -49,9 +47,8 @@ class _CameraTestPageState extends State<CameraTestPage> {
       // Initialize camera
       await _cameraService.initialize();
 
-      // Load marker template
-      final markerBytes = await rootBundle.load('assets/templates/marker.png');
-      await _markerDetector.loadMarkerTemplate(markerBytes.buffer.asUint8List());
+      // Initialize ArUco marker detector
+      await _markerDetector.initialize();
 
       // Start image stream for real-time detection
       _cameraService.startImageStream();
@@ -94,7 +91,7 @@ class _CameraTestPageState extends State<CameraTestPage> {
       // Convert camera image to bytes
       final bytes = CameraService.convertCameraImageToBytes(image);
 
-      // Create Mat from raw pixel data (not imdecode)
+      // Create Mat from raw pixel data
       final isBGRA = image.format.group == ImageFormatGroup.bgra8888;
       final mat = _preprocessor.createMatFromPixels(
         bytes,
@@ -109,31 +106,28 @@ class _CameraTestPageState extends State<CameraTestPage> {
         return;
       }
 
-      debugPrint('Mat created: ${mat.width}x${mat.height}, channels: ${mat.channels}');
-
       try {
-        // Preprocess
-        final processed = await _preprocessor.preprocess(mat);
+        // ArUco detection works on grayscale - preprocess to get grayscale
+        final grayscale = await _preprocessor.preprocess(mat);
 
         try {
-          // Detect markers
-          final result = await _markerDetector.detect(processed);
+          // Detect ArUco markers
+          final result = await _markerDetector.detect(grayscale);
 
           // Update UI
           if (mounted) {
             setState(() {
               _frameCount++;
-              _markersDetected = result.markerCenters.length;
-              _avgConfidence = result.avgConfidence;
+              _markersDetected = result.markersDetectedCount;
             });
           }
 
           // Print coordinates if all markers detected
-          if (result.allMarkersFound) {
-            debugPrint('Markers detected: ${result.markerCenters}');
+          if (result.isValid) {
+            debugPrint('ArUco markers detected: ${result.markerCenters}');
           }
         } finally {
-          processed.dispose();
+          grayscale.dispose();
         }
       } finally {
         mat.dispose();
@@ -235,16 +229,18 @@ class _CameraTestPageState extends State<CameraTestPage> {
                 style: const TextStyle(color: Colors.white),
               ),
               Text(
-                'Markers Detected: $_markersDetected / 4',
+                'ArUco Markers Detected: $_markersDetected / 4',
                 style: TextStyle(
-                  color: _markersDetected == 4 ? Colors.green : Colors.orange,
+                  color: _markersDetected == 4 ? Colors.green : Colors.red,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
-                'Confidence: ${(_avgConfidence * 100).toStringAsFixed(1)}%',
+                _markersDetected == 4 
+                    ? 'All markers found!' 
+                    : 'Point camera at OMR sheet with ArUco markers',
                 style: TextStyle(
-                  color: _avgConfidence > 0.3 ? Colors.green : Colors.red,
+                  color: _markersDetected == 4 ? Colors.green : Colors.orange,
                 ),
               ),
             ],

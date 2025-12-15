@@ -138,13 +138,14 @@ features/<feature_name>/
 
 1. **OMR Prototype** (`lib/features/omr/`)
    - Services for preprocess → detect → transform → read → threshold (OmrPipeline)
-   - `CameraTestPage` streams preview frames through preprocess + marker detection
-   - Marker template loaded from `assets/templates/marker.png`
+   - `CameraTestPage` streams preview frames through ArUco marker detection
+   - **ArUco markers** used for corner detection (DICT_4X4_50, IDs 0-3)
    - DI via get_it/injectable (`configureDependencies`)
 
 2. **Spike** (`omr_spike/`)
    - Standalone Flutter project with full pipeline UI, assets (`assets/gallery/*`), and tests
    - Detailed results in `omr_spike/SPIKE_RESULTS.md`
+   - Note: Spike uses old template matching; main app now uses ArUco
 
 3. **Quiz/Export Scaffolds** (`lib/features/quiz`, `lib/features/export`)
    - Placeholder BLoC/pages/widgets and `pdf_export_service.dart` with no implementation yet
@@ -290,25 +291,38 @@ class CameraState extends State<CameraWidget> {
 - Use `adaptiveThreshold` for inconsistent lighting conditions
 - Handle exceptions when image processing fails
 
+**ArUco Marker Detection** (preferred for corner detection):
+- Use `DICT_4X4_50` dictionary with marker IDs 0-3 for corners
+- ArUco detection is binary (found/not found) - no false positives
+- No confidence threshold needed - markers either match or don't
+- Works on grayscale images after preprocessing
+
 **Example Pattern**:
 ```dart
-// Use async variants
-final mat = await cv.imreadAsync(imagePath);
-try {
-  final gray = await cv.cvtColorAsync(mat, cv.COLOR_BGR2GRAY);
-  try {
-    // Process image...
-  } finally {
-    gray.dispose();  // Always dispose
-  }
-} finally {
-  mat.dispose();  // Always dispose
+// ArUco marker detection
+final dictionary = cv.ArucoDictionary.predefined(cv.PredefinedDictionaryType.DICT_4X4_50);
+final params = cv.ArucoDetectorParameters.empty();
+final detector = cv.ArucoDetector.create(dictionary, params);
+
+final (corners, ids, rejected) = detector.detectMarkers(grayscaleImage);
+// corners: List of 4 corner points for each detected marker
+// ids: List of marker IDs found (should be 0, 1, 2, 3 for valid sheet)
+
+// Validate all 4 markers found
+if (ids.length != 4) {
+  throw OMRException('Could not detect all 4 corner markers');
 }
 
-// Validate markers
-if (corners.length != 4) {
-  throw OMRException('Could not detect 4 corner markers');
-}
+// Always dispose
+detector.dispose();
+dictionary.dispose();
+params.dispose();
+```
+
+**Legacy Template Matching** (deprecated - causes false positives):
+```dart
+// Don't use - solid black squares match any dark region
+final result = cv.matchTemplate(image, template, cv.TM_CCOEFF_NORMED);
 ```
 
 ### PDF Export
@@ -383,6 +397,8 @@ const spacing = EdgeInsets.all(8.0);
 | Hardcoded paths | `path_provider` package |
 | `ResolutionPreset.max` | `ResolutionPreset.high` |
 | Forgetting `dispose()` | Always dispose controllers/Mats |
+| Template matching for markers | ArUco marker detection |
+| Solid black square markers | ArUco markers (DICT_4X4_50) |
 
 ## Asset Management
 
@@ -390,7 +406,12 @@ Quiz templates are stored in `assets/templates/`:
 - `template_10q.json` - 10 question template
 - `template_20q.json` - 20 question template
 - `template_50q.json` - 50 question template
-- `marker.png` - Marker image for OMR alignment
+- `aruco_0.png` - ArUco marker ID 0 (Top-Left corner)
+- `aruco_1.png` - ArUco marker ID 1 (Top-Right corner)
+- `aruco_2.png` - ArUco marker ID 2 (Bottom-Right corner)
+- `aruco_3.png` - ArUco marker ID 3 (Bottom-Left corner)
+- `aruco_test_sheet.png` - Test sheet with all 4 ArUco markers for testing
+- `marker.png` - (Legacy) Old solid black marker, no longer used
 
 When adding new assets, update `pubspec.yaml` under the `flutter.assets` section.
 
@@ -491,3 +512,41 @@ Status: Pipeline validated in `omr_spike`; main app currently includes `CameraTe
 - Created comprehensive SPIKE_RESULTS.md documenting findings, metrics, and migration path
 - Key finding: Android API 24+ required (acceptable, 97% device coverage)
 - ✅ Spike complete - ready to port to main QuizziO project
+
+## Session: 2025-12-15
+
+**ArUco Marker Migration (Phase 0.6.5 Fix)**
+- ⚠️ **Issue Found**: Template matching with solid black square markers caused false positives
+  - Original `marker.png` was a 50x50 solid black square (only 1 unique color)
+  - Template matching found ANY dark region as a "match" (black cloth, shadows, edges)
+  - Spike worked because it used pre-designed static images with known marker positions
+  - Live camera on iOS showed 3-4/4 markers even pointing at random tables
+
+**Solution: Replaced with ArUco Markers**
+- ArUco markers have built-in encoding - impossible to confuse with random objects
+- Detection is binary (found/not found) - no confidence threshold needed
+- Used `DICT_4X4_50` dictionary with marker IDs 0-3 for corners:
+  - ID 0: Top-Left
+  - ID 1: Top-Right
+  - ID 2: Bottom-Right
+  - ID 3: Bottom-Left
+
+**Files Changed**:
+- `lib/features/omr/services/marker_detector.dart` - Complete rewrite using ArUco detection
+- `lib/features/omr/models/detection_result.dart` - Updated `isValid` for ArUco
+- `lib/features/omr/presentation/pages/camera_test_page.dart` - Updated UI for ArUco
+- `lib/core/constants/omr_constants.dart` - Replaced template matching constants with ArUco IDs
+
+**New Assets Created**:
+- `assets/templates/aruco_0.png` through `aruco_3.png` - Individual ArUco markers
+- `assets/templates/aruco_test_sheet.png` - Test sheet with all 4 markers for testing
+
+**Test Results**:
+- ✅ Pointing camera at random objects: 0/4 markers (correct - no false positives)
+- ✅ Pointing camera at ArUco test sheet: 4/4 markers detected
+- ✅ Real-time detection working at ~38 FPS on iOS
+
+**Important Note**: 
+- OMR answer sheets must now use ArUco markers at corners instead of solid black squares
+- Use `aruco_test_sheet.png` as reference for marker placement
+- Old sheets with black square markers will NOT be detected

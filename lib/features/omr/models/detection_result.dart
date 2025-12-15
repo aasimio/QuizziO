@@ -21,7 +21,11 @@ class MarkerDetectionResult {
     required this.allMarkersFound,
   });
 
-  bool get isValid => allMarkersFound && avgConfidence >= 0.3;
+  /// For ArUco detection, valid means all 4 markers were found
+  bool get isValid => allMarkersFound;
+
+  /// Count of markers that were successfully detected
+  int get markersDetectedCount => perMarkerConfidence.where((c) => c > 0).length;
 
   @override
   String toString() {

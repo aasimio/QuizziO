@@ -274,11 +274,13 @@ TECHNICAL NOTES:
 
 | ID | Requirement | Priority | Notes |
 | --- | --- | --- | --- |
-| FR-MD-01 | System shall detect 4 corner markers via template matching | P0 | TM_CCOEFF_NORMED |
-| FR-MD-02 | Detection shall work at 3 scale levels (85%, 100%, 115%) | P0 | Handle distance variance |
-| FR-MD-03 | Minimum confidence threshold shall be 0.3 | P0 | Configurable |
+| FR-MD-01 | System shall detect 4 corner ArUco markers (DICT_4X4_50, IDs 0-3) | P0 | ArUco detection (replaces template matching) |
+| FR-MD-02 | ArUco marker IDs: TL=0, TR=1, BR=2, BL=3 | P0 | Fixed IDs per corner |
+| FR-MD-03 | Detection is binary (found/not found) - no confidence threshold needed | P0 | ArUco encoding prevents false positives |
 | FR-MD-04 | Detection shall complete within 60ms per frame | P0 | Performance budget |
-| FR-MD-05 | System shall report detection confidence for UI feedback | P1 | 0.0 to 1.0 |
+| FR-MD-05 | System shall report which markers were detected for UI feedback | P1 | 0-4 markers found |
+
+**Note:** ArUco markers replaced solid black square markers in v0.6.5 due to false positive issues with template matching on live camera feeds. ArUco markers have built-in encoding that prevents detection of random objects.
 
 ### 5.4 Image Processing
 
@@ -632,7 +634,11 @@ lib/
 │
 └── assets/
 └── templates/
-├── marker.png                          # Corner marker image
+├── aruco_0.png                         # ArUco marker ID 0 (Top-Left)
+├── aruco_1.png                         # ArUco marker ID 1 (Top-Right)
+├── aruco_2.png                         # ArUco marker ID 2 (Bottom-Right)
+├── aruco_3.png                         # ArUco marker ID 3 (Bottom-Left)
+├── aruco_test_sheet.png                # Test sheet with all 4 ArUco markers
 ├── template_10q.json
 ├── template_20q.json
 └── template_50q.json
@@ -690,21 +696,22 @@ lib/
 │  │                      MarkerDetector                                │     │
 │  ├───────────────────────────────────────────────────────────────────┤     │
 │  │                                                                   │     │
-│  │  // Configuration                                                 │     │
-│  │  - double minConfidence = 0.3                                     │     │
-│  │  - List<double> scales = [0.85, 1.0, 1.15]                       │     │
+│  │  // ArUco Configuration                                           │     │
+│  │  - dictionary: DICT_4X4_50                                        │     │
+│  │  - markerIds: TL=0, TR=1, BR=2, BL=3                             │     │
 │  │                                                                   │     │
-│  │  // Methods (accept Uint8List; convert to cv.Mat internally)     │  🔄 │
-│  │  + void loadMarkerTemplate(Uint8List markerImageBytes)           │     │
-│  │  + Future<MarkerDetectionResult?> detect(                        │     │
-│  │      Uint8List grayscaleImageBytes                               │  🔄 │
-│  │    )                                                              │     │
+│  │  // Methods                                                       │  🔄 │
+│  │  + Future<void> initialize()  // Setup ArUco detector            │     │
+│  │  + Future<MarkerDetectionResult> detect(cv.Mat grayscaleImage)   │     │
+│  │  + List<Point>? getCornerPointsForTransform(cv.Mat image)        │     │
+│  │  + void dispose()                                                 │     │
 │  │                                                                   │     │
 │  │  // Returns                                                       │     │
 │  │  MarkerDetectionResult {                                          │     │
 │  │    List<Point> markerCenters;  // 4 points (TL, TR, BR, BL)      │     │
-│  │    double avgConfidence;       // 0.0 - 1.0                      │     │
-│  │    List<double> perMarkerConfidence; // Individual scores        │     │
+│  │    double avgConfidence;       // Proportion of markers found    │     │
+│  │    List<double> perMarkerConfidence; // 1.0 if found, 0.0 if not │     │
+│  │    bool allMarkersFound;       // true if all 4 ArUco IDs found  │     │
 │  │  }                                                                │     │
 │  │                                                                   │     │
 │  └───────────────────────────────────────────────────────────────────┘     │
@@ -899,10 +906,14 @@ lib/
   },
 
   "markerConfig": {
-    "imagePath": "marker.png",
-    "sheetToMarkerRatio": 17,
-    "scales": [0.85, 1.0, 1.15],
-    "minConfidence": 0.3
+    "type": "aruco",
+    "dictionary": "DICT_4X4_50",
+    "markerIds": {
+      "topLeft": 0,
+      "topRight": 1,
+      "bottomRight": 2,
+      "bottomLeft": 3
+    }
   },
 
   "nameRegion": {

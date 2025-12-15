@@ -5,15 +5,15 @@
 class OmrConstants {
   OmrConstants._(); // Private constructor to prevent instantiation
 
-  // --- Marker Detection Constants ---
+  // --- ArUco Marker Constants ---
+  // ArUco markers use DICT_4X4_50 dictionary
+  // Marker IDs: TL=0, TR=1, BR=2, BL=3
 
-  /// Minimum confidence threshold for marker template matching
-  /// Range: 0.0 to 1.0, where 1.0 is a perfect match
-  static const double markerMinConfidence = 0.3;
-
-  /// Multi-scale factors for marker detection
-  /// Allows detection of markers at different sizes/distances
-  static const List<double> markerScales = [0.85, 1.0, 1.15];
+  /// Expected ArUco marker IDs for each corner
+  static const int markerIdTopLeft = 0;
+  static const int markerIdTopRight = 1;
+  static const int markerIdBottomRight = 2;
+  static const int markerIdBottomLeft = 3;
 
   // --- Threshold Calculation Constants ---
 

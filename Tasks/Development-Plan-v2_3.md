@@ -6,8 +6,9 @@
 **Goal:** Ship MVP with quiz creation, camera scanning, result editing, and PDF export — all offline.
 
 **Current State:** 
-- ✅ Clean architecture folders, OMR spike (98%+ validated), template JSONs, marker image
-- 🔜 Next: Complete setup (dependencies, DI), then camera integration spike
+- ✅ Clean architecture folders, OMR spike (98%+ validated), template JSONs, ArUco markers
+- ✅ Phase 0.6 complete: Camera + ArUco marker detection working on iOS (~38 FPS)
+- 🔜 Next: App navigation setup (0.7), then Data Layer (Phase 1)
 
 **Reference:** `QuizziO-PRD.md`, `QuizziO-Tech-Stack.md`
 
@@ -54,6 +55,7 @@
 | Named routes (not GoRouter) | Simpler for MVP, no deep linking needed | v2.2 |
 | Answer status as strings | DB compatibility per PRD 8.2 | PRD |
 | Single quiz dialog | Code reuse for create/edit | v2.2 |
+| **ArUco markers (not template matching)** | Template matching caused false positives on live camera; ArUco has built-in encoding | v0.6.5 |
 
 ---
 
@@ -62,16 +64,16 @@
 ### Core Services (OMR)
 | File | Purpose | Status |
 |------|---------|--------|
-| `features/omr/services/image_preprocessor.dart` | Grayscale, CLAHE, normalize | 📦 Migrate from spike |
-| `features/omr/services/marker_detector.dart` | Corner template matching | 📦 Migrate |
-| `features/omr/services/perspective_transformer.dart` | 4-point warp | 📦 Migrate |
-| `features/omr/services/bubble_reader.dart` | ROI + mean intensity | 📦 Migrate |
-| `features/omr/services/threshold_calculator.dart` | Gap-finding | 📦 Migrate |
-| `features/omr/services/answer_extractor.dart` | Multi-mark/blank detection | 📦 Migrate |
-| `features/omr/services/omr_scanner_service.dart` | Pipeline orchestrator | 📦 Migrate |
+| `features/omr/services/image_preprocessor.dart` | Grayscale, CLAHE, normalize | ✅ Migrated |
+| `features/omr/services/marker_detector.dart` | ArUco marker detection (DICT_4X4_50) | ✅ Implemented |
+| `features/omr/services/perspective_transformer.dart` | 4-point warp | ✅ Migrated |
+| `features/omr/services/bubble_reader.dart` | ROI + mean intensity | ✅ Migrated |
+| `features/omr/services/threshold_calculator.dart` | Gap-finding | ✅ Migrated |
+| `features/omr/services/answer_extractor.dart` | Multi-mark/blank detection | ✅ Migrated |
+| `features/omr/services/omr_scanner_service.dart` | Pipeline orchestrator | ✅ Migrated |
 | `features/omr/services/grading_service.dart` | Score calculation | 🆕 Create |
 | `features/omr/services/template_manager.dart` | Load JSON templates | 🆕 Create |
-| `core/services/camera_service.dart` | Camera lifecycle | 🆕 Create |
+| `core/services/camera_service.dart` | Camera lifecycle | ✅ Implemented |
 
 ### Data Layer
 | File | Purpose | Status |
@@ -107,9 +109,14 @@
 ### Assets
 | File | Purpose | Status |
 |------|---------|--------|
-| `assets/templates/marker.png` | Corner marker | ✅ Exists (verify) |
+| `assets/templates/aruco_0.png` | ArUco marker ID 0 (Top-Left) | ✅ Created |
+| `assets/templates/aruco_1.png` | ArUco marker ID 1 (Top-Right) | ✅ Created |
+| `assets/templates/aruco_2.png` | ArUco marker ID 2 (Bottom-Right) | ✅ Created |
+| `assets/templates/aruco_3.png` | ArUco marker ID 3 (Bottom-Left) | ✅ Created |
+| `assets/templates/aruco_test_sheet.png` | Test sheet with all 4 ArUco markers | ✅ Created |
 | `assets/templates/template_{10q,20q,50q}.json` | Templates | ✅ Exists (verify schema) |
-| `assets/sheets/answer_sheet_{10q,20q,50q}.pdf` | Printable sheets | 🆕 Create |
+| `assets/templates/marker.png` | (Legacy) Old solid black marker | ⚠️ Deprecated |
+| `assets/sheets/answer_sheet_{10q,20q,50q}.pdf` | Printable sheets with ArUco markers | 🆕 Create |
 
 ### Notes
 - **Tests:** `test/features/{feature}/...` mirrors source
@@ -470,8 +477,8 @@
   - [ ] 4.5.1 In `ScannerBloc`: Stream camera frames from `CameraService`
   - [ ] 4.5.2 Throttle to 10 FPS (skip frames if processing)
   - [ ] 4.5.3 Convert `CameraImage` → `Uint8List` (handle YUV420/BGRA)
-  - [ ] 4.5.4 Call `MarkerDetector.detect()`
-  - [ ] 4.5.5 If detected (confidence > 0.3): Emit `MarkerDetected` event
+  - [ ] 4.5.4 Call `MarkerDetector.detect()` (ArUco detection)
+  - [ ] 4.5.5 If all 4 ArUco markers detected: Emit `MarkerDetected` event
   - [ ] 4.5.6 If stable for 500ms: Emit `CaptureTriggered`
   - **Done when:** Real-time detection works, auto-capture fires
 
@@ -716,9 +723,10 @@
 | Issue | Impact | Resolution |
 |-------|--------|------------|
 | opencv_dart requires minSdk 24 | Can't support Android 6.0 | ✅ Accepted — covers 95%+ devices |
-| PRD says minSdk 23, spike proved 24 | Documentation mismatch | ✅ Updated Dev Plan; PRD needs update |
-| CameraImage format varies by platform | Need YUV420 + BGRA handling | 🔄 Handle in camera spike (0.6) |
-| *Add discoveries during development* | | |
+| PRD says minSdk 23, spike proved 24 | Documentation mismatch | ✅ Updated Dev Plan + PRD |
+| CameraImage format varies by platform | Need YUV420 + BGRA handling | ✅ Handled in camera service (0.6) |
+| **Template matching false positives** | Solid black markers matched random dark objects on live camera | ✅ Replaced with ArUco markers (v0.6.5) |
+| **ArUco requires new answer sheets** | Old sheets with black squares won't work | ⚠️ Must print new sheets with ArUco markers |
 
 ---
 
@@ -759,5 +767,18 @@ Week 5:   Phase 6 (Export + Polish) → Phase 7 (Testing)            [4-5 days]
 
 ---
 
-*QuizziO Development Plan v2.3 (Condensed) — Streamlined for implementation*
+## Change Log
+
+### v2.3.1 (2025-12-15)
+- **ArUco Marker Migration**: Replaced template matching with ArUco marker detection
+  - Added ArUco marker assets (aruco_0.png - aruco_3.png)
+  - Created aruco_test_sheet.png for testing
+  - Updated marker_detector.dart to use DICT_4X4_50 dictionary
+  - Marker IDs: TL=0, TR=1, BR=2, BL=3
+- **Camera Integration**: Phase 0.6 complete with ~38 FPS detection on iOS
+- **Note**: Answer sheets must now use ArUco markers at corners
+
+---
+
+*QuizziO Development Plan v2.3.1 (Condensed) — Streamlined for implementation*
 *Reference: QuizziO-PRD.md, QuizziO-Tech-Stack.md*
