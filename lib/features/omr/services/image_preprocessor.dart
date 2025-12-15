@@ -62,23 +62,18 @@ class ImagePreprocessor {
   ///
   /// iOS camera returns BGRA8888, Android returns grayscale Y plane
   cv.Mat createMatFromPixels(Uint8List bytes, int width, int height, bool isBGRA) {
-    if (isBGRA) {
-      // iOS BGRA8888: 4 bytes per pixel
-      return cv.Mat.fromBytes(
-        width: width,
-        height: height,
-        type: cv.MatType.CV_8UC4,  // 8-bit unsigned, 4 channels (BGRA)
-        bytes: bytes,
-      );
-    } else {
-      // Android grayscale (Y plane): 1 byte per pixel
-      return cv.Mat.fromBytes(
-        width: width,
-        height: height,
-        type: cv.MatType.CV_8UC1,  // 8-bit unsigned, 1 channel (grayscale)
-        bytes: bytes,
-      );
-    }
+    // Create empty Mat with correct dimensions and type
+    final matType = isBGRA ? cv.MatType.CV_8UC4 : cv.MatType.CV_8UC1;
+    final mat = cv.Mat.create(
+      rows: height,
+      cols: width,
+      type: matType,
+    );
+
+    // Copy raw pixel data into the Mat
+    mat.data.setAll(0, bytes);
+
+    return mat;
   }
 
   /// Converts Uint8List to cv.Mat (deprecated - use decodeImage or createMatFromPixels)
