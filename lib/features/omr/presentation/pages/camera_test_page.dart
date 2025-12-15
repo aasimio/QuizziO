@@ -94,8 +94,22 @@ class _CameraTestPageState extends State<CameraTestPage> {
       // Convert camera image to bytes
       final bytes = CameraService.convertCameraImageToBytes(image);
 
-      // Decode to Mat
-      final mat = _preprocessor.uint8ListToMat(bytes);
+      // Create Mat from raw pixel data (not imdecode)
+      final isBGRA = image.format.group == ImageFormatGroup.bgra8888;
+      final mat = _preprocessor.createMatFromPixels(
+        bytes,
+        image.width,
+        image.height,
+        isBGRA,
+      );
+
+      // Validate Mat was created successfully
+      if (mat.isEmpty) {
+        debugPrint('ERROR: Created Mat is empty');
+        return;
+      }
+
+      debugPrint('Mat created: ${mat.width}x${mat.height}, channels: ${mat.channels}');
 
       try {
         // Preprocess

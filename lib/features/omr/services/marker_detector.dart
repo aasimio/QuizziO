@@ -1,18 +1,16 @@
 import 'dart:typed_data';
 import 'package:injectable/injectable.dart';
 import 'package:opencv_dart/opencv_dart.dart' as cv;
+import '../../../core/constants/omr_constants.dart';
 import '../models/detection_result.dart';
 
 @lazySingleton
 class MarkerDetector {
   cv.Mat? _markerTemplate;
-  final double minConfidence;
-  final List<double> scales;
+  final double minConfidence = OmrConstants.markerMinConfidence;
+  final List<double> scales = OmrConstants.markerScales;
 
-  MarkerDetector({
-    this.minConfidence = 0.3,
-    this.scales = const [0.85, 1.0, 1.15],
-  });
+  MarkerDetector();
 
   /// Load marker template from image bytes
   Future<void> loadMarkerTemplate(Uint8List bytes) async {

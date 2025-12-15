@@ -1,4 +1,5 @@
 import 'package:injectable/injectable.dart';
+import '../../../core/constants/omr_constants.dart';
 
 class ThresholdResult {
   final double threshold;
@@ -35,10 +36,10 @@ class ExtractedAnswer {
 
 @lazySingleton
 class ThresholdCalculator {
-  final int minJump;
-  final int looseness;
+  final int minJump = OmrConstants.thresholdMinJump;
+  final int looseness = OmrConstants.thresholdLooseness;
 
-  ThresholdCalculator({this.minJump = 20, this.looseness = 4});
+  ThresholdCalculator();
 
   ThresholdResult calculate(List<double> allBubbleValues) {
     if (allBubbleValues.isEmpty) {

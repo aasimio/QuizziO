@@ -4,7 +4,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-QuizziO is a Flutter application for OMR (Optical Mark Recognition) quiz scanning and grading. The app allows users to create quizzes, scan answer sheets using a camera, grade papers automatically, and export results to PDF.
+QuizziO is building a Flutter application for OMR (Optical Mark Recognition) quiz scanning and grading. The root app currently has an OMR prototype (camera test page + service pipeline scaffolding) with quiz/export features scaffolded but not implemented yet. A validated spike lives in `omr_spike/` with the full pipeline UI/tests/assets used for the results below.
+
+## Repository Layout
+
+```
+.
+├── lib/                     # Main app code
+│   ├── core/                # Camera service, constants, stubs for utils/errors/extensions
+│   ├── features/
+│   │   ├── omr/             # Implemented services + camera_test_page; marker model
+│   │   ├── quiz/            # Presentation stubs (no logic yet)
+│   │   └── export/          # Stub widget/service for PDF export
+│   ├── injection.dart(.config.dart)  # get_it + injectable setup
+│   ├── main.dart            # Entry point (Hive init, CameraTestPage)
+│   └── app.dart             # Placeholder
+├── assets/templates/        # OMR template JSON + marker.png used by main app
+├── omr_spike/               # Standalone spike with full OMR pipeline, assets, tests, SPIKE_RESULTS.md
+├── Tasks/                   # PRD + planning docs
+└── test/                    # Root smoke test
+```
 
 ## Development Commands
 
@@ -75,19 +94,16 @@ The project follows **Clean Architecture** with a **feature-based folder structu
 
 ```
 lib/
-├── core/                    # Shared utilities and services
-│   ├── constants/          # App-wide constants (app, OMR)
-│   ├── errors/             # Error handling (exceptions, failures)
-│   ├── extensions/         # Dart extensions (list extensions)
-│   ├── services/           # Core services (camera)
-│   └── utils/              # Utility functions (image, math)
-├── features/               # Feature modules
-│   ├── quiz/              # Quiz management feature
-│   ├── omr/               # OMR scanning and processing
-│   └── export/            # PDF export functionality
-├── app.dart               # App widget configuration
-└── main.dart              # Application entry point
+├── core/                    # Constants + camera service (utils/errors/extensions are stubs)
+├── features/                # Feature modules
+│   ├── omr/                 # OMR services + camera_test_page, detection_result model
+│   ├── quiz/                # Pages/widgets/BLoC stubs only
+│   └── export/              # PDF export stub (service/widget empty)
+├── injection.dart(.config.dart)  # DI setup
+└── main.dart                # Entry point (uses CameraTestPage)
 ```
+
+Clean Architecture is the target, but domain/data layers are not implemented yet; most non-OMR files are placeholders.
 
 ### Clean Architecture Rules
 
@@ -99,7 +115,7 @@ lib/
 
 ### Feature Structure
 
-Each feature follows Clean Architecture layers:
+Target structure (not yet implemented in current code):
 
 ```
 features/<feature_name>/
@@ -120,23 +136,22 @@ features/<feature_name>/
 
 ### Current Features
 
-1. **Quiz Management** (`features/quiz/`)
-   - Create and manage quizzes
-   - Define answer keys
-   - Quiz templates (10, 20, 50 questions)
+1. **OMR Prototype** (`lib/features/omr/`)
+   - Services for preprocess → detect → transform → read → threshold (OmrPipeline)
+   - `CameraTestPage` streams preview frames through preprocess + marker detection
+   - Marker template loaded from `assets/templates/marker.png`
+   - DI via get_it/injectable (`configureDependencies`)
 
-2. **OMR Scanning** (`features/omr/`)
-   - Camera-based paper scanning
-   - Optical mark recognition
-   - Paper grading and results
+2. **Spike** (`omr_spike/`)
+   - Standalone Flutter project with full pipeline UI, assets (`assets/gallery/*`), and tests
+   - Detailed results in `omr_spike/SPIKE_RESULTS.md`
 
-3. **Export** (`features/export/`)
-   - PDF generation for results
-   - Export functionality for graded papers
+3. **Quiz/Export Scaffolds** (`lib/features/quiz`, `lib/features/export`)
+   - Placeholder BLoC/pages/widgets and `pdf_export_service.dart` with no implementation yet
 
 ### Key Architectural Patterns
 
-- **BLoC Pattern**: State management using the BLoC pattern (see `presentation/bloc/` in features)
+- **BLoC Pattern (planned)**: State management using the BLoC pattern (see `presentation/bloc/` in features)
 - **Dependency Flow**: presentation → domain → data (dependencies point inward)
 - **Repository Pattern**: Abstract repositories in domain layer, implemented in data layer
 - **Use Cases**: Each business action is a separate use case class in `domain/usecases/`
@@ -144,6 +159,8 @@ features/<feature_name>/
 ## Technical Implementation Guidelines
 
 ### BLoC/Cubit
+
+No BLoC/Cubit classes are implemented yet; keep these rules for future state.
 
 **State Management Rules**:
 - All states MUST extend `Equatable` with ALL fields in `props`
@@ -211,6 +228,8 @@ class QuizPage extends StatelessWidget {
 - Each `@HiveType(typeId: X)` must have unique X across all models
 - Call `Hive.close()` on app lifecycle pause
 - Never use dynamic boxes
+
+Current state: `main.dart` opens untyped `quizzes` and `scan_results` boxes as placeholders until models/adapters are added.
 
 **Example Pattern**:
 ```dart
@@ -300,6 +319,8 @@ if (corners.length != 4) {
 - Verify file exists after write before sharing
 - Handle PDF generation errors gracefully
 
+`lib/features/export/services/pdf_export_service.dart` is currently empty; implement per above when export is built.
+
 **Example Pattern**:
 ```dart
 // Generate off main thread
@@ -373,6 +394,8 @@ Quiz templates are stored in `assets/templates/`:
 
 When adding new assets, update `pubspec.yaml` under the `flutter.assets` section.
 
+Spike-only assets for validation live under `omr_spike/assets/` (marker/test sheets/gallery variations).
+
 ## Code Standards
 
 The project uses `flutter_lints` package for linting. Analysis options are configured in `analysis_options.yaml`.
@@ -387,25 +410,28 @@ Follow the technical implementation standards in the sections above, including:
 
 - Dart SDK: `>=3.0.0 <4.0.0`
 - Flutter SDK: `>=3.10.0`
+- Android minSdkVersion 24 (set in `android/app/build.gradle.kts`) due to `opencv_dart`
 
 ## Dependencies
 
-All required dependencies are installed:
-- `cupertino_icons` - iOS style icons
-- `flutter_bloc` + `equatable` - State management
-- `get_it` + `injectable` - Dependency injection
-- `hive` + `hive_flutter` - Local storage
-- `camera` - Camera access for OMR
-- `opencv_dart` ^1.4.3 - Image processing for OMR
-- `pdf` + `printing` - PDF generation
-- `path_provider` - File system paths
-- `permission_handler` - Camera/storage permissions
-- `flutter_lints` - Recommended lints (dev dependency)
-- `build_runner`, `injectable_generator`, `hive_generator` - Code generation (dev dependencies)
+Root `pubspec.yaml` dependencies (main app):
+- UI: `cupertino_icons`, `flutter_svg`
+- State: `flutter_bloc`, `equatable` (not used yet)
+- DI: `get_it`, `injectable`
+- Storage: `hive`, `hive_flutter`
+- Camera/permissions: `camera`, `permission_handler`
+- OMR: `opencv_dart` ^1.4.3, `image`
+- Export: `pdf`, `printing`, `share_plus`, `path_provider`
+- Utils: `uuid`, `intl`, `collection`
+- Dev: `flutter_test`, `bloc_test`, `mocktail`, `flutter_lints`, `build_runner`, `injectable_generator`, `hive_generator`
+
+The `omr_spike/` subproject has its own `pubspec.yaml` (opencv_dart, image, path_provider, image_picker).
 
 When adding new dependencies, run `flutter pub get` to install them.
 
 # Progress (pre build testing)
+
+Status: Pipeline validated in `omr_spike`; main app currently includes `CameraTestPage` plus service scaffolding, with quiz/export UIs still empty.
 
 ## Session: 2025-11-28
 
@@ -465,4 +491,3 @@ When adding new dependencies, run `flutter pub get` to install them.
 - Created comprehensive SPIKE_RESULTS.md documenting findings, metrics, and migration path
 - Key finding: Android API 24+ required (acceptable, 97% device coverage)
 - ✅ Spike complete - ready to port to main QuizziO project
-
