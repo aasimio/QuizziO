@@ -298,7 +298,7 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 
 ---
 
-- [ ] **1.4 OMR Data Layer** — 🧠🧠🧠
+- [x] **1.4 OMR Data Layer** — 🧠🧠🧠
   - [x] 1.4.1 `data/models/scan_result_model.dart` extends `ScanResult`: — 🧠🧠🧠
     ```dart
     @HiveType(typeId: 1)

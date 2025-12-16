@@ -6,9 +6,19 @@ import '../../domain/entities/quiz.dart';
 import '../../domain/repositories/quiz_repository.dart';
 import '../models/quiz_model.dart';
 
+/// Repository implementation for Quiz persistence using Hive.
+/// Requires [HiveBoxes.quizzes] to be opened during app initialization (see main.dart).
 @LazySingleton(as: QuizRepository)
 class QuizRepositoryImpl implements QuizRepository {
-  Box<QuizModel> get _box => Hive.box<QuizModel>(HiveBoxes.quizzes);
+  Box<QuizModel> get _box {
+    if (!Hive.isBoxOpen(HiveBoxes.quizzes)) {
+      throw StateError(
+        'Hive box "${HiveBoxes.quizzes}" is not open. '
+        'Ensure Hive.openBox<QuizModel>(HiveBoxes.quizzes) is called during app initialization.',
+      );
+    }
+    return Hive.box<QuizModel>(HiveBoxes.quizzes);
+  }
 
   @override
   Future<List<Quiz>> getAll() async {

@@ -7,12 +7,20 @@ class Quiz extends Equatable {
   final DateTime createdAt;
   final Map<String, String> answerKey;
 
-  const Quiz({
+  Quiz({
     required this.id,
     required this.name,
     required this.templateId,
     required this.createdAt,
-    this.answerKey = const {},
+    Map<String, String> answerKey = const {},
+  }) : answerKey = Map.unmodifiable(Map.from(answerKey));
+
+  Quiz._internal({
+    required this.id,
+    required this.name,
+    required this.templateId,
+    required this.createdAt,
+    required this.answerKey,
   });
 
   Quiz copyWith({
@@ -22,12 +30,14 @@ class Quiz extends Equatable {
     DateTime? createdAt,
     Map<String, String>? answerKey,
   }) {
-    return Quiz(
+    return Quiz._internal(
       id: id ?? this.id,
       name: name ?? this.name,
       templateId: templateId ?? this.templateId,
       createdAt: createdAt ?? this.createdAt,
-      answerKey: answerKey ?? this.answerKey,
+      answerKey: answerKey != null
+          ? Map.unmodifiable(Map.from(answerKey))
+          : Map.unmodifiable(Map.from(this.answerKey)),
     );
   }
 

@@ -36,29 +36,84 @@ class OmrTemplate extends Equatable {
   });
 
   factory OmrTemplate.fromJson(Map<String, dynamic> json) {
-    final pageDimensions = json['pageDimensions'] as Map<String, dynamic>;
-    final bubbleDimensions = json['bubbleDimensions'] as Map<String, dynamic>;
-    final nameRegion = json['nameRegion'] as Map<String, dynamic>;
-    final fieldBlocksList = json['fieldBlocks'] as List;
+    try {
+      final id = json['id'] as String? ??
+          (throw FormatException('Missing required field: id'));
+      final name = json['name'] as String? ??
+          (throw FormatException('Missing required field: name'));
+      final version = json['version'] as String? ??
+          (throw FormatException('Missing required field: version'));
+      final questionCount = json['questionCount'] as int? ??
+          (throw FormatException('Missing required field: questionCount'));
 
-    return OmrTemplate(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      version: json['version'] as String,
-      questionCount: json['questionCount'] as int,
-      pageWidth: pageDimensions['width'] as int,
-      pageHeight: pageDimensions['height'] as int,
-      pageDpi: pageDimensions['dpi'] as int,
-      bubbleWidth: bubbleDimensions['width'] as int,
-      bubbleHeight: bubbleDimensions['height'] as int,
-      nameRegionX: nameRegion['x'] as int,
-      nameRegionY: nameRegion['y'] as int,
-      nameRegionWidth: nameRegion['width'] as int,
-      nameRegionHeight: nameRegion['height'] as int,
-      fieldBlocks: fieldBlocksList
-          .map((block) => FieldBlock.fromJson(block as Map<String, dynamic>))
-          .toList(),
-    );
+      final pageDimensions = json['pageDimensions'] as Map<String, dynamic>? ??
+          (throw FormatException('Missing required field: pageDimensions'));
+      final pageWidth = pageDimensions['width'] as int? ??
+          (throw FormatException('Missing required field: pageDimensions.width'));
+      final pageHeight = pageDimensions['height'] as int? ??
+          (throw FormatException('Missing required field: pageDimensions.height'));
+      final pageDpi = pageDimensions['dpi'] as int? ??
+          (throw FormatException('Missing required field: pageDimensions.dpi'));
+
+      final bubbleDimensions = json['bubbleDimensions'] as Map<String, dynamic>? ??
+          (throw FormatException('Missing required field: bubbleDimensions'));
+      final bubbleWidth = bubbleDimensions['width'] as int? ??
+          (throw FormatException('Missing required field: bubbleDimensions.width'));
+      final bubbleHeight = bubbleDimensions['height'] as int? ??
+          (throw FormatException('Missing required field: bubbleDimensions.height'));
+
+      final nameRegion = json['nameRegion'] as Map<String, dynamic>? ??
+          (throw FormatException('Missing required field: nameRegion'));
+      final nameRegionX = nameRegion['x'] as int? ??
+          (throw FormatException('Missing required field: nameRegion.x'));
+      final nameRegionY = nameRegion['y'] as int? ??
+          (throw FormatException('Missing required field: nameRegion.y'));
+      final nameRegionWidth = nameRegion['width'] as int? ??
+          (throw FormatException('Missing required field: nameRegion.width'));
+      final nameRegionHeight = nameRegion['height'] as int? ??
+          (throw FormatException('Missing required field: nameRegion.height'));
+
+      final fieldBlocksList = json['fieldBlocks'] as List? ??
+          (throw FormatException('Missing required field: fieldBlocks'));
+
+      final fieldBlocks = <FieldBlock>[];
+      for (var i = 0; i < fieldBlocksList.length; i++) {
+        final block = fieldBlocksList[i];
+        if (block is! Map<String, dynamic>) {
+          throw FormatException(
+            'Invalid fieldBlocks[$i]: expected Map<String, dynamic>, got ${block.runtimeType}',
+          );
+        }
+        try {
+          fieldBlocks.add(FieldBlock.fromJson(block));
+        } on FormatException catch (e) {
+          throw FormatException('Invalid fieldBlocks[$i]: ${e.message}');
+        }
+      }
+
+      return OmrTemplate(
+        id: id,
+        name: name,
+        version: version,
+        questionCount: questionCount,
+        pageWidth: pageWidth,
+        pageHeight: pageHeight,
+        pageDpi: pageDpi,
+        bubbleWidth: bubbleWidth,
+        bubbleHeight: bubbleHeight,
+        nameRegionX: nameRegionX,
+        nameRegionY: nameRegionY,
+        nameRegionWidth: nameRegionWidth,
+        nameRegionHeight: nameRegionHeight,
+        fieldBlocks: fieldBlocks,
+      );
+    } on FormatException {
+      rethrow;
+    } on TypeError catch (e) {
+      throw FormatException('Invalid JSON type: $e');
+    } catch (e) {
+      throw FormatException('Failed to parse OmrTemplate: $e');
+    }
   }
 
   Map<String, dynamic> toJson() {

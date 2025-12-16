@@ -67,11 +67,18 @@ class ScanResultModel extends HiveObject {
   ScanResult toEntity() {
     final Map<String, AnswerStatus> detectedAnswers = {};
     for (final entry in detectedAnswerValues.entries) {
-      final statusString = answerStatuses[entry.key] ?? 'BLANK';
-      detectedAnswers[entry.key] = AnswerStatus.fromJson(
-        statusString,
-        entry.value,
-      );
+      if (!answerStatuses.containsKey(entry.key)) {
+        detectedAnswers[entry.key] = AnswerStatus.inconsistent(
+          'Missing status for key "${entry.key}" '
+          '(detectedValue: ${entry.value ?? "null"})',
+        );
+        continue;
+      }
+      final statusString = answerStatuses[entry.key]!;
+      detectedAnswers[entry.key] = AnswerStatus.fromJson({
+        'type': statusString,
+        if (entry.value != null) 'value': entry.value,
+      });
     }
 
     return ScanResult(
@@ -95,8 +102,9 @@ class ScanResultModel extends HiveObject {
     final Map<String, String> statuses = {};
 
     for (final entry in result.detectedAnswers.entries) {
-      answerValues[entry.key] = entry.value.value;
-      statuses[entry.key] = entry.value.toJson();
+      final json = entry.value.toJson();
+      answerValues[entry.key] = json['value'] as String?;
+      statuses[entry.key] = json['type'] as String;
     }
 
     return ScanResultModel(

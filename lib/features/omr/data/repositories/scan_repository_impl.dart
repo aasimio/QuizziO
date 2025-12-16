@@ -44,8 +44,11 @@ class ScanRepositoryImpl implements ScanRepository {
 
   @override
   Future<void> deleteByQuizId(String quizId) async {
-    final keysToDelete = _box.keys
-        .where((key) => _box.get(key)?.quizId == quizId)
+    final keysToDelete = _box
+        .toMap()
+        .entries
+        .where((entry) => entry.value.quizId == quizId)
+        .map((entry) => entry.key)
         .toList();
     await _box.deleteAll(keysToDelete);
   }
