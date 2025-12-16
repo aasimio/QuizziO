@@ -103,7 +103,7 @@ lib/
 └── main.dart                # Entry point (uses CameraTestPage)
 ```
 
-Clean Architecture is the target, but domain/data layers are not implemented yet; most non-OMR files are placeholders.
+Clean Architecture is the target. Domain/data layers are implemented for quiz and OMR features; presentation layer (BLoCs, pages) is next.
 
 ### Clean Architecture Rules
 
@@ -147,8 +147,13 @@ features/<feature_name>/
    - Detailed results in `omr_spike/SPIKE_RESULTS.md`
    - Note: Spike uses old template matching; main app now uses ArUco
 
-3. **Quiz/Export Scaffolds** (`lib/features/quiz`, `lib/features/export`)
-   - Placeholder BLoC/pages/widgets and `pdf_export_service.dart` with no implementation yet
+3. **Quiz Feature** (`lib/features/quiz`)
+   - Domain: `Quiz` entity, `QuizRepository` interface
+   - Data: `QuizModel` (Hive), `QuizRepositoryImpl`
+   - Presentation: BLoC/pages/widgets scaffolded but not implemented yet
+
+4. **Export Feature** (`lib/features/export`)
+   - `pdf_export_service.dart` scaffolded but not implemented yet
 
 ### Key Architectural Patterns
 
@@ -230,7 +235,7 @@ class QuizPage extends StatelessWidget {
 - Call `Hive.close()` on app lifecycle pause
 - Never use dynamic boxes
 
-Current state: `main.dart` opens untyped `quizzes` and `scan_results` boxes as placeholders until models/adapters are added.
+Current state: `main.dart` registers `QuizModelAdapter` and `ScanResultModelAdapter`, then opens typed boxes.
 
 **Example Pattern**:
 ```dart
