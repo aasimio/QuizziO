@@ -1,6 +1,7 @@
 # Task List Management
 
 Guidelines for managing task lists (@Tasks/Development-Plan-v2_3.md) in markdown files to track progress on development tasks.
+
 ## Task Implementation
 - **One sub-task at a time:** Do **NOT** start the next sub‑task until you ask the user for permission and they say "yes" or "y"
 - **Completion protocol:**  

@@ -15,13 +15,13 @@ class QuizMenuArgs {
 }
 
 class QuizMenuPage extends StatelessWidget {
-  final QuizMenuArgs? args;
+  final QuizMenuArgs args;
 
-  const QuizMenuPage({super.key, this.args});
+  const QuizMenuPage({super.key, required this.args});
 
   @override
   Widget build(BuildContext context) {
-    final quizName = args?.quizName ?? 'Unknown Quiz';
+    final quizName = args.quizName;
 
     return Scaffold(
       appBar: AppBar(
@@ -40,7 +40,7 @@ class QuizMenuPage extends StatelessWidget {
                 context,
                 AppRoutes.editAnswerKey,
                 arguments: EditAnswerKeyArgs(
-                  quizId: args?.quizId ?? '',
+                  quizId: args.quizId,
                   quizName: quizName,
                 ),
               );
@@ -56,7 +56,7 @@ class QuizMenuPage extends StatelessWidget {
                 context,
                 AppRoutes.scanPapers,
                 arguments: ScanPapersArgs(
-                  quizId: args?.quizId ?? '',
+                  quizId: args.quizId,
                   quizName: quizName,
                 ),
               );
@@ -72,7 +72,7 @@ class QuizMenuPage extends StatelessWidget {
                 context,
                 AppRoutes.gradedPapers,
                 arguments: GradedPapersArgs(
-                  quizId: args?.quizId ?? '',
+                  quizId: args.quizId,
                   quizName: quizName,
                 ),
               );

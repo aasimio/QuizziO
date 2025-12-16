@@ -33,6 +33,17 @@ class QuizziOApp extends StatelessWidget {
 
       case AppRoutes.quizMenu:
         final args = settings.arguments as QuizMenuArgs?;
+        if (args == null) {
+          return MaterialPageRoute(
+            builder: (_) => Scaffold(
+              appBar: AppBar(title: const Text('Error')),
+              body: const Center(
+                child: Text('Missing required quiz arguments'),
+              ),
+            ),
+            settings: settings,
+          );
+        }
         return MaterialPageRoute(
           builder: (_) => QuizMenuPage(args: args),
           settings: settings,
