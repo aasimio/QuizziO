@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'app.dart';
 import 'core/constants/hive_boxes.dart';
+import 'features/omr/data/models/scan_result_model.dart';
+import 'features/quiz/data/models/quiz_model.dart';
 import 'injection.dart';
 
 Future<void> main() async {
@@ -13,9 +15,13 @@ Future<void> main() async {
   // Initialize Hive
   await Hive.initFlutter();
 
-  // Open boxes (untyped for now, will be typed when models are created in Phase 1)
-  await Hive.openBox(HiveBoxes.quizzes);
-  await Hive.openBox(HiveBoxes.scanResults);
+  // Register adapters before opening boxes
+  Hive.registerAdapter(QuizModelAdapter());
+  Hive.registerAdapter(ScanResultModelAdapter());
+
+  // Open typed boxes
+  await Hive.openBox<QuizModel>(HiveBoxes.quizzes);
+  await Hive.openBox<ScanResultModel>(HiveBoxes.scanResults);
 
   runApp(const QuizziOApp());
 }

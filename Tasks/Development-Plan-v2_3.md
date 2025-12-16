@@ -242,8 +242,8 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 > Build entities, models, repositories
 **Est:** 2-3 days
 
-- [ ] **1.1 Quiz Domain Layer** — 🧠
-  - [ ] 1.1.1 `domain/entities/quiz.dart`: — 🧠
+- [x] **1.1 Quiz Domain Layer** — 🧠
+  - [x] 1.1.1 `domain/entities/quiz.dart`: — 🧠
     ```dart
     class Quiz extends Equatable {
       final String id;
@@ -253,17 +253,17 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
       final Map<String, String> answerKey; // {'q1': 'A', ...}
     }
     ```
-  - [ ] 1.1.2 `domain/repositories/quiz_repository.dart` (interface): — 🧠
+  - [x] 1.1.2 `domain/repositories/quiz_repository.dart` (interface): — 🧠
     - `Future<List<Quiz>> getAll()`
     - `Future<Quiz?> getById(String id)`
     - `Future<void> save(Quiz quiz)`
     - `Future<void> delete(String id)`
-  - **Done when:** Entities + interfaces compile
+  - **Done when:** Entities + interfaces compile ✅
 
 ---
 
-- [ ] **1.2 Quiz Data Layer** — 🧠🧠
-  - [ ] 1.2.1 `data/models/quiz_model.dart` extends `Quiz`: — 🧠🧠
+- [x] **1.2 Quiz Data Layer** — 🧠🧠
+  - [x] 1.2.1 `data/models/quiz_model.dart` extends `Quiz`: — 🧠🧠
     ```dart
     @HiveType(typeId: 0)
     class QuizModel extends Quiz {
@@ -271,17 +271,17 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
       // toEntity() / fromEntity() methods
     }
     ```
-  - [ ] 1.2.2 Run: `dart run build_runner build` → generates adapter — 🧠
-  - [ ] 1.2.3 Register adapter in `main.dart`: `Hive.registerAdapter(QuizModelAdapter())` — 🧠
-  - [ ] 1.2.4 `data/repositories/quiz_repository_impl.dart`: — 🧠🧠
+  - [x] 1.2.2 Run: `dart run build_runner build` → generates adapter — 🧠
+  - [x] 1.2.3 Register adapter in `main.dart`: `Hive.registerAdapter(QuizModelAdapter())` — 🧠
+  - [x] 1.2.4 `data/repositories/quiz_repository_impl.dart`: — 🧠🧠
     - Inject Hive box
     - Implement CRUD with box operations
-  - **Done when:** Save/load works in basic test
+  - **Done when:** Save/load works in basic test ✅
 
 ---
 
-- [ ] **1.3 OMR Domain Layer** — 🧠🧠
-  - [ ] 1.3.1 `domain/entities/answer_status.dart`: — 🧠🧠
+- [x] **1.3 OMR Domain Layer** — 🧠🧠
+  - [x] 1.3.1 `domain/entities/answer_status.dart`: — 🧠🧠
     ```dart
     enum AnswerType { valid, blank, multipleMark }
     
@@ -292,14 +292,14 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
       String toJson() => type.name.toUpperCase(); // "VALID", "BLANK", "MULTIPLE_MARK"
     }
     ```
-  - [ ] 1.3.2 Create entities: `OmrTemplate`, `FieldBlock`, `ScanResult`, `GradedResult` — 🧠🧠
-  - [ ] 1.3.3 `domain/repositories/scan_repository.dart` + `template_repository.dart` (interfaces) — 🧠
-  - **Done when:** All entities compile with Equatable
+  - [x] 1.3.2 Create entities: `OmrTemplate`, `FieldBlock`, `ScanResult`, `GradedResult` — 🧠🧠
+  - [x] 1.3.3 `domain/repositories/scan_repository.dart` + `template_repository.dart` (interfaces) — 🧠
+  - **Done when:** All entities compile with Equatable ✅
 
 ---
 
 - [ ] **1.4 OMR Data Layer** — 🧠🧠🧠
-  - [ ] 1.4.1 `data/models/scan_result_model.dart` extends `ScanResult`: — 🧠🧠🧠
+  - [x] 1.4.1 `data/models/scan_result_model.dart` extends `ScanResult`: — 🧠🧠🧠
     ```dart
     @HiveType(typeId: 1)
     class ScanResultModel extends ScanResult {
@@ -318,9 +318,9 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
       @HiveField(12) String? rawBubbleValues; // JSON string for debug
     }
     ```
-  - [ ] 1.4.2 Generate adapter, register in `main.dart` — 🧠
-  - [ ] 1.4.3 Implement `ScanRepositoryImpl` with Hive CRUD — 🧠🧠
-  - [ ] 1.4.4 Implement `TemplateRepositoryImpl`: — 🧠🧠🧠
+  - [x] 1.4.2 Generate adapter, register in `main.dart` — 🧠
+  - [x] 1.4.3 Implement `ScanRepositoryImpl` with Hive CRUD — 🧠🧠
+  - [x] 1.4.4 Implement `TemplateRepositoryImpl`: — 🧠🧠🧠
     - Load JSONs from `assets/templates/` via `rootBundle`
     - Parse to `OmrTemplate` entities
     - Cache in memory
