@@ -107,7 +107,7 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 ### Presentation Layer
 | File | Purpose | Status |
 |------|---------|--------|
-| `features/quiz/presentation/bloc/quiz_bloc.dart` | Quiz CRUD state | 🆕 Create |
+| `features/quiz/presentation/bloc/quiz_bloc.dart` | Quiz CRUD state | ✅ Created |
 | `features/quiz/presentation/cubit/answer_key_cubit.dart` | Answer key editing | 🆕 Create |
 | `features/quiz/presentation/pages/{quizzes,quiz_menu,edit_answer_key}_page.dart` | Screens 1, 3, 4 | 🆕 Create all |
 | `features/quiz/presentation/widgets/{quiz_card,quiz_dialog,answer_key_row}.dart` | Quiz UI components | 🆕 Create all |
@@ -347,12 +347,12 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 > Quizzes list, create/edit, menu
 **Est:** 2-3 days
 
-- [ ] **2.1 QuizBloc** — 🧠🧠
-  - [ ] 2.1.1 Events: `LoadQuizzes`, `CreateQuiz`, `UpdateQuiz`, `DeleteQuiz` — 🧠
-  - [ ] 2.1.2 States: `QuizInitial`, `QuizLoading`, `QuizLoaded`, `QuizError` — 🧠
-  - [ ] 2.1.3 Inject `QuizRepository`, implement event handlers — 🧠🧠
-  - [ ] 2.1.4 Register in DI — 🧠
-  - **Done when:** BLoC tests pass (`bloc_test`)
+- [x] **2.1 QuizBloc** — 🧠🧠
+  - [x] 2.1.1 Events: `LoadQuizzes`, `CreateQuiz`, `UpdateQuiz`, `DeleteQuiz` — 🧠
+  - [x] 2.1.2 States: `QuizInitial`, `QuizLoading`, `QuizLoaded`, `QuizError` — 🧠
+  - [x] 2.1.3 Inject `QuizRepository`, implement event handlers — 🧠🧠
+  - [x] 2.1.4 Register in DI — 🧠
+  - **Done when:** BLoC tests pass (`bloc_test`) ✅
 
 ---
 
