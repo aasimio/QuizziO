@@ -23,8 +23,9 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 
 **Current State:** 
 - ✅ Clean architecture folders, OMR spike (98%+ validated), template JSONs, ArUco markers
-- ✅ Phase 0.6 complete: Camera + ArUco marker detection working on iOS (~38 FPS)
-- 🔜 Next: App navigation setup (0.7), then Data Layer (Phase 1)
+- ✅ Phase 0 complete: Foundation, camera, ArUco detection working on iOS (~38 FPS)
+- ✅ Phase 1 complete: Data Layer (entities, models, repositories, supporting services)
+- 🔜 Next: Phase 2 - Quiz Management (Screens 1-3)
 
 **Reference:** `QuizziO-PRD.md`, `QuizziO-Tech-Stack.md`
 
@@ -87,8 +88,8 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 | `features/omr/services/threshold_calculator.dart` | Gap-finding | ✅ Migrated |
 | `features/omr/services/answer_extractor.dart` | Multi-mark/blank detection | ✅ Migrated |
 | `features/omr/services/omr_scanner_service.dart` | Pipeline orchestrator | ✅ Migrated |
-| `features/omr/services/grading_service.dart` | Score calculation | 🆕 Create |
-| `features/omr/services/template_manager.dart` | Load JSON templates | 🆕 Create |
+| `features/omr/services/grading_service.dart` | Score calculation | ✅ Created |
+| `features/omr/services/template_manager.dart` | Load JSON templates | ✅ Created |
 | `core/services/camera_service.dart` | Camera lifecycle | ✅ Implemented |
 
 ### Data Layer
@@ -328,17 +329,17 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 
 ---
 
-- [ ] **1.5 Supporting Services** — 🧠🧠
-  - [ ] 1.5.1 `features/omr/services/template_manager.dart`: — 🧠🧠
+- [x] **1.5 Supporting Services** — 🧠🧠
+  - [x] 1.5.1 `features/omr/services/template_manager.dart`: — 🧠🧠
     - Wrapper around `TemplateRepository`
     - `Future<OmrTemplate> getTemplate(String id)`
     - `List<String> getAvailableTemplateIds()`
-  - [ ] 1.5.2 `features/omr/services/grading_service.dart`: — 🧠🧠
+  - [x] 1.5.2 `features/omr/services/grading_service.dart`: — 🧠🧠
     - Input: `Map<String, AnswerStatus> extractedAnswers`, `Map<String, String> answerKey`
     - Output: `GradedResult` with correct/incorrect/blank/multiMark counts
     - Grading rules: correct=+1, all else=0
-  - [ ] 1.5.3 Register both in DI — 🧠
-  - **Done when:** Services instantiate via DI, basic logic works
+  - [x] 1.5.3 Register both in DI — 🧠
+  - **Done when:** Services instantiate via DI, basic logic works ✅
 
 ---
 
