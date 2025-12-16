@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 
-class GradedPapersArgs {
+class EditAnswerKeyArgs {
   final String quizId;
   final String quizName;
 
-  const GradedPapersArgs({
+  const EditAnswerKeyArgs({
     required this.quizId,
     required this.quizName,
   });
 }
 
-class GradedPapersPage extends StatelessWidget {
-  final GradedPapersArgs? args;
+class EditAnswerKeyPage extends StatelessWidget {
+  final EditAnswerKeyArgs? args;
 
-  const GradedPapersPage({super.key, this.args});
+  const EditAnswerKeyPage({super.key, this.args});
 
   @override
   Widget build(BuildContext context) {
@@ -21,12 +21,20 @@ class GradedPapersPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Results - $quizName'),
+        title: Text('Answer Key - $quizName'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.save),
+            onPressed: () {
+              // TODO: Implement save answer key
+            },
+          ),
+        ],
       ),
       body: const Center(
         child: Text(
-          'Graded papers list will be shown here',
+          'Answer key editor will be implemented here',
           style: TextStyle(fontSize: 16, color: Colors.grey),
         ),
       ),

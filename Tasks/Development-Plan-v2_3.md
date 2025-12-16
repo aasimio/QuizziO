@@ -209,16 +209,16 @@
 
 ---
 
-- [ ] **0.7 App Navigation Setup**
-  - [ ] 0.7.1 Create route constants in `lib/core/constants/app_constants.dart`
-  - [ ] 0.7.2 Configure `MaterialApp` in `app.dart` with named routes:
+- [x] **0.7 App Navigation Setup**
+  - [x] 0.7.1 Create route constants in `lib/core/constants/app_constants.dart`
+  - [x] 0.7.2 Configure `MaterialApp` in `app.dart` with named routes:
     - `/` → QuizzesPage
     - `/quiz-menu` → QuizMenuPage (with args)
     - `/edit-answer-key` → EditAnswerKeyPage (with args)
     - `/scan-papers` → ScanPapersPage (with args)
     - `/graded-papers` → GradedPapersPage (with args)
     - `/scan-result-detail` → ScanResultDetailPage (with args)
-  - **Done when:** Navigation structure defined, routes registered
+  - **Done when:** Navigation structure defined, routes registered ✅
 
 ---
 
