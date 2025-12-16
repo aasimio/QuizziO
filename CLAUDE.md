@@ -555,3 +555,12 @@ Status: Pipeline validated in `omr_spike`; main app currently includes `CameraTe
 - OMR answer sheets must now use ArUco markers at corners instead of solid black squares
 - Use `aruco_test_sheet.png` as reference for marker placement
 - Old sheets with black square markers will NOT be detected
+
+## Session: 2025-12-16
+
+**Phase 1 Data Layer Complete**
+- Implemented `GradingService` - compares extracted answers to answer key, returns `GradedResult`
+- Implemented `TemplateManager` - wrapper around `TemplateRepository` for service-layer access
+- Both registered in DI via `@lazySingleton`
+- ✅ Phase 1 complete: All entities, models, repositories, and supporting services implemented
+- 🔜 Next: Phase 2 - Quiz Management (BLoCs, Screens 1-3)
