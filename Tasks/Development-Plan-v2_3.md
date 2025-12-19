@@ -25,7 +25,9 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 - ✅ Clean architecture folders, OMR spike (98%+ validated), template JSONs, ArUco markers
 - ✅ Phase 0 complete: Foundation, camera, ArUco detection working on iOS (~38 FPS)
 - ✅ Phase 1 complete: Data Layer (entities, models, repositories, supporting services)
-- 🔜 Next: Phase 2 - Quiz Management (Screens 1-3)
+- ✅ Phase 2 complete: Quiz Management UI (QuizzesPage, QuizMenuPage, QuizDialog, QuizCard)
+- ✅ Phase 3 complete: Answer Key Management (AnswerKeyCubit, EditAnswerKeyPage, AnswerKeyRow)
+- 🔜 Next: Phase 4 - Scanning (Screen 5)
 
 **Reference:** `QuizziO-PRD.md`, `QuizziO-Tech-Stack.md`
 
@@ -108,13 +110,13 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 | File | Purpose | Status |
 |------|---------|--------|
 | `features/quiz/presentation/bloc/quiz_bloc.dart` | Quiz CRUD state | ✅ Created |
-| `features/quiz/presentation/cubit/answer_key_cubit.dart` | Answer key editing | 🆕 Create |
+| `features/quiz/presentation/cubit/answer_key_cubit.dart` | Answer key editing | ✅ Created |
 | `features/quiz/presentation/pages/quizzes_page.dart` | Screen 1: Quiz list | ✅ Created |
 | `features/quiz/presentation/pages/quiz_menu_page.dart` | Screen 3: Quiz menu (polished design, edit icon) | ✅ Complete |
-| `features/quiz/presentation/pages/edit_answer_key_page.dart` | Screen 4: Answer key | 🆕 Create |
+| `features/quiz/presentation/pages/edit_answer_key_page.dart` | Screen 4: Answer key | ✅ Created |
 | `features/quiz/presentation/widgets/quiz_card.dart` | Quiz list card | ✅ Created |
 | `features/quiz/presentation/widgets/quiz_dialog.dart` | Create/edit dialog | ✅ Created |
-| `features/quiz/presentation/widgets/answer_key_row.dart` | Answer key row | 🆕 Create |
+| `features/quiz/presentation/widgets/answer_key_row.dart` | Answer key row | ✅ Created |
 | `features/omr/presentation/bloc/{scanner,graded_papers}_bloc.dart` | Scanning + results state | 🆕 Create |
 | `features/omr/presentation/pages/{scan_papers,graded_papers,scan_result_detail}_page.dart` | Screens 5, 6 + detail | 🆕 Create all |
 | `features/omr/presentation/widgets/{alignment_overlay,scan_result_popup,graded_paper_card}.dart` | OMR UI components | 🆕 Create all |
@@ -407,34 +409,34 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 > Edit answer key with live persistence
 **Est:** 1-2 days
 
-- [ ] **3.1 AnswerKeyCubit** — 🧠🧠
-  - [ ] 3.1.1 State: `{ Map<String, String> answers, bool isSaving, String? error }` — 🧠
-  - [ ] 3.1.2 Methods: — 🧠🧠
+- [x] **3.1 AnswerKeyCubit** — 🧠🧠
+  - [x] 3.1.1 State: `{ Map<String, String> answers, bool isSaving, String? error }` — 🧠
+  - [x] 3.1.2 Methods: — 🧠🧠
     - `load(String quizId)` → Load from repo
     - `selectAnswer(String questionId, String option)` → Update map, debounce save
     - `save()` → Persist to repo
-  - [ ] 3.1.3 Debounce: 500ms delay after last selection before auto-save — 🧠🧠
-  - [ ] 3.1.4 Register in DI — 🧠
-  - **Done when:** Cubit tests pass, debounce works
+  - [x] 3.1.3 Debounce: 500ms delay after last selection before auto-save — 🧠🧠
+  - [x] 3.1.4 Register in DI — 🧠
+  - **Done when:** Cubit tests pass, debounce works ✅
 
 ---
 
-- [ ] **3.2 Screen 4: Edit Answer Key Page** — 🧠🧠
-  - [ ] 3.2.1 Create `features/quiz/presentation/pages/edit_answer_key_page.dart` — 🧠
-  - [ ] 3.2.2 Load quiz by ID, get question count from template — 🧠🧠
-  - [ ] 3.2.3 AppBar: Quiz name, back button, save indicator (optional) — 🧠
-  - [ ] 3.2.4 Body: `ListView` of `AnswerKeyRow` widgets (one per question) — 🧠
-  - [ ] 3.2.5 Show SnackBar when auto-save completes — 🧠
-  - **Done when:** Page displays all questions, selection saves
+- [x] **3.2 Screen 4: Edit Answer Key Page** — 🧠🧠
+  - [x] 3.2.1 Create `features/quiz/presentation/pages/edit_answer_key_page.dart` — 🧠
+  - [x] 3.2.2 Load quiz by ID, get question count from template — 🧠🧠
+  - [x] 3.2.3 AppBar: Quiz name, back button, save indicator (optional) — 🧠
+  - [x] 3.2.4 Body: `ListView` of `AnswerKeyRow` widgets (one per question) — 🧠
+  - [x] 3.2.5 Show SnackBar when auto-save completes — 🧠
+  - **Done when:** Page displays all questions, selection saves ✅
 
 ---
 
-- [ ] **3.3 AnswerKeyRow Widget** — 🧠
-  - [ ] 3.3.1 Create `features/quiz/presentation/widgets/answer_key_row.dart` — 🧠
-  - [ ] 3.3.2 Layout: `Row([ Text("1."), ChoiceChip("A"), ChoiceChip("B"), ... ])` — 🧠
-  - [ ] 3.3.3 ChoiceChips for A-E, selected state visual — 🧠
-  - [ ] 3.3.4 On tap → Call `cubit.selectAnswer(questionId, option)` — 🧠
-  - **Done when:** Selection is clear, state updates immediately
+- [x] **3.3 AnswerKeyRow Widget** — 🧠
+  - [x] 3.3.1 Create `features/quiz/presentation/widgets/answer_key_row.dart` — 🧠
+  - [x] 3.3.2 Layout: `Row([ Text("1."), ChoiceChip("A"), ChoiceChip("B"), ... ])` — 🧠
+  - [x] 3.3.3 ChoiceChips for A-E, selected state visual — 🧠
+  - [x] 3.3.4 On tap → Call `cubit.selectAnswer(questionId, option)` — 🧠
+  - **Done when:** Selection is clear, state updates immediately ✅
 
 ---
 

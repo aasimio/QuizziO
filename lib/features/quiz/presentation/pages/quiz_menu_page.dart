@@ -127,10 +127,7 @@ class _QuizMenuContent extends StatelessWidget {
               Navigator.pushNamed(
                 context,
                 AppRoutes.editAnswerKey,
-                arguments: EditAnswerKeyArgs(
-                  quizId: quiz.id,
-                  quizName: quiz.name,
-                ),
+                arguments: EditAnswerKeyArgs(quiz: quiz),
               );
             },
           ),
