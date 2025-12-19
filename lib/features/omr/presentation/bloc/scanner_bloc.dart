@@ -10,6 +10,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../../../core/services/camera_service.dart';
 import '../../domain/entities/answer_status.dart';
+import '../../domain/entities/omr_template.dart';
 import '../../domain/entities/scan_result.dart';
 import '../../domain/repositories/scan_repository.dart';
 import '../../models/detection_result.dart';
@@ -88,10 +89,6 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
       await _markerDetector.initialize();
       if (isClosed) return;
 
-      // Load template for bubble positions
-      final template = await _templateManager.getTemplate(event.quiz.templateId);
-      if (isClosed) return;
-
       // Start camera image stream
       _cameraService.startImageStream();
 
@@ -138,6 +135,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
       );
 
       if (mat.isEmpty) {
+        mat.dispose();
         return;
       }
 
@@ -227,6 +225,10 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
     }
 
     try {
+      // Cancel frame subscription before stopping stream
+      await _frameSubscription?.cancel();
+      _frameSubscription = null;
+
       // Stop image stream during capture
       await _cameraService.stopImageStream();
       if (isClosed) return;
@@ -389,6 +391,10 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
     Emitter<ScannerState> emit,
   ) async {
     try {
+      // Cancel any existing subscription to prevent duplicates
+      await _frameSubscription?.cancel();
+      _frameSubscription = null;
+
       // Restart camera stream
       _cameraService.startImageStream();
 
@@ -444,41 +450,27 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
   }
 
   /// Build bubble positions map from template field blocks
-  Map<String, List<Rect>> _buildBubblePositions(
-    dynamic template,
-  ) {
+  Map<String, List<Rect>> _buildBubblePositions(OmrTemplate template) {
     final positions = <String, List<Rect>>{};
 
-    // Access template through dynamic to avoid circular imports
-    final fieldBlocks = template.fieldBlocks as List;
-    final bubbleWidth = template.bubbleWidth as int;
-    final bubbleHeight = template.bubbleHeight as int;
+    final bubbleWidth = template.bubbleWidth;
+    final bubbleHeight = template.bubbleHeight;
 
-    for (final blockDynamic in fieldBlocks) {
-      final block = blockDynamic;
-      final direction = block.direction as String;
-      final originX = block.originX as int;
-      final originY = block.originY as int;
-      final bubblesGap = block.bubblesGap as int;
-      final labelsGap = block.labelsGap as int;
-      final options = block.options as List<String>;
-      final questionLabels = block.questionLabels as List<String>;
+    for (final block in template.fieldBlocks) {
+      final isHorizontal = block.direction == 'horizontal';
 
-      // Determine layout direction
-      final isHorizontal = direction == 'horizontal';
-
-      for (int qIdx = 0; qIdx < questionLabels.length; qIdx++) {
-        final questionId = questionLabels[qIdx];
+      for (int qIdx = 0; qIdx < block.questionLabels.length; qIdx++) {
+        final questionId = block.questionLabels[qIdx];
         final bubbleRects = <Rect>[];
 
-        for (int optIdx = 0; optIdx < options.length; optIdx++) {
+        for (int optIdx = 0; optIdx < block.options.length; optIdx++) {
           final bubbleX = isHorizontal
-              ? originX + (optIdx * (bubbleWidth + bubblesGap))
-              : originX + (qIdx * (bubbleWidth + bubblesGap));
+              ? block.originX + (optIdx * (bubbleWidth + block.bubblesGap))
+              : block.originX + (qIdx * (bubbleWidth + block.bubblesGap));
 
           final bubbleY = isHorizontal
-              ? originY + (qIdx * (bubbleHeight + labelsGap))
-              : originY + (optIdx * (bubbleHeight + labelsGap));
+              ? block.originY + (qIdx * (bubbleHeight + block.labelsGap))
+              : block.originY + (optIdx * (bubbleHeight + block.labelsGap));
 
           bubbleRects.add(Rect.fromLTWH(
             bubbleX.toDouble(),
@@ -514,7 +506,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
   /// Extract name region from captured image
   Future<Uint8List> _extractNameRegion(
     Uint8List imageBytes,
-    dynamic template,
+    OmrTemplate template,
   ) async {
     // Decode image
     final mat = _preprocessor.decodeImage(imageBytes);
@@ -542,17 +534,17 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
         final aligned = await _perspectiveTransformer.transform(
           processed,
           cornerPoints,
-          template.pageWidth as int,
-          template.pageHeight as int,
+          template.pageWidth,
+          template.pageHeight,
         );
 
         try {
           // Crop name region (coordinates are relative to aligned image)
           final nameRegion = aligned.region(cv.Rect(
-            template.nameRegionX as int,
-            template.nameRegionY as int,
-            template.nameRegionWidth as int,
-            template.nameRegionHeight as int,
+            template.nameRegionX,
+            template.nameRegionY,
+            template.nameRegionWidth,
+            template.nameRegionHeight,
           ));
 
           try {

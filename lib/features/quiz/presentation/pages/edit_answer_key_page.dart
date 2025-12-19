@@ -14,14 +14,35 @@ class EditAnswerKeyArgs {
   const EditAnswerKeyArgs({required this.quiz});
 }
 
-class EditAnswerKeyPage extends StatelessWidget {
+class EditAnswerKeyPage extends StatefulWidget {
   final EditAnswerKeyArgs? args;
 
   const EditAnswerKeyPage({super.key, this.args});
 
   @override
+  State<EditAnswerKeyPage> createState() => _EditAnswerKeyPageState();
+}
+
+class _EditAnswerKeyPageState extends State<EditAnswerKeyPage> {
+  AnswerKeyCubit? _cubit;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.args != null) {
+      _cubit = getIt<AnswerKeyCubit>()..load(widget.args!.quiz.id);
+    }
+  }
+
+  @override
+  void dispose() {
+    _cubit?.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (args == null) {
+    if (widget.args == null || _cubit == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Error')),
         body: const Center(
@@ -30,9 +51,9 @@ class EditAnswerKeyPage extends StatelessWidget {
       );
     }
 
-    return BlocProvider<AnswerKeyCubit>(
-      create: (_) => getIt<AnswerKeyCubit>()..load(args!.quiz.id),
-      child: _EditAnswerKeyContent(quiz: args!.quiz),
+    return BlocProvider<AnswerKeyCubit>.value(
+      value: _cubit!,
+      child: _EditAnswerKeyContent(quiz: widget.args!.quiz),
     );
   }
 }

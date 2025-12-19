@@ -55,12 +55,17 @@ class AnswerKeyCubit extends Cubit<AnswerKeyState> {
 
   void selectAnswer(String questionId, String option) {
     final updatedAnswers = Map<String, String>.from(state.answers);
+    updatedAnswers[questionId] = option;
 
-    if (updatedAnswers[questionId] == option) {
-      updatedAnswers.remove(questionId);
-    } else {
-      updatedAnswers[questionId] = option;
-    }
+    emit(state.copyWith(answers: updatedAnswers, clearError: true));
+
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(_debounceDuration, _debouncedSave);
+  }
+
+  void clearAnswer(String questionId) {
+    final updatedAnswers = Map<String, String>.from(state.answers);
+    updatedAnswers.remove(questionId);
 
     emit(state.copyWith(answers: updatedAnswers, clearError: true));
 
