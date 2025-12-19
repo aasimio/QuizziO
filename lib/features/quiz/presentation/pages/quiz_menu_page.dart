@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,6 +9,7 @@ import '../../../../injection.dart';
 import '../../domain/entities/quiz.dart';
 import '../bloc/quiz_bloc.dart';
 import '../bloc/quiz_event.dart';
+import '../bloc/quiz_state.dart';
 import '../widgets/quiz_dialog.dart';
 import '../../../omr/presentation/pages/scan_papers_page.dart';
 import '../../../omr/presentation/pages/graded_papers_page.dart';
@@ -70,29 +73,48 @@ class _QuizMenuContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          quiz.name,
-          style: GoogleFonts.outfit(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        centerTitle: false,
-        backgroundColor: colorScheme.surface,
-        surfaceTintColor: Colors.transparent,
-        actions: [
-          IconButton(
-            icon: Icon(
-              Icons.edit_outlined,
-              color: colorScheme.onSurfaceVariant,
+    return BlocListener<QuizBloc, QuizState>(
+      listener: (context, state) {
+        if (state is QuizError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                state.message,
+                style: GoogleFonts.dmSans(),
+              ),
+              backgroundColor: colorScheme.error,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              duration: const Duration(seconds: 3),
             ),
-            tooltip: 'Edit quiz',
-            onPressed: () => _showEditDialog(context),
+          );
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            quiz.name,
+            style: GoogleFonts.outfit(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-        ],
-      ),
+          centerTitle: false,
+          backgroundColor: colorScheme.surface,
+          surfaceTintColor: Colors.transparent,
+          actions: [
+            IconButton(
+              icon: Icon(
+                Icons.edit_outlined,
+                color: colorScheme.onSurfaceVariant,
+              ),
+              tooltip: 'Edit quiz',
+              onPressed: () => _showEditDialog(context),
+            ),
+          ],
+        ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
         children: [
@@ -148,6 +170,7 @@ class _QuizMenuContent extends StatelessWidget {
           ),
         ],
       ),
+      ),
     );
   }
 
@@ -155,28 +178,48 @@ class _QuizMenuContent extends StatelessWidget {
     final result = await QuizDialog.show(context, quiz: quiz);
 
     if (result != null && result is Quiz && context.mounted) {
+      final bloc = context.read<QuizBloc>();
+
+      // Listen for bloc state changes to confirm success
+      StreamSubscription<QuizState>? subscription;
+      subscription = bloc.stream.listen((state) {
+        if (!context.mounted) {
+          subscription?.cancel();
+          return;
+        }
+
+        if (state is QuizLoaded) {
+          // Find the updated quiz in the list
+          final updatedQuiz = state.quizzes.firstWhere(
+            (q) => q.id == result.id,
+            orElse: () => result,
+          );
+
+          // Update local state
+          onQuizUpdated(updatedQuiz);
+
+          // Show success confirmation
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Quiz updated',
+                style: GoogleFonts.dmSans(),
+              ),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              duration: const Duration(seconds: 2),
+            ),
+          );
+
+          // Cancel subscription after handling
+          subscription?.cancel();
+        }
+      });
+
       // Dispatch update event
-      context.read<QuizBloc>().add(UpdateQuiz(quiz: result));
-
-      // Update local state
-      onQuizUpdated(result);
-
-      // Show confirmation
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Quiz updated',
-              style: GoogleFonts.dmSans(),
-            ),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            duration: const Duration(seconds: 2),
-          ),
-        );
-      }
+      bloc.add(UpdateQuiz(quiz: result));
     }
   }
 }
