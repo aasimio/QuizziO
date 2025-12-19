@@ -14,7 +14,7 @@ QuizziO is building a Flutter application for OMR (Optical Mark Recognition) qui
 │   ├── core/                # Camera service, constants, stubs for utils/errors/extensions
 │   ├── features/
 │   │   ├── omr/             # Implemented services + camera_test_page; marker model
-│   │   ├── quiz/            # Presentation stubs (no logic yet)
+│   │   ├── quiz/            # Quiz CRUD: BLoC, pages, widgets
 │   │   └── export/          # Stub widget/service for PDF export
 │   ├── injection.dart(.config.dart)  # get_it + injectable setup
 │   ├── main.dart            # Entry point (Hive init, CameraTestPage)
@@ -97,13 +97,13 @@ lib/
 ├── core/                    # Constants + camera service (utils/errors/extensions are stubs)
 ├── features/                # Feature modules
 │   ├── omr/                 # OMR services + camera_test_page, detection_result model
-│   ├── quiz/                # Pages/widgets/BLoC stubs only
+│   ├── quiz/                # Quiz CRUD: BLoC, pages (list, menu), widgets (card, dialog)
 │   └── export/              # PDF export stub (service/widget empty)
 ├── injection.dart(.config.dart)  # DI setup
 └── main.dart                # Entry point (uses CameraTestPage)
 ```
 
-Clean Architecture is the target. Domain/data layers are implemented for quiz and OMR features; presentation layer (BLoCs, pages) is next.
+Clean Architecture is the target. Domain/data/presentation layers are implemented for quiz feature; OMR presentation layer is next.
 
 ### Clean Architecture Rules
 
@@ -150,14 +150,14 @@ features/<feature_name>/
 3. **Quiz Feature** (`lib/features/quiz`)
    - Domain: `Quiz` entity, `QuizRepository` interface
    - Data: `QuizModel` (Hive), `QuizRepositoryImpl`
-   - Presentation: BLoC/pages/widgets scaffolded but not implemented yet
+   - Presentation: `QuizBloc` (CRUD), `QuizzesPage`, `QuizMenuPage`, `QuizCard`, `QuizDialog`
 
 4. **Export Feature** (`lib/features/export`)
    - `pdf_export_service.dart` scaffolded but not implemented yet
 
 ### Key Architectural Patterns
 
-- **BLoC Pattern (planned)**: State management using the BLoC pattern (see `presentation/bloc/` in features)
+- **BLoC Pattern**: State management using the BLoC pattern (`QuizBloc` implemented)
 - **Dependency Flow**: presentation → domain → data (dependencies point inward)
 - **Repository Pattern**: Abstract repositories in domain layer, implemented in data layer
 - **Use Cases**: Each business action is a separate use case class in `domain/usecases/`
@@ -166,7 +166,7 @@ features/<feature_name>/
 
 ### BLoC/Cubit
 
-No BLoC/Cubit classes are implemented yet; keep these rules for future state.
+`QuizBloc` is implemented; follow these rules for all BLoC/Cubit classes.
 
 **State Management Rules**:
 - All states MUST extend `Equatable` with ALL fields in `props`
@@ -441,8 +441,8 @@ Follow the technical implementation standards in the sections above, including:
 ## Dependencies
 
 Root `pubspec.yaml` dependencies (main app):
-- UI: `cupertino_icons`, `flutter_svg`
-- State: `flutter_bloc`, `equatable` (not used yet)
+- UI: `cupertino_icons`, `flutter_svg`, `google_fonts`
+- State: `flutter_bloc`, `equatable`
 - DI: `get_it`, `injectable`
 - Storage: `hive`, `hive_flutter`
 - Camera/permissions: `camera`, `permission_handler`
