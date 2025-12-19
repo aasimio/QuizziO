@@ -37,6 +37,7 @@ migrate_working_dir/
 # Temporary files
 a.
 "Git Commits Complete.md"
+notes.md
 
 # Symbolication related
 app.*.symbols
