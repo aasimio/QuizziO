@@ -1,0 +1,29 @@
+{
+  "name": "Sample Configuration",
+  "description": "Sample configuration for QuizziO. Customize as needed for your environment. NOTE: This uses development-friendly defaults (e.g., debug logging). For production, review and adjust settings accordingly.",
+  "version": "1.0.0",
+  "features": {
+    "omr_scanning": {
+      "enabled": true,
+      "min_marker_confidence": 0.85,
+      "bubble_detection": {
+        "threshold": 0.4,
+        "adaptive_block_size": 11
+      }
+    },
+    "quiz_management": {
+      "enabled": true,
+      "max_quizzes": 1000,
+      "export_format": "pdf"
+    },
+    "ui": {
+      "theme": "material_3",
+      "dark_mode": "auto"
+    }
+  },
+  "logging": {
+    "level": "debug",
+    "output": "console",
+    "_comment": "IMPORTANT: 'debug' is verbose and development-focused. For production, use 'info' (standard) or 'warn' (minimal). Levels: error < warn < info < debug < verbose"
+  }
+}

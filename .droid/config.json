@@ -1,0 +1,9 @@
+{
+  "version": "1.0",
+  "description": "Droid configuration for QuizziO project",
+  "skills": {
+    "enabled": [
+      "quizzio-flutter-design"
+    ]
+  }
+}

@@ -150,7 +150,9 @@ features/<feature_name>/
 3. **Quiz Feature** (`lib/features/quiz`)
    - Domain: `Quiz` entity, `QuizRepository` interface
    - Data: `QuizModel` (Hive), `QuizRepositoryImpl`
-   - Presentation: `QuizBloc` (CRUD), `QuizzesPage`, `QuizMenuPage`, `QuizCard`, `QuizDialog`
+   - Presentation: `QuizBloc` (CRUD), `AnswerKeyCubit` (answer key editing with 500ms debounced auto-save)
+   - Pages: `QuizzesPage`, `QuizMenuPage`, `EditAnswerKeyPage`
+   - Widgets: `QuizCard`, `QuizDialog`, `AnswerKeyRow`
 
 4. **Export Feature** (`lib/features/export`)
    - `pdf_export_service.dart` scaffolded but not implemented yet
