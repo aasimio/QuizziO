@@ -444,17 +444,17 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 > Camera view, alignment, auto-capture, processing
 **Est:** 3-4 days (heaviest phase)
 
-- [ ] **4.1 ScannerBloc State Machine** — 🧠🧠🧠
-  - [ ] 4.1.1 States: `Idle`, `Initializing`, `Previewing`, `Aligning`, `Capturing`, `Processing`, `Result`, `Error` — 🧠🧠
-  - [ ] 4.1.2 Events: `InitCamera`, `MarkerDetected`, `MarkerLost`, `CaptureTriggered`, `ProcessingComplete`, `RescanRequested`, `ResultDismissed`, `ErrorOccurred` — 🧠🧠
-  - [ ] 4.1.3 Inject: `CameraService`, `OmrScannerService`, `GradingService`, `ScanRepository` — 🧠🧠
-  - [ ] 4.1.4 Logic: — 🧠🧠🧠
-    - `Previewing` → poll camera frames (10 FPS), detect markers
-    - `Aligning` → markers stable for 500ms → emit `CaptureTriggered`
-    - `Capturing` → capture high-res image → emit processing
+- [x] **4.1 ScannerBloc State Machine** — 🧠🧠🧠
+  - [x] 4.1.1 States: `Idle`, `Initializing`, `Previewing`, `Aligning`, `Capturing`, `Processing`, `Result`, `Error` — 🧠🧠
+  - [x] 4.1.2 Events: `InitCamera`, `MarkersUpdated`, `StabilityAchieved/Lost`, `ImageCaptured`, `ProcessingUpdate/Complete`, `ResultDismissed`, `RetryRequested`, `ErrorOccurred` — 🧠🧠
+  - [x] 4.1.3 Inject: `CameraService`, `OmrPipeline`, `GradingService`, `ScanRepository`, `TemplateManager`, `ImagePreprocessor`, `MarkerDetector`, `PerspectiveTransformer` — 🧠🧠
+  - [x] 4.1.4 Logic: — 🧠🧠🧠
+    - `Previewing` → stream camera frames, detect markers with throttling
+    - `Aligning` → markers stable for 500ms → auto-capture triggered
+    - `Capturing` → capture high-res image → start processing
     - `Processing` → run OMR pipeline → grade → save → emit `Result`
-  - [ ] 4.1.5 Register in DI — 🧠
-  - **Done when:** State machine tests pass
+  - [x] 4.1.5 Register in DI — 🧠
+  - **Done when:** State machine tests pass ✅
 
 ---
 
