@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -68,6 +70,12 @@ class ScanResultPopup extends StatelessWidget {
               size: 36,
               color: getScoreColor(scanResult.percentage),
             ),
+          ),
+          const SizedBox(height: 16),
+
+          // Name region image preview
+          _NameRegionPreview(
+            imageBytes: scanResult.nameRegionImage,
           ),
           const SizedBox(height: 16),
 
@@ -214,6 +222,83 @@ class _StatusChip extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Displays the name region image from the scanned answer sheet.
+/// Shows a placeholder if the image data is empty.
+class _NameRegionPreview extends StatelessWidget {
+  final Uint8List imageBytes;
+
+  const _NameRegionPreview({
+    required this.imageBytes,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    // Show placeholder if image is empty
+    if (imageBytes.isEmpty) {
+      return Container(
+        width: double.infinity,
+        height: 48,
+        decoration: BoxDecoration(
+          color: colorScheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: colorScheme.outlineVariant,
+            width: 1,
+          ),
+        ),
+        child: Center(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.person_outline,
+                size: 20,
+                color: colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Name region preview',
+                style: GoogleFonts.dmSans(
+                  fontSize: 14,
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Show actual image
+    return Container(
+      width: double.infinity,
+      height: 48,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: colorScheme.outlineVariant,
+          width: 1,
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Image.memory(
+        imageBytes,
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stackTrace) {
+          return Center(
+            child: Icon(
+              Icons.broken_image_outlined,
+              color: colorScheme.onSurfaceVariant,
+            ),
+          );
+        },
       ),
     );
   }

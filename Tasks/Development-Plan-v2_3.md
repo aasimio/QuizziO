@@ -490,7 +490,7 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 
 ---
 
-- [x] **4.4 ScanResultPopup Widget** — 🧠🧠
+- [x] **4.4 ScanResultPopup Widget** — 🧠🧠 ✅
   - [x] 4.4.1 Create `features/omr/presentation/widgets/scan_result_popup.dart` — 🧠
   - [x] 4.4.2 Dialog with: — 🧠🧠
     - Score: "18 / 20 = 90%"
@@ -499,8 +499,8 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
     - Buttons: "View Details", "Continue"
   - [x] 4.4.3 "View Details" → Navigate to `/scan-result-detail` — 🧠
   - [x] 4.4.4 "Continue" → Dispatch `ResultDismissed` event → back to `Previewing` — 🧠
-  - [ ] 4.4.5 Name region image preview (placeholder - Phase 5) — 🧠
-  - **Done when:** Popup displays correctly, buttons work ✅ (name region pending)
+  - [x] 4.4.5 Name region image preview (placeholder - Phase 5) — 🧠
+  - **Done when:** Popup displays correctly, buttons work ✅
 
 ---
 
