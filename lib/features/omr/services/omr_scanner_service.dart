@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'dart:typed_data';
 import 'dart:ui';
 import 'package:injectable/injectable.dart';
@@ -83,7 +84,7 @@ class OmrPipeline {
 
     try {
       // Step 1: Convert bytes to Mat
-      mat = _preprocessor.uint8ListToMat(imageBytes);
+      mat = _preprocessor.decodeImage(imageBytes);
 
       // Step 2: Preprocess image
       processed = await _preprocessor.preprocess(mat);
@@ -148,8 +149,12 @@ class OmrPipeline {
       aligned?.dispose();
 
       // Log error details for debugging (not exposed to user)
-      print('Pipeline error: $e');
-      print('Stack trace: $stackTrace');
+      developer.log(
+        'Pipeline error',
+        name: 'OmrScannerService',
+        error: e,
+        stackTrace: stackTrace,
+      );
 
       stopwatch.stop();
       return OmrResult(

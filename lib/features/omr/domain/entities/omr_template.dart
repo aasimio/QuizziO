@@ -49,18 +49,23 @@ class OmrTemplate extends Equatable {
       final pageDimensions = json['pageDimensions'] as Map<String, dynamic>? ??
           (throw FormatException('Missing required field: pageDimensions'));
       final pageWidth = pageDimensions['width'] as int? ??
-          (throw FormatException('Missing required field: pageDimensions.width'));
+          (throw FormatException(
+              'Missing required field: pageDimensions.width'));
       final pageHeight = pageDimensions['height'] as int? ??
-          (throw FormatException('Missing required field: pageDimensions.height'));
+          (throw FormatException(
+              'Missing required field: pageDimensions.height'));
       final pageDpi = pageDimensions['dpi'] as int? ??
           (throw FormatException('Missing required field: pageDimensions.dpi'));
 
-      final bubbleDimensions = json['bubbleDimensions'] as Map<String, dynamic>? ??
+      final bubbleDimensions = json['bubbleDimensions']
+              as Map<String, dynamic>? ??
           (throw FormatException('Missing required field: bubbleDimensions'));
       final bubbleWidth = bubbleDimensions['width'] as int? ??
-          (throw FormatException('Missing required field: bubbleDimensions.width'));
+          (throw FormatException(
+              'Missing required field: bubbleDimensions.width'));
       final bubbleHeight = bubbleDimensions['height'] as int? ??
-          (throw FormatException('Missing required field: bubbleDimensions.height'));
+          (throw FormatException(
+              'Missing required field: bubbleDimensions.height'));
 
       final nameRegion = json['nameRegion'] as Map<String, dynamic>? ??
           (throw FormatException('Missing required field: nameRegion'));

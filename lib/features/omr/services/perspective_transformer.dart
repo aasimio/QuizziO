@@ -91,8 +91,7 @@ class PerspectiveTransformer {
 
   /// Converts list of Point objects to VecPoint for OpenCV
   cv.VecPoint _pointsToVecPoint(List<Point> points) {
-    return cv.VecPoint.fromList([
-      for (final p in points) cv.Point(p.x.toInt(), p.y.toInt())
-    ]);
+    return cv.VecPoint.fromList(
+        [for (final p in points) cv.Point(p.x.toInt(), p.y.toInt())]);
   }
 }

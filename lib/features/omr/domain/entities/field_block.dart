@@ -131,7 +131,8 @@ class FieldBlock extends Equatable {
     if (questionLabelsRaw == null) {
       questionLabels = [];
     } else if (questionLabelsRaw is List) {
-      questionLabels = questionLabelsRaw.map((e) => e?.toString() ?? '').toList();
+      questionLabels =
+          questionLabelsRaw.map((e) => e?.toString() ?? '').toList();
     } else {
       throw FormatException(
         "FieldBlock: 'questionLabels' must be a List, "

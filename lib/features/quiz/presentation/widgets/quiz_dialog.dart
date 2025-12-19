@@ -135,7 +135,7 @@ class _QuizDialogState extends State<QuizDialog> {
 
               // Template dropdown
               DropdownButtonFormField<String>(
-                value: _selectedTemplateId,
+                initialValue: _selectedTemplateId,
                 decoration: InputDecoration(
                   labelText: 'Template',
                   labelStyle: GoogleFonts.dmSans(),

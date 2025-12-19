@@ -7,6 +7,7 @@ class Quiz extends Equatable {
   final DateTime createdAt;
   final Map<String, String> answerKey;
 
+  // ignore: prefer_const_constructors_in_immutables
   Quiz({
     required this.id,
     required this.name,
@@ -15,7 +16,7 @@ class Quiz extends Equatable {
     Map<String, String> answerKey = const {},
   }) : answerKey = Map.unmodifiable(Map.from(answerKey));
 
-  Quiz._internal({
+  const Quiz._internal({
     required this.id,
     required this.name,
     required this.templateId,

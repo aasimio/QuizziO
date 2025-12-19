@@ -93,9 +93,8 @@ class _OptionChip extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: isSelected
-                  ? colorScheme.primary
-                  : colorScheme.outlineVariant,
+              color:
+                  isSelected ? colorScheme.primary : colorScheme.outlineVariant,
               width: isSelected ? 2 : 1,
             ),
           ),

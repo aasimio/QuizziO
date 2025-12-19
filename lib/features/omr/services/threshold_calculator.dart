@@ -72,9 +72,8 @@ class ThresholdCalculator {
     // Expected input range: 0-255 (grayscale intensity from bubble_reader)
     // Using actual max makes code robust to input range changes and prevents confidence > 1.0
     final actualMax = sorted.isNotEmpty ? sorted.last : 0.0;
-    final divisor = actualMax > 0
-        ? actualMax
-        : 1.0; // Fallback to 1.0 if max is zero
+    final divisor =
+        actualMax > 0 ? actualMax : 1.0; // Fallback to 1.0 if max is zero
     final confidence = (maxGap / divisor).clamp(0.0, 1.0);
 
     return ThresholdResult(

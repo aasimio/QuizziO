@@ -236,8 +236,8 @@ class _CameraTestPageState extends State<CameraTestPage> {
                 ),
               ),
               Text(
-                _markersDetected == 4 
-                    ? 'All markers found!' 
+                _markersDetected == 4
+                    ? 'All markers found!'
                     : 'Point camera at OMR sheet with ArUco markers',
                 style: TextStyle(
                   color: _markersDetected == 4 ? Colors.green : Colors.orange,

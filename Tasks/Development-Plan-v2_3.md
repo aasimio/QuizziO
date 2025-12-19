@@ -27,7 +27,9 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 - ✅ Phase 1 complete: Data Layer (entities, models, repositories, supporting services)
 - ✅ Phase 2 complete: Quiz Management UI (QuizzesPage, QuizMenuPage, QuizDialog, QuizCard)
 - ✅ Phase 3 complete: Answer Key Management (AnswerKeyCubit, EditAnswerKeyPage, AnswerKeyRow)
-- 🔜 Next: Phase 4 - Scanning (Screen 5)
+- ✅ Phase 4.1 complete: ScannerBloc State Machine (8-state machine)
+- ✅ Phase 4.2 complete: Screen 5 Scan Papers Page (ScanPapersPage, AlignmentOverlay, ScanBottomBar, ProcessingOverlay, ScanResultPopup)
+- 🔜 Next: Phase 4.3-4.6 (camera frame processing integration, high-res capture) or Phase 5 (Results Management)
 
 **Reference:** `QuizziO-PRD.md`, `QuizziO-Tech-Stack.md`
 
@@ -117,9 +119,16 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 | `features/quiz/presentation/widgets/quiz_card.dart` | Quiz list card | ✅ Created |
 | `features/quiz/presentation/widgets/quiz_dialog.dart` | Create/edit dialog | ✅ Created |
 | `features/quiz/presentation/widgets/answer_key_row.dart` | Answer key row | ✅ Created |
-| `features/omr/presentation/bloc/{scanner,graded_papers}_bloc.dart` | Scanning + results state | 🆕 Create |
-| `features/omr/presentation/pages/{scan_papers,graded_papers,scan_result_detail}_page.dart` | Screens 5, 6 + detail | 🆕 Create all |
-| `features/omr/presentation/widgets/{alignment_overlay,scan_result_popup,graded_paper_card}.dart` | OMR UI components | 🆕 Create all |
+| `features/omr/presentation/bloc/scanner_bloc.dart` | Scanning state machine | ✅ Created |
+| `features/omr/presentation/bloc/graded_papers_bloc.dart` | Results list state | 🆕 Create |
+| `features/omr/presentation/pages/scan_papers_page.dart` | Screen 5: Scan papers | ✅ Created |
+| `features/omr/presentation/pages/graded_papers_page.dart` | Screen 6: Results list | 🆕 Create |
+| `features/omr/presentation/pages/scan_result_detail_page.dart` | Result detail view | ✅ Created (placeholder) |
+| `features/omr/presentation/widgets/alignment_overlay.dart` | 4-corner marker overlay | ✅ Created |
+| `features/omr/presentation/widgets/scan_bottom_bar.dart` | Scan count + capture button | ✅ Created |
+| `features/omr/presentation/widgets/processing_overlay.dart` | Processing spinner | ✅ Created |
+| `features/omr/presentation/widgets/scan_result_popup.dart` | Result summary popup | ✅ Created |
+| `features/omr/presentation/widgets/graded_paper_card.dart` | Result list card | 🆕 Create |
 | `features/export/services/pdf_export_service.dart` | PDF generation | 🆕 Create |
 
 ### Core/Shared
@@ -458,41 +467,40 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 
 ---
 
-- [ ] **4.2 Screen 5: Scan Papers Page** — 🧠🧠🧠
-  - [ ] 4.2.1 Create `features/omr/presentation/pages/scan_papers_page.dart` — 🧠
-  - [ ] 4.2.2 Scaffold: AppBar("Scan Papers"), back button, flash toggle — 🧠
-  - [ ] 4.2.3 Body: `BlocBuilder<ScannerBloc>` → render based on state — 🧠🧠🧠
-  - [ ] 4.2.4 `Previewing`: Camera preview + `AlignmentOverlay` — 🧠🧠
-  - [ ] 4.2.5 `Processing`: Semi-transparent overlay + spinner + "Analyzing..." — 🧠
-  - [ ] 4.2.6 `Result`: Show `ScanResultPopup` dialog — 🧠🧠
-  - [ ] 4.2.7 `Error`: Show error message with retry button — 🧠
-  - [ ] 4.2.8 Bottom bar: "Scanned: X / ∞", manual capture button — 🧠
-  - **Done when:** Full flow works from camera → result
+- [x] **4.2 Screen 5: Scan Papers Page** — 🧠🧠🧠
+  - [x] 4.2.1 Create `features/omr/presentation/pages/scan_papers_page.dart` — 🧠
+  - [x] 4.2.2 Scaffold: AppBar("Scan Papers"), back button, flash toggle — 🧠
+  - [x] 4.2.3 Body: `BlocBuilder<ScannerBloc>` → render based on state — 🧠🧠🧠
+  - [x] 4.2.4 `Previewing`: Camera preview + `AlignmentOverlay` — 🧠🧠
+  - [x] 4.2.5 `Processing`: Semi-transparent overlay + spinner + "Analyzing..." — 🧠
+  - [x] 4.2.6 `Result`: Show `ScanResultPopup` dialog — 🧠🧠
+  - [x] 4.2.7 `Error`: Show error message with retry button — 🧠
+  - [x] 4.2.8 Bottom bar: "Scanned: X / ∞", manual capture button — 🧠
+  - **Done when:** Full flow works from camera → result ✅
 
 ---
 
-- [ ] **4.3 AlignmentOverlay Widget** — 🧠🧠
-  - [ ] 4.3.1 Create `features/omr/presentation/widgets/alignment_overlay.dart` — 🧠
-  - [ ] 4.3.2 CustomPaint with 4 corner squares (red when not detected, green when detected) — 🧠🧠
-  - [ ] 4.3.3 Listen to `ScannerBloc` for marker confidence — 🧠🧠
-  - [ ] 4.3.4 Pulsing animation when red, solid when green — 🧠🧠
-  - [ ] 4.3.5 Center text: "Align sheet with corners" or "Hold steady..." — 🧠
-  - **Done when:** Guides are clear, state changes visible
+- [x] **4.3 AlignmentOverlay Widget** — 🧠🧠
+  - [x] 4.3.1 Create `features/omr/presentation/widgets/alignment_overlay.dart` — 🧠
+  - [x] 4.3.2 CustomPaint with 4 corner L-brackets (coral when not detected, mint when detected) — 🧠🧠
+  - [x] 4.3.3 Listen to `ScannerBloc` for marker confidence — 🧠🧠
+  - [x] 4.3.4 Pulsing animation when not detected, solid when detected — 🧠🧠
+  - [x] 4.3.5 Center text: "Point camera at answer sheet" or "Hold steady..." — 🧠
+  - **Done when:** Guides are clear, state changes visible ✅
 
 ---
 
-- [ ] **4.4 ScanResultPopup Widget** — 🧠🧠
-  - [ ] 4.4.1 Create `features/omr/presentation/widgets/scan_result_popup.dart` — 🧠
-  - [ ] 4.4.2 Dialog with: — 🧠🧠
-    - Name region image (cropped from scan)
+- [x] **4.4 ScanResultPopup Widget** — 🧠🧠
+  - [x] 4.4.1 Create `features/omr/presentation/widgets/scan_result_popup.dart` — 🧠
+  - [x] 4.4.2 Dialog with: — 🧠🧠
     - Score: "18 / 20 = 90%"
     - Blank answers: N
     - Multiple marks: N
-    - Buttons: "View Details", "Rescan", "Save"
-  - [ ] 4.4.3 "View Details" → Navigate to `/scan-result-detail` (Phase 5) — 🧠
-  - [ ] 4.4.4 "Rescan" → Dispatch `RescanRequested` event — 🧠
-  - [ ] 4.4.5 "Save" → Dispatch `ResultDismissed` event → back to `Previewing` — 🧠
-  - **Done when:** Popup displays correctly, all buttons work
+    - Buttons: "View Details", "Continue"
+  - [x] 4.4.3 "View Details" → Navigate to `/scan-result-detail` — 🧠
+  - [x] 4.4.4 "Continue" → Dispatch `ResultDismissed` event → back to `Previewing` — 🧠
+  - [ ] 4.4.5 Name region image preview (placeholder - Phase 5) — 🧠
+  - **Done when:** Popup displays correctly, buttons work ✅ (name region pending)
 
 ---
 
@@ -612,6 +620,7 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
   - [ ] 6.3.5 SnackBars: "Quiz created", "Answer key saved", "Result updated" — 🧠
   - [ ] 6.3.6 Haptic feedback: On marker alignment, capture, errors — 🧠
   - [ ] 6.3.7 Sound effects: Camera shutter sound on capture (optional) — 🧠
+  - [ ] 6.3.8 Theme consistency: Centralize scan feature color `Color(0xFF0D7377)` — add `kScanFeatureColor` to `app_constants.dart`, replace hardcoded instances in `quiz_menu_page.dart` (line 139), `scan_result_popup.dart`, `scan_bottom_bar.dart`, `scan_papers_page.dart` — 🧠
   - **Done when:** App feels polished, feedback is clear
 
 ---
@@ -791,6 +800,17 @@ Week 5:   Phase 6 (Export + Polish) → Phase 7 (Testing)            [4-5 days]
 ---
 
 ## Change Log
+
+### v2.3.2 (2025-12-19)
+- **Task 4.2 Complete**: Screen 5 Scan Papers Page implemented
+  - `ScanPapersPage` with BlocConsumer, camera preview, state-based UI rendering
+  - `AlignmentOverlay` with 4-corner L-brackets, pulsing animation, stability progress ring
+  - `ScanBottomBar` with scan count and manual capture button
+  - `ProcessingOverlay` with spinner and status text
+  - `ScanResultPopup` modal bottom sheet with score summary and action buttons
+  - `ScanResultDetailPage` updated to accept full ScanResult
+  - `QuizMenuPage` navigation updated to pass full Quiz object
+- **Tasks 4.3, 4.4 Complete**: AlignmentOverlay and ScanResultPopup widgets
 
 ### v2.3.1 (2025-12-15)
 - **ArUco Marker Migration**: Replaced template matching with ArUco marker detection

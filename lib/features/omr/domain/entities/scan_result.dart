@@ -45,8 +45,7 @@ class ScanResult extends Equatable {
     return detectedAnswers[questionId];
   }
 
-  int get blankCount =>
-      detectedAnswers.values.where((s) => s.isBlank).length;
+  int get blankCount => detectedAnswers.values.where((s) => s.isBlank).length;
 
   int get multipleMarkCount =>
       detectedAnswers.values.where((s) => s.isMultipleMark).length;

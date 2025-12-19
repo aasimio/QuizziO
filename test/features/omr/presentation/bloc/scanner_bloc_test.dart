@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 
 import 'package:bloc_test/bloc_test.dart';
-import 'package:camera/camera.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:quizzio/core/services/camera_service.dart';
@@ -131,10 +130,8 @@ void main() {
         expect: () => [
           const ScannerInitializing(),
           isA<ScannerError>()
-              .having((state) => state.type,
-                  'type',
-                  ScannerErrorType
-                      .cameraInitialization)
+              .having((state) => state.type, 'type',
+                  ScannerErrorType.cameraInitialization)
               .having((state) => state.message, 'message',
                   contains('Failed to initialize camera')),
         ],
@@ -155,7 +152,8 @@ void main() {
           mockPerspectiveTransformer,
           uuid: testUuid,
         ),
-        seed: () => const ScannerPreviewing(markersDetected: 0, avgConfidence: 0.0),
+        seed: () =>
+            const ScannerPreviewing(markersDetected: 0, avgConfidence: 0.0),
         act: (bloc) => bloc.add(ScannerMarkersUpdated(
           detectionResult: _buildMarkerDetectionResult(
             allMarkersFound: true,
@@ -185,7 +183,8 @@ void main() {
           mockPerspectiveTransformer,
           uuid: testUuid,
         ),
-        seed: () => const ScannerPreviewing(markersDetected: 0, avgConfidence: 0.0),
+        seed: () =>
+            const ScannerPreviewing(markersDetected: 0, avgConfidence: 0.0),
         act: (bloc) => bloc.add(ScannerMarkersUpdated(
           detectionResult: _buildMarkerDetectionResult(
             allMarkersFound: false,
@@ -275,8 +274,8 @@ void main() {
         expect: () => [
           const ScannerCapturing(),
           isA<ScannerError>()
-              .having((state) => state.type, 'type',
-                  ScannerErrorType.imageCapture)
+              .having(
+                  (state) => state.type, 'type', ScannerErrorType.imageCapture)
               .having((state) => state.message, 'message',
                   contains('Failed to capture image')),
         ],
@@ -344,7 +343,8 @@ void main() {
         when(() => mockCameraService.startImageStream()).thenReturn(null);
         when(() => mockCameraService.imageStream)
             .thenAnswer((_) => const Stream.empty());
-        when(() => mockCameraService.stopImageStream()).thenAnswer((_) async {});
+        when(() => mockCameraService.stopImageStream())
+            .thenAnswer((_) async {});
 
         final bloc = ScannerBloc(
           mockCameraService,
@@ -363,7 +363,8 @@ void main() {
         await bloc.close();
 
         // Verify cleanup was called
-        verify(() => mockCameraService.stopImageStream()).called(greaterThan(0));
+        verify(() => mockCameraService.stopImageStream())
+            .called(greaterThan(0));
       });
     });
   });

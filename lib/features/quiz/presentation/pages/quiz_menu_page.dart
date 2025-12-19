@@ -115,58 +115,55 @@ class _QuizMenuContent extends StatelessWidget {
             ),
           ],
         ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
-        children: [
-          _MenuTile(
-            icon: Icons.key_outlined,
-            title: 'Edit Answer Key',
-            subtitle: 'Set the correct answers for grading',
-            iconColor: colorScheme.primary,
-            onTap: () {
-              Navigator.pushNamed(
-                context,
-                AppRoutes.editAnswerKey,
-                arguments: EditAnswerKeyArgs(quiz: quiz),
-              );
-            },
-          ),
-          const SizedBox(height: 12),
-          _MenuTile(
-            icon: Icons.camera_alt_outlined,
-            title: 'Scan Papers',
-            subtitle: 'Scan and grade answer sheets instantly',
-            iconColor: colorScheme.tertiary,
-            onTap: () {
-              Navigator.pushNamed(
-                context,
-                AppRoutes.scanPapers,
-                arguments: ScanPapersArgs(
-                  quizId: quiz.id,
-                  quizName: quiz.name,
-                ),
-              );
-            },
-          ),
-          const SizedBox(height: 12),
-          _MenuTile(
-            icon: Icons.assignment_outlined,
-            title: 'View Graded Papers',
-            subtitle: 'See all scanned results and scores',
-            iconColor: colorScheme.secondary,
-            onTap: () {
-              Navigator.pushNamed(
-                context,
-                AppRoutes.gradedPapers,
-                arguments: GradedPapersArgs(
-                  quizId: quiz.id,
-                  quizName: quiz.name,
-                ),
-              );
-            },
-          ),
-        ],
-      ),
+        body: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
+          children: [
+            _MenuTile(
+              icon: Icons.key_outlined,
+              title: 'Edit Answer Key',
+              subtitle: 'Set the correct answers for grading',
+              iconColor: colorScheme.primary,
+              onTap: () {
+                Navigator.pushNamed(
+                  context,
+                  AppRoutes.editAnswerKey,
+                  arguments: EditAnswerKeyArgs(quiz: quiz),
+                );
+              },
+            ),
+            const SizedBox(height: 12),
+            _MenuTile(
+              icon: Icons.camera_alt_outlined,
+              title: 'Scan Papers',
+              subtitle: 'Scan and grade answer sheets instantly',
+              iconColor: const Color(0xFF0D7377),
+              onTap: () {
+                Navigator.pushNamed(
+                  context,
+                  AppRoutes.scanPapers,
+                  arguments: ScanPapersArgs(quiz: quiz),
+                );
+              },
+            ),
+            const SizedBox(height: 12),
+            _MenuTile(
+              icon: Icons.assignment_outlined,
+              title: 'View Graded Papers',
+              subtitle: 'See all scanned results and scores',
+              iconColor: colorScheme.secondary,
+              onTap: () {
+                Navigator.pushNamed(
+                  context,
+                  AppRoutes.gradedPapers,
+                  arguments: GradedPapersArgs(
+                    quizId: quiz.id,
+                    quizName: quiz.name,
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

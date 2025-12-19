@@ -132,7 +132,8 @@ void main() {
       blocTest<QuizBloc, QuizState>(
         'emits [QuizLoading, QuizError] on save failure',
         setUp: () {
-          when(() => repository.save(any())).thenThrow(Exception('Save failed'));
+          when(() => repository.save(any()))
+              .thenThrow(Exception('Save failed'));
         },
         build: () => QuizBloc(repository, uuid: uuid),
         act: (bloc) => bloc.add(const CreateQuiz(
@@ -141,8 +142,8 @@ void main() {
         )),
         expect: () => [
           const QuizLoading(),
-          isA<QuizError>()
-              .having((e) => e.message, 'message', contains('Failed to create')),
+          isA<QuizError>().having(
+              (e) => e.message, 'message', contains('Failed to create')),
         ],
       );
 
@@ -197,8 +198,8 @@ void main() {
         act: (bloc) => bloc.add(UpdateQuiz(quiz: updatedQuiz)),
         expect: () => [
           const QuizLoading(),
-          isA<QuizError>()
-              .having((e) => e.message, 'message', contains('Failed to update')),
+          isA<QuizError>().having(
+              (e) => e.message, 'message', contains('Failed to update')),
         ],
       );
     });
@@ -232,8 +233,8 @@ void main() {
         act: (bloc) => bloc.add(const DeleteQuiz(id: 'quiz-1')),
         expect: () => [
           const QuizLoading(),
-          isA<QuizError>()
-              .having((e) => e.message, 'message', contains('Failed to delete')),
+          isA<QuizError>().having(
+              (e) => e.message, 'message', contains('Failed to delete')),
         ],
       );
     });

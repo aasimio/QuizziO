@@ -8,7 +8,7 @@ class ArucoMarkerIds {
   static const int topRight = 1;
   static const int bottomRight = 2;
   static const int bottomLeft = 3;
-  
+
   static const List<int> all = [topLeft, topRight, bottomRight, bottomLeft];
 }
 
@@ -22,7 +22,8 @@ class MarkerDetector {
 
   /// Initialize the ArUco detector with DICT_4X4_50 dictionary
   Future<void> initialize() async {
-    _dictionary = cv.ArucoDictionary.predefined(cv.PredefinedDictionaryType.DICT_4X4_50);
+    _dictionary =
+        cv.ArucoDictionary.predefined(cv.PredefinedDictionaryType.DICT_4X4_50);
     _params = cv.ArucoDetectorParameters.empty();
     _detector = cv.ArucoDetector.create(_dictionary!, _params!);
   }
@@ -59,8 +60,10 @@ class MarkerDetector {
       if (detectedMarkers.containsKey(expectedId)) {
         // Calculate center from the 4 corner points
         final markerCorners = detectedMarkers[expectedId]!;
-        final centerX = markerCorners.map((p) => p.x).reduce((a, b) => a + b) / 4;
-        final centerY = markerCorners.map((p) => p.y).reduce((a, b) => a + b) / 4;
+        final centerX =
+            markerCorners.map((p) => p.x).reduce((a, b) => a + b) / 4;
+        final centerY =
+            markerCorners.map((p) => p.y).reduce((a, b) => a + b) / 4;
         markerCenters.add(Point(centerX, centerY));
         confidences.add(1.0); // ArUco detection is binary - either found or not
       } else {

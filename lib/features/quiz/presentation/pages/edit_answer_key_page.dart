@@ -236,7 +236,9 @@ class _EditAnswerKeyContentState extends State<_EditAnswerKeyContent> {
                 selectedOption: selectedOption,
                 options: state.options,
                 onOptionSelected: (option) {
-                  context.read<AnswerKeyCubit>().selectAnswer(questionId, option);
+                  context
+                      .read<AnswerKeyCubit>()
+                      .selectAnswer(questionId, option);
                 },
               );
             },

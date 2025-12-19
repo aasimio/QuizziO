@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 import 'dart:ui';
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
@@ -13,7 +12,6 @@ import '../../domain/entities/answer_status.dart';
 import '../../domain/entities/omr_template.dart';
 import '../../domain/entities/scan_result.dart';
 import '../../domain/repositories/scan_repository.dart';
-import '../../models/detection_result.dart';
 import '../../services/grading_service.dart';
 import '../../services/image_preprocessor.dart';
 import '../../services/marker_detector.dart';
@@ -47,17 +45,17 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
   static const _stabilityDuration = Duration(milliseconds: 500);
 
   ScannerBloc(
-    this._cameraService,
-    this._markerDetector,
-    this._preprocessor,
-    this._omrPipeline,
-    this._gradingService,
-    this._scanRepository,
-    this._templateManager,
-    this._perspectiveTransformer,
-    {Uuid? uuid}
-  ) : _uuid = uuid ?? const Uuid(),
-      super(const ScannerIdle()) {
+      this._cameraService,
+      this._markerDetector,
+      this._preprocessor,
+      this._omrPipeline,
+      this._gradingService,
+      this._scanRepository,
+      this._templateManager,
+      this._perspectiveTransformer,
+      {Uuid? uuid})
+      : _uuid = uuid ?? const Uuid(),
+        super(const ScannerIdle()) {
     on<ScannerInitCamera>(_onInitCamera);
     on<ScannerMarkersUpdated>(_onMarkersUpdated);
     on<ScannerStabilityAchieved>(_onStabilityAchieved);
@@ -282,7 +280,8 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
 
     try {
       // Load template for bubble positions
-      final template = await _templateManager.getTemplate(_currentQuiz!.templateId);
+      final template =
+          await _templateManager.getTemplate(_currentQuiz!.templateId);
       if (isClosed) return;
 
       // Build bubble positions map from template
@@ -524,7 +523,9 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
         }
 
         // Get corner points for transform
-        final cornerPoints = await _markerDetector.getCornerPointsForTransform(processed);
+        final cornerPoints = _markerDetector.getCornerPointsForTransform(
+          processed,
+        );
 
         if (cornerPoints == null) {
           throw Exception('Could not extract corner points');

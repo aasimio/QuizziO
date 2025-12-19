@@ -15,10 +15,10 @@ class ImagePreprocessor {
       // Step 1: Convert to grayscale
       // Handle both BGR (3 channels), BGRA (4 channels), and already grayscale (1 channel)
       final colorCode = inputMat.channels == 4
-          ? cv.COLOR_BGRA2GRAY  // iOS BGRA
+          ? cv.COLOR_BGRA2GRAY // iOS BGRA
           : inputMat.channels == 3
-              ? cv.COLOR_BGR2GRAY  // Encoded images
-              : -1;  // Already grayscale
+              ? cv.COLOR_BGR2GRAY // Encoded images
+              : -1; // Already grayscale
 
       if (colorCode == -1) {
         // Already grayscale, clone it
@@ -61,7 +61,8 @@ class ImagePreprocessor {
   /// Create Mat from raw pixel data (for camera frames)
   ///
   /// iOS camera returns BGRA8888, Android returns grayscale Y plane
-  cv.Mat createMatFromPixels(Uint8List bytes, int width, int height, bool isBGRA) {
+  cv.Mat createMatFromPixels(
+      Uint8List bytes, int width, int height, bool isBGRA) {
     // Create empty Mat with correct dimensions and type
     final matType = isBGRA ? cv.MatType.CV_8UC4 : cv.MatType.CV_8UC1;
     final mat = cv.Mat.create(
@@ -77,7 +78,7 @@ class ImagePreprocessor {
   }
 
   /// Converts Uint8List to cv.Mat (deprecated - use decodeImage or createMatFromPixels)
-  @deprecated
+  @Deprecated('Use decodeImage or createMatFromPixels instead')
   cv.Mat uint8ListToMat(Uint8List bytes) {
     return cv.imdecode(bytes, cv.IMREAD_COLOR);
   }

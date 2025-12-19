@@ -103,7 +103,7 @@ lib/
 └── main.dart                # Entry point (uses CameraTestPage)
 ```
 
-Clean Architecture is the target. Domain/data/presentation layers are implemented for both quiz and OMR features. OMR UI (Scan Papers Page) is next.
+Clean Architecture is the target. Domain/data/presentation layers are implemented for both quiz and OMR features.
 
 ### Clean Architecture Rules
 
@@ -141,7 +141,8 @@ features/<feature_name>/
    - Data: `ScanResultModel` (Hive), `ScanRepositoryImpl`
    - Services: Full OMR pipeline (preprocess → detect → transform → read → threshold via `OmrPipeline`)
    - Presentation: `ScannerBloc` (8-state machine for camera → capture → process → result flow)
-   - `CameraTestPage` for testing ArUco marker detection
+   - Pages: `ScanPapersPage`, `ScanResultDetailPage`, `CameraTestPage`
+   - Widgets: `AlignmentOverlay`, `ScanBottomBar`, `ProcessingOverlay`, `ScanResultPopup`
    - **ArUco markers** used for corner detection (DICT_4X4_50, IDs 0-3)
    - DI via get_it/injectable (`configureDependencies`)
 

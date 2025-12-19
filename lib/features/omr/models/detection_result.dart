@@ -25,7 +25,8 @@ class MarkerDetectionResult {
   bool get isValid => allMarkersFound;
 
   /// Count of markers that were successfully detected
-  int get markersDetectedCount => perMarkerConfidence.where((c) => c > 0).length;
+  int get markersDetectedCount =>
+      perMarkerConfidence.where((c) => c > 0).length;
 
   @override
   String toString() {
