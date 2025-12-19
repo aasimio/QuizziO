@@ -96,14 +96,14 @@ The project follows **Clean Architecture** with a **feature-based folder structu
 lib/
 ├── core/                    # Constants + camera service (utils/errors/extensions are stubs)
 ├── features/                # Feature modules
-│   ├── omr/                 # OMR services + camera_test_page, detection_result model
+│   ├── omr/                 # OMR services, ScannerBloc, camera_test_page, detection_result model
 │   ├── quiz/                # Quiz CRUD: BLoC, pages (list, menu), widgets (card, dialog)
 │   └── export/              # PDF export stub (service/widget empty)
 ├── injection.dart(.config.dart)  # DI setup
 └── main.dart                # Entry point (uses CameraTestPage)
 ```
 
-Clean Architecture is the target. Domain/data/presentation layers are implemented for quiz feature; OMR presentation layer is next.
+Clean Architecture is the target. Domain/data/presentation layers are implemented for both quiz and OMR features. OMR UI (Scan Papers Page) is next.
 
 ### Clean Architecture Rules
 
@@ -136,9 +136,12 @@ features/<feature_name>/
 
 ### Current Features
 
-1. **OMR Prototype** (`lib/features/omr/`)
-   - Services for preprocess → detect → transform → read → threshold (OmrPipeline)
-   - `CameraTestPage` streams preview frames through ArUco marker detection
+1. **OMR Feature** (`lib/features/omr/`)
+   - Domain: `ScanResult`, `AnswerStatus`, `OmrTemplate` entities, `ScanRepository` interface
+   - Data: `ScanResultModel` (Hive), `ScanRepositoryImpl`
+   - Services: Full OMR pipeline (preprocess → detect → transform → read → threshold via `OmrPipeline`)
+   - Presentation: `ScannerBloc` (8-state machine for camera → capture → process → result flow)
+   - `CameraTestPage` for testing ArUco marker detection
    - **ArUco markers** used for corner detection (DICT_4X4_50, IDs 0-3)
    - DI via get_it/injectable (`configureDependencies`)
 
