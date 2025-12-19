@@ -109,8 +109,12 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 |------|---------|--------|
 | `features/quiz/presentation/bloc/quiz_bloc.dart` | Quiz CRUD state | ✅ Created |
 | `features/quiz/presentation/cubit/answer_key_cubit.dart` | Answer key editing | 🆕 Create |
-| `features/quiz/presentation/pages/{quizzes,quiz_menu,edit_answer_key}_page.dart` | Screens 1, 3, 4 | 🆕 Create all |
-| `features/quiz/presentation/widgets/{quiz_card,quiz_dialog,answer_key_row}.dart` | Quiz UI components | 🆕 Create all |
+| `features/quiz/presentation/pages/quizzes_page.dart` | Screen 1: Quiz list | ✅ Created |
+| `features/quiz/presentation/pages/quiz_menu_page.dart` | Screen 3: Quiz menu | ✅ Created |
+| `features/quiz/presentation/pages/edit_answer_key_page.dart` | Screen 4: Answer key | 🆕 Create |
+| `features/quiz/presentation/widgets/quiz_card.dart` | Quiz list card | ✅ Created |
+| `features/quiz/presentation/widgets/quiz_dialog.dart` | Create/edit dialog | ✅ Created |
+| `features/quiz/presentation/widgets/answer_key_row.dart` | Answer key row | 🆕 Create |
 | `features/omr/presentation/bloc/{scanner,graded_papers}_bloc.dart` | Scanning + results state | 🆕 Create |
 | `features/omr/presentation/pages/{scan_papers,graded_papers,scan_result_detail}_page.dart` | Screens 5, 6 + detail | 🆕 Create all |
 | `features/omr/presentation/widgets/{alignment_overlay,scan_result_popup,graded_paper_card}.dart` | OMR UI components | 🆕 Create all |
@@ -356,34 +360,34 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 
 ---
 
-- [ ] **2.2 Screen 1: Quizzes Page** — 🧠🧠
-  - [ ] 2.2.1 Create `features/quiz/presentation/pages/quizzes_page.dart` — 🧠
-  - [ ] 2.2.2 Scaffold: AppBar("Quizzes"), FloatingActionButton(+), BlocBuilder(QuizBloc) — 🧠🧠
-  - [ ] 2.2.3 Empty state: "No quizzes yet. Tap + to create one." — 🧠
-  - [ ] 2.2.4 List state: `ListView` of `QuizCard` widgets — 🧠
-  - [ ] 2.2.5 FAB → Show `QuizDialog` in create mode — 🧠🧠
-  - [ ] 2.2.6 Card tap → Navigate to `/quiz-menu` with quiz ID — 🧠
-  - **Done when:** List displays, FAB opens dialog, tap navigates
+- [x] **2.2 Screen 1: Quizzes Page** — 🧠🧠
+  - [x] 2.2.1 Create `features/quiz/presentation/pages/quizzes_page.dart` — 🧠
+  - [x] 2.2.2 Scaffold: AppBar("Quizzes"), FloatingActionButton(+), BlocBuilder(QuizBloc) — 🧠🧠
+  - [x] 2.2.3 Empty state: "No quizzes yet. Tap + to create one." — 🧠
+  - [x] 2.2.4 List state: `ListView` of `QuizCard` widgets — 🧠
+  - [x] 2.2.5 FAB → Show `QuizDialog` in create mode — 🧠🧠
+  - [x] 2.2.6 Card tap → Navigate to `/quiz-menu` with quiz ID — 🧠
+  - **Done when:** List displays, FAB opens dialog, tap navigates ✅
 
 ---
 
-- [ ] **2.3 QuizCard Widget** — 🧠
-  - [ ] 2.3.1 Create `features/quiz/presentation/widgets/quiz_card.dart` — 🧠
-  - [ ] 2.3.2 Display: Quiz name, date, template (e.g., "20 Questions") — 🧠
-  - [ ] 2.3.3 Trailing: Edit icon, Delete icon (with confirmation dialog) — 🧠
-  - [ ] 2.3.4 Dismissible for swipe-to-delete (optional) — 🧠
-  - **Done when:** Card renders correctly, delete works
+- [x] **2.3 QuizCard Widget** — 🧠
+  - [x] 2.3.1 Create `features/quiz/presentation/widgets/quiz_card.dart` — 🧠
+  - [x] 2.3.2 Display: Quiz name, date, template (e.g., "20 Questions") — 🧠
+  - [x] 2.3.3 Trailing: Overflow menu with Edit/Delete (per user preference) — 🧠
+  - [x] 2.3.4 Dismissible for swipe-to-delete (optional) — 🧠 (skipped - using overflow menu)
+  - **Done when:** Card renders correctly, delete works ✅
 
 ---
 
-- [ ] **2.4 QuizDialog (Screen 2)** — 🧠🧠
-  - [ ] 2.4.1 Create `features/quiz/presentation/widgets/quiz_dialog.dart` — 🧠
-  - [ ] 2.4.2 Accept `Quiz? quiz` param (null = create mode, non-null = edit mode) — 🧠🧠
-  - [ ] 2.4.3 Fields: Name (TextField), Template (DropdownButton), Date (DatePicker) — 🧠
-  - [ ] 2.4.4 Buttons: Cancel, Create/Save — 🧠
-  - [ ] 2.4.5 Validation: Name required, template required — 🧠🧠
-  - [ ] 2.4.6 On save → Dispatch `CreateQuiz` or `UpdateQuiz` event — 🧠🧠
-  - **Done when:** Create + edit both work, validation enforced
+- [x] **2.4 QuizDialog (Screen 2)** — 🧠🧠
+  - [x] 2.4.1 Create `features/quiz/presentation/widgets/quiz_dialog.dart` — 🧠
+  - [x] 2.4.2 Accept `Quiz? quiz` param (null = create mode, non-null = edit mode) — 🧠🧠
+  - [x] 2.4.3 Fields: Name (TextField), Template (DropdownButton) — 🧠 (Date auto-generated)
+  - [x] 2.4.4 Buttons: Cancel, Create/Save — 🧠
+  - [x] 2.4.5 Validation: Name required, template required — 🧠🧠
+  - [x] 2.4.6 On save → Dispatch `CreateQuiz` or `UpdateQuiz` event — 🧠🧠
+  - **Done when:** Create + edit both work, validation enforced ✅
 
 ---
 
