@@ -110,7 +110,7 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 | `features/quiz/presentation/bloc/quiz_bloc.dart` | Quiz CRUD state | ✅ Created |
 | `features/quiz/presentation/cubit/answer_key_cubit.dart` | Answer key editing | 🆕 Create |
 | `features/quiz/presentation/pages/quizzes_page.dart` | Screen 1: Quiz list | ✅ Created |
-| `features/quiz/presentation/pages/quiz_menu_page.dart` | Screen 3: Quiz menu | ✅ Created |
+| `features/quiz/presentation/pages/quiz_menu_page.dart` | Screen 3: Quiz menu (polished design, edit icon) | ✅ Complete |
 | `features/quiz/presentation/pages/edit_answer_key_page.dart` | Screen 4: Answer key | 🆕 Create |
 | `features/quiz/presentation/widgets/quiz_card.dart` | Quiz list card | ✅ Created |
 | `features/quiz/presentation/widgets/quiz_dialog.dart` | Create/edit dialog | ✅ Created |
@@ -391,15 +391,15 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 
 ---
 
-- [ ] **2.5 Screen 3: Quiz Menu Page** — 🧠
-  - [ ] 2.5.1 Create `features/quiz/presentation/pages/quiz_menu_page.dart` — 🧠
-  - [ ] 2.5.2 Load quiz by ID from route args — 🧠
-  - [ ] 2.5.3 AppBar: Quiz name, back button, edit icon (opens `QuizDialog` in edit mode) — 🧠
-  - [ ] 2.5.4 Body: 3 large buttons: — 🧠
+- [x] **2.5 Screen 3: Quiz Menu Page** — 🧠
+  - [x] 2.5.1 Create `features/quiz/presentation/pages/quiz_menu_page.dart` — 🧠
+  - [x] 2.5.2 Load quiz by ID from route args — 🧠 (pass full Quiz object via QuizMenuArgs)
+  - [x] 2.5.3 AppBar: Quiz name, back button, edit icon (opens `QuizDialog` in edit mode) — 🧠
+  - [x] 2.5.4 Body: 3 large buttons: — 🧠
     - "Edit Answer Key" → Navigate to `/edit-answer-key`
     - "Scan Papers" → Navigate to `/scan-papers`
     - "Graded Papers" → Navigate to `/graded-papers`
-  - **Done when:** Menu displays, all navigation works
+  - **Done when:** Menu displays, all navigation works ✅
 
 ---
 
