@@ -399,6 +399,7 @@ class _ScanPapersContentState extends State<_ScanPapersContent>
             AppRoutes.scanResultDetail,
             arguments: ScanResultDetailArgs(
               scanResult: state.scanResult,
+              quiz: widget.quiz,
             ),
           );
         },

@@ -55,7 +55,7 @@ class GradedPapersPage extends StatelessWidget {
   }
 }
 
-class _GradedPapersContent extends StatelessWidget {
+class _GradedPapersContent extends StatefulWidget {
   final String quizId;
   final String quizName;
   final Quiz? quiz;
@@ -67,13 +67,20 @@ class _GradedPapersContent extends StatelessWidget {
   });
 
   @override
+  State<_GradedPapersContent> createState() => _GradedPapersContentState();
+}
+
+class _GradedPapersContentState extends State<_GradedPapersContent> {
+  String? _pendingDeleteId;
+
+  @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          quizName,
+          widget.quizName,
           style: GoogleFonts.outfit(
             fontSize: 20,
             fontWeight: FontWeight.w600,
@@ -93,9 +100,26 @@ class _GradedPapersContent extends StatelessWidget {
       ),
       body: BlocConsumer<GradedPapersBloc, GradedPapersState>(
         listener: (context, state) {
-          // Show snackbar on successful delete
+          if (_pendingDeleteId == null) return;
+
+          if (state is ResultsError) {
+            _showDeleteFailed(context);
+            setState(() {
+              _pendingDeleteId = null;
+            });
+            return;
+          }
+
           if (state is ResultsLoaded) {
-            // Listener handled in delete confirmation
+            final deleted = !state.results.any(
+              (result) => result.id == _pendingDeleteId,
+            );
+            if (deleted) {
+              _showDeleteSuccess(context);
+              setState(() {
+                _pendingDeleteId = null;
+              });
+            }
           }
         },
         builder: (context, state) {
@@ -103,17 +127,20 @@ class _GradedPapersContent extends StatelessWidget {
             ResultsInitial() => const SizedBox.shrink(),
             ResultsLoading() => const _LoadingView(),
             ResultsLoaded(:final results) => results.isEmpty
-                ? _EmptyState(quiz: quiz)
+                ? _EmptyState(quiz: widget.quiz)
                 : _ResultsList(
                     results: results,
-                    quizId: quizId,
+                    quizId: widget.quizId,
+                    quiz: widget.quiz,
+                    onDeleteConfirmed: (result) =>
+                        _requestDelete(context, result),
                   ),
             ResultsError(:final message) => _ErrorView(
                 message: message,
                 onRetry: () {
                   context
                       .read<GradedPapersBloc>()
-                      .add(LoadResults(quizId: quizId));
+                      .add(LoadResults(quizId: widget.quizId));
                 },
               ),
           };
@@ -127,6 +154,39 @@ class _GradedPapersContent extends StatelessWidget {
       SnackBar(
         content: Text(
           'Export feature coming soon!',
+          style: GoogleFonts.dmSans(),
+        ),
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _requestDelete(BuildContext context, ScanResult result) {
+    setState(() {
+      _pendingDeleteId = result.id;
+    });
+    context.read<GradedPapersBloc>().add(DeleteResult(resultId: result.id));
+  }
+
+  void _showDeleteSuccess(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Result deleted',
+          style: GoogleFonts.dmSans(),
+        ),
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _showDeleteFailed(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Failed to delete result',
           style: GoogleFonts.dmSans(),
         ),
         behavior: SnackBarBehavior.floating,
@@ -249,10 +309,14 @@ class _EmptyState extends StatelessWidget {
 class _ResultsList extends StatelessWidget {
   final List<ScanResult> results;
   final String quizId;
+  final Quiz? quiz;
+  final void Function(ScanResult result) onDeleteConfirmed;
 
   const _ResultsList({
     required this.results,
     required this.quizId,
+    this.quiz,
+    required this.onDeleteConfirmed,
   });
 
   @override
@@ -289,12 +353,36 @@ class _ResultsList extends StatelessWidget {
     );
   }
 
-  void _navigateToDetail(BuildContext context, ScanResult result) {
-    Navigator.pushNamed(
+  Future<void> _navigateToDetail(BuildContext context, ScanResult result) async {
+    final updatedResult = await Navigator.pushNamed(
       context,
       AppRoutes.scanResultDetail,
-      arguments: ScanResultDetailArgs(scanResult: result),
+      arguments: ScanResultDetailArgs(
+        scanResult: result,
+        quiz: quiz,
+      ),
     );
+
+    // Handle returned updated result from detail page
+    if (updatedResult is ScanResult && context.mounted) {
+      context.read<GradedPapersBloc>().add(
+            UpdateResult(
+              result: updatedResult,
+              correctedAnswers: updatedResult.correctedAnswers,
+            ),
+          );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Result updated',
+            style: GoogleFonts.dmSans(),
+          ),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   Future<void> _showDeleteConfirmation(
@@ -343,18 +431,7 @@ class _ResultsList extends StatelessWidget {
     );
 
     if (confirmed == true && context.mounted) {
-      context.read<GradedPapersBloc>().add(DeleteResult(resultId: result.id));
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Result deleted',
-            style: GoogleFonts.dmSans(),
-          ),
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 2),
-        ),
-      );
+      onDeleteConfirmed(result);
     }
   }
 }

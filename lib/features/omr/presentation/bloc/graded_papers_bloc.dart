@@ -88,7 +88,8 @@ class GradedPapersBloc extends Bloc<GradedPapersEvent, GradedPapersState> {
 
       final updatedResult = event.result.copyWith(
         correctedAnswers: updatedCorrectedAnswers,
-        wasEdited: updatedCorrectedAnswers.isNotEmpty,
+        wasEdited:
+            event.result.wasEdited || updatedCorrectedAnswers.isNotEmpty,
         score: gradedResult.score,
         total: gradedResult.total,
         percentage: gradedResult.percentage,

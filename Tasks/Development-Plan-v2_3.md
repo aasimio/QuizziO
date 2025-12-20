@@ -21,15 +21,15 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 
 **Goal:** Ship MVP with quiz creation, camera scanning, result editing, and PDF export — all offline.
 
-**Current State:** 
+**Current State:**
 - ✅ Clean architecture folders, OMR spike (98%+ validated), template JSONs, ArUco markers
 - ✅ Phase 0 complete: Foundation, camera, ArUco detection working on iOS (~38 FPS)
 - ✅ Phase 1 complete: Data Layer (entities, models, repositories, supporting services)
 - ✅ Phase 2 complete: Quiz Management UI (QuizzesPage, QuizMenuPage, QuizDialog, QuizCard)
 - ✅ Phase 3 complete: Answer Key Management (AnswerKeyCubit, EditAnswerKeyPage, AnswerKeyRow)
-- ✅ Phase 4.1 complete: ScannerBloc State Machine (8-state machine)
-- ✅ Phase 4.2 complete: Screen 5 Scan Papers Page (ScanPapersPage, AlignmentOverlay, ScanBottomBar, ProcessingOverlay, ScanResultPopup)
-- 🔜 Next: Phase 4.3-4.6 (camera frame processing integration, high-res capture) or Phase 5 (Results Management)
+- ✅ Phase 4 complete: Scanning (ScannerBloc, ScanPapersPage, camera processing, high-res capture)
+- ✅ Phase 5 complete: Results Management (GradedPapersBloc, GradedPapersPage, ScanResultDetailPage)
+- 🔜 Next: Phase 6 (Export & Polish)
 
 **Reference:** `QuizziO-PRD.md`, `QuizziO-Tech-Stack.md`
 
@@ -83,6 +83,7 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 ## Relevant Files
 
 ### Core Services (OMR)
+
 | File | Purpose | Status |
 |------|---------|--------|
 | `features/omr/services/image_preprocessor.dart` | Grayscale, CLAHE, normalize | ✅ Migrated |
@@ -97,6 +98,7 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 | `core/services/camera_service.dart` | Camera lifecycle | ✅ Implemented |
 
 ### Data Layer
+
 | File | Purpose | Status |
 |------|---------|--------|
 | `features/quiz/domain/entities/quiz.dart` | Quiz entity | 🆕 Create |
@@ -109,6 +111,7 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 | `features/omr/data/repositories/{scan,template}_repository_impl.dart` | Implementations | 🆕 Create |
 
 ### Presentation Layer
+
 | File | Purpose | Status |
 |------|---------|--------|
 | `features/quiz/presentation/bloc/quiz_bloc.dart` | Quiz CRUD state | ✅ Created |
@@ -125,7 +128,7 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 | `features/omr/presentation/bloc/graded_papers_state.dart` | Results list states | ✅ Created |
 | `features/omr/presentation/pages/scan_papers_page.dart` | Screen 5: Scan papers | ✅ Created |
 | `features/omr/presentation/pages/graded_papers_page.dart` | Screen 6: Results list | ✅ Created |
-| `features/omr/presentation/pages/scan_result_detail_page.dart` | Result detail view | ✅ Created (placeholder) |
+| `features/omr/presentation/pages/scan_result_detail_page.dart` | Result detail view | ✅ Complete |
 | `features/omr/presentation/widgets/alignment_overlay.dart` | 4-corner marker overlay | ✅ Created |
 | `features/omr/presentation/widgets/scan_bottom_bar.dart` | Scan count + capture button | ✅ Created |
 | `features/omr/presentation/widgets/processing_overlay.dart` | Processing spinner | ✅ Created |
@@ -134,6 +137,7 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 | `features/export/services/pdf_export_service.dart` | PDF generation | 🆕 Create |
 
 ### Core/Shared
+
 | File | Purpose | Status |
 |------|---------|--------|
 | `main.dart`, `app.dart` | Entry point + MaterialApp | 📝 Update |
@@ -142,11 +146,13 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 | `core/constants/{hive_boxes,app_constants,omr_constants}.dart` | Constants | 🆕 Create all |
 
 ### Tests
+
 | File | Purpose | Status |
 |------|---------|--------|
 | `test/features/omr/presentation/bloc/graded_papers_bloc_test.dart` | GradedPapersBloc tests | ✅ Created |
 
 ### Assets
+
 | File | Purpose | Status |
 |------|---------|--------|
 | `assets/templates/aruco_0.png` | ArUco marker ID 0 (Top-Left) | ✅ Created |
@@ -159,6 +165,7 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 | `assets/sheets/answer_sheet_{10q,20q,50q}.pdf` | Printable sheets with ArUco markers | 🆕 Create |
 
 ### Notes
+
 - **Tests:** `test/features/{feature}/...` mirrors source
 - **Run tests:** `flutter test` (all) or `flutter test path/to_test.dart` (specific)
 - **Code gen:** `dart run build_runner build`
@@ -573,21 +580,21 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 
 ---
 
-- [ ] **5.4 Screen: Scan Result Detail Page** — 🧠🧠🧠
-  - [ ] 5.4.1 Create `features/omr/presentation/pages/scan_result_detail_page.dart` — 🧠
-  - [ ] 5.4.2 Load result by ID from route args — 🧠
-  - [ ] 5.4.3 AppBar: "Scan Details", back button — 🧠
-  - [ ] 5.4.4 Body sections: — 🧠🧠🧠
+- [x] **5.4 Screen: Scan Result Detail Page** — 🧠🧠🧠
+  - [x] 5.4.1 Create `features/omr/presentation/pages/scan_result_detail_page.dart` — 🧠
+  - [x] 5.4.2 Load result by ID from route args — 🧠
+  - [x] 5.4.3 AppBar: "Scan Details", back button — 🧠
+  - [x] 5.4.4 Body sections: — 🧠🧠🧠
     - Name region image (full size)
     - Score summary
     - Question-by-question breakdown:
       - Question #, Detected answer, Correct answer, Status icon (✓/✗/⚠/∅)
       - Tap question → Edit dialog to override detected answer
-  - [ ] 5.4.5 Edit dialog: — 🧠🧠
+  - [x] 5.4.5 Edit dialog: — 🧠🧠
     - ChoiceChips for A-E + "Blank" + "Multiple Mark"
     - On save → Dispatch `UpdateResult` event
-  - [ ] 5.4.6 Show "Edited" badge if `wasEdited == true` — 🧠
-  - **Done when:** Detail view displays, manual override works
+  - [x] 5.4.6 Show "Edited" badge if `wasEdited == true` — 🧠
+  - **Done when:** Detail view displays, manual override works ✅
 
 ---
 

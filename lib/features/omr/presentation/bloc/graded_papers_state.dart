@@ -26,6 +26,16 @@ class ResultsLoaded extends GradedPapersState {
     required this.results,
   });
 
+  ResultsLoaded copyWith({
+    String? quizId,
+    List<ScanResult>? results,
+  }) {
+    return ResultsLoaded(
+      quizId: quizId ?? this.quizId,
+      results: results ?? this.results,
+    );
+  }
+
   @override
   List<Object?> get props => [quizId, results];
 }
