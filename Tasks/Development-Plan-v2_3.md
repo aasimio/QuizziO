@@ -504,7 +504,7 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 
 ---
 
-- [ ] **4.5 Camera Frame Processing** — 🧠🧠🧠
+- [x] **4.5 Camera Frame Processing** — 🧠🧠🧠
   - [x] 4.5.1 In `ScannerBloc`: Stream camera frames from `CameraService` — 🧠🧠
   - [x] 4.5.2 Throttle to 10 FPS (skip frames if processing) — 🧠🧠
   - [x] 4.5.3 Convert `CameraImage` → `Uint8List` (handle YUV420/BGRA) — 🧠🧠🧠
@@ -515,7 +515,7 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 
 ---
 
-- [ ] **4.6 High-Res Capture & Processing** — 🧠🧠🧠
+- [x] **4.6 High-Res Capture & Processing** — 🧠🧠🧠
   - [x] 4.6.1 On `Capturing` state → Call `CameraService.captureImage()` — 🧠🧠
   - [x] 4.6.2 Feed to `OmrScannerService.scanAnswerSheet(image, template)` — 🧠🧠
   - [x] 4.6.3 Get `ScanResult` with detected answers + statuses — 🧠🧠
