@@ -539,7 +539,7 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 > List graded papers, edit results, delete
 **Est:** 2-3 days
 
-- [ ] **5.1 GradedPapersBloc** — 🧠🧠
+- [x] **5.1 GradedPapersBloc** — 🧠🧠
   - [x] 5.1.1 Events: `LoadResults`, `UpdateResult`, `DeleteResult` — 🧠
   - [x] 5.1.2 States: `ResultsInitial`, `ResultsLoading`, `ResultsLoaded`, `ResultsError` — 🧠
   - [x] 5.1.3 Inject `ScanRepository` — 🧠
