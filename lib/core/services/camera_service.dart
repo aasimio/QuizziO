@@ -166,9 +166,34 @@ class CameraService {
 
   /// Convert BGRA8888 format (iOS) to bytes
   static Uint8List _convertBGRA8888ToBytes(CameraImage image) {
-    // For BGRA8888, extract data directly
-    // OpenCV can handle BGRA format
-    return Uint8List.fromList(image.planes[0].bytes);
+    final plane = image.planes[0];
+    final bytesPerRow = plane.bytesPerRow;
+    final bytesPerPixel = plane.bytesPerPixel ?? 4;
+    final width = image.width;
+    final height = image.height;
+    final rowBytes = width * bytesPerPixel;
+
+    if (bytesPerRow == rowBytes) {
+      // Contiguous rows, no padding
+      return Uint8List.fromList(plane.bytes);
+    }
+
+    // Remove row padding for OpenCV Mat creation
+    final result = Uint8List(width * height * bytesPerPixel);
+    var offset = 0;
+
+    for (int row = 0; row < height; row++) {
+      final start = row * bytesPerRow;
+      result.setRange(
+        offset,
+        offset + rowBytes,
+        plane.bytes,
+        start,
+      );
+      offset += rowBytes;
+    }
+
+    return result;
   }
 
   /// Dispose camera resources

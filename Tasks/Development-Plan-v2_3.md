@@ -505,12 +505,12 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 ---
 
 - [ ] **4.5 Camera Frame Processing** — 🧠🧠🧠
-  - [ ] 4.5.1 In `ScannerBloc`: Stream camera frames from `CameraService` — 🧠🧠
-  - [ ] 4.5.2 Throttle to 10 FPS (skip frames if processing) — 🧠🧠
-  - [ ] 4.5.3 Convert `CameraImage` → `Uint8List` (handle YUV420/BGRA) — 🧠🧠🧠
-  - [ ] 4.5.4 Call `MarkerDetector.detect()` (ArUco detection) — 🧠🧠
-  - [ ] 4.5.5 If all 4 ArUco markers detected: Emit `MarkerDetected` event — 🧠🧠
-  - [ ] 4.5.6 If stable for 500ms: Emit `CaptureTriggered` — 🧠🧠
+  - [x] 4.5.1 In `ScannerBloc`: Stream camera frames from `CameraService` — 🧠🧠
+  - [x] 4.5.2 Throttle to 10 FPS (skip frames if processing) — 🧠🧠
+  - [x] 4.5.3 Convert `CameraImage` → `Uint8List` (handle YUV420/BGRA) — 🧠🧠🧠
+  - [x] 4.5.4 Call `MarkerDetector.detect()` (ArUco detection) — 🧠🧠
+  - [x] 4.5.5 If all 4 ArUco markers detected: Emit `MarkerDetected` event — 🧠🧠
+  - [x] 4.5.6 If stable for 500ms: Emit `CaptureTriggered` — 🧠🧠
   - **Done when:** Real-time detection works, auto-capture fires
 
 ---

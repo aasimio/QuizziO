@@ -38,11 +38,15 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
   // Internal state for frame processing
   StreamSubscription? _frameSubscription;
   bool _isProcessingFrame = false;
+  DateTime? _lastFrameTime;
   Timer? _stabilityTimer;
   DateTime? _stabilityStartTime;
+  DateTime? _lastAllMarkersSeenAt;
   Quiz? _currentQuiz;
 
   static const _stabilityDuration = Duration(milliseconds: 500);
+  static const _stabilityGrace = Duration(milliseconds: 75);
+  static const _frameInterval = Duration(milliseconds: 100);
 
   ScannerBloc(
       this._cameraService,
@@ -110,12 +114,14 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
 
   /// Process individual camera frames for marker detection
   Future<void> _processFrame(CameraImage image) async {
-    // Skip if already processing (frame throttling)
-    if (_isProcessingFrame) {
+    if (state is! ScannerPreviewing && state is! ScannerAligning) {
       return;
     }
 
-    _isProcessingFrame = true;
+    final now = DateTime.now();
+    if (!_shouldProcessFrame(now)) {
+      return;
+    }
 
     try {
       // Convert camera image to bytes
@@ -163,6 +169,48 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
     }
   }
 
+  bool _shouldProcessFrame(DateTime now) {
+    // Throttle to ~10 FPS and skip if currently processing
+    if (_isProcessingFrame) {
+      return false;
+    }
+
+    if (_lastFrameTime != null &&
+        now.difference(_lastFrameTime!) < _frameInterval) {
+      return false;
+    }
+
+    _lastFrameTime = now;
+    _isProcessingFrame = true;
+    return true;
+  }
+
+  void _scheduleStabilityCheck() {
+    _stabilityTimer?.cancel();
+    _stabilityTimer = Timer(_stabilityDuration, () {
+      _stabilityTimer = null;
+      if (isClosed) {
+        return;
+      }
+
+      final lastSeen = _lastAllMarkersSeenAt;
+      if (lastSeen == null) {
+        return;
+      }
+
+      final now = DateTime.now();
+      if (now.difference(lastSeen) > _stabilityDuration + _stabilityGrace) {
+        return;
+      }
+
+      if (state is! ScannerAligning) {
+        return;
+      }
+
+      add(const ScannerStabilityAchieved());
+    });
+  }
+
   /// Handle marker detection updates from frame processing
   Future<void> _onMarkersUpdated(
     ScannerMarkersUpdated event,
@@ -172,14 +220,11 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
 
     if (state is ScannerPreviewing) {
       if (result.allMarkersFound) {
+        final now = DateTime.now();
         // All markers detected - start stability timer
-        _stabilityStartTime = DateTime.now();
-        _stabilityTimer?.cancel();
-        _stabilityTimer = Timer(_stabilityDuration, () {
-          if (!isClosed) {
-            add(const ScannerStabilityAchieved());
-          }
-        });
+        _stabilityStartTime = now;
+        _lastAllMarkersSeenAt = now;
+        _scheduleStabilityCheck();
 
         emit(ScannerAligning(
           markersDetected: result.markersDetectedCount,
@@ -195,9 +240,16 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
       }
     } else if (state is ScannerAligning) {
       if (result.allMarkersFound) {
+        final now = DateTime.now();
+        _lastAllMarkersSeenAt = now;
+        _stabilityStartTime ??= now;
+        if (_stabilityTimer == null) {
+          _scheduleStabilityCheck();
+        }
+
         // Update alignment state with elapsed stability time
         final elapsed = _stabilityStartTime != null
-            ? DateTime.now().difference(_stabilityStartTime!).inMilliseconds
+            ? now.difference(_stabilityStartTime!).inMilliseconds
             : 0;
 
         emit(ScannerAligning(
@@ -256,6 +308,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
     _stabilityTimer?.cancel();
     _stabilityTimer = null;
     _stabilityStartTime = null;
+    _lastAllMarkersSeenAt = null;
 
     emit(const ScannerPreviewing(
       markersDetected: 0,
@@ -574,6 +627,8 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
     _stabilityTimer?.cancel();
     _stabilityTimer = null;
     _stabilityStartTime = null;
+    _lastAllMarkersSeenAt = null;
+    _lastFrameTime = null;
     await _frameSubscription?.cancel();
     _frameSubscription = null;
     await _cameraService.stopImageStream();

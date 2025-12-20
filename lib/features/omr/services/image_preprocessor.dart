@@ -72,7 +72,14 @@ class ImagePreprocessor {
     );
 
     // Copy raw pixel data into the Mat
-    mat.data.setAll(0, bytes);
+    final bytesPerPixel = isBGRA ? 4 : 1;
+    final expectedLength = width * height * bytesPerPixel;
+    if (bytes.length < expectedLength) {
+      throw ArgumentError(
+        'Pixel buffer too small: ${bytes.length} < $expectedLength',
+      );
+    }
+    mat.data.setRange(0, expectedLength, bytes);
 
     return mat;
   }
