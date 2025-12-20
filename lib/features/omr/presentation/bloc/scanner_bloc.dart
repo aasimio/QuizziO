@@ -7,6 +7,7 @@ import 'package:injectable/injectable.dart';
 import 'package:opencv_dart/opencv_dart.dart' as cv;
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/constants/omr_constants.dart';
 import '../../../../core/services/camera_service.dart';
 import '../../domain/entities/answer_status.dart';
 import '../../domain/entities/omr_template.dart';
@@ -623,6 +624,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
           cornerPoints,
           template.pageWidth,
           template.pageHeight,
+          edgePaddingPx: OmrConstants.markerPaddingPx,
         );
 
         try {

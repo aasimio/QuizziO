@@ -29,19 +29,28 @@ class PerspectiveTransformer {
   /// - Only the returned warped Mat requires caller disposal
   Future<cv.Mat> transform(
     cv.Mat inputMat,
-    List<Point> sourcePoints, // 4 marker centers
+    List<Point> sourcePoints, // 4 sheet corner points from markers
     int outputWidth,
     int outputHeight,
+    {int edgePaddingPx = 0}
   ) async {
     // Order source points
     final orderedPoints = _orderPoints(sourcePoints);
 
+    final maxPadding = ((outputWidth < outputHeight
+                ? outputWidth
+                : outputHeight) ~/
+            2) -
+        1;
+    final padding = edgePaddingPx.clamp(0, maxPadding);
+
     // Define destination points (corners of output rectangle)
     final dst = [
-      Point(0, 0), // TL
-      Point(outputWidth - 1, 0), // TR
-      Point(outputWidth - 1, outputHeight - 1), // BR
-      Point(0, outputHeight - 1), // BL
+      Point(padding.toDouble(), padding.toDouble()), // TL
+      Point((outputWidth - 1 - padding).toDouble(), padding.toDouble()), // TR
+      Point((outputWidth - 1 - padding).toDouble(),
+          (outputHeight - 1 - padding).toDouble()), // BR
+      Point(padding.toDouble(), (outputHeight - 1 - padding).toDouble()), // BL
     ];
 
     // Convert points to VecPoint for OpenCV

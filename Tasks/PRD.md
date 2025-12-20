@@ -114,7 +114,7 @@ We will build a **native Flutter OMR scanning engine** using `opencv_dart` for i
 3. Corner markers are clearly visible (not torn/covered)
 4. Camera has at least 8MP resolution
 5. Sheet is placed on contrasting background
-6. Template coordinates are fixed-pixel at 300 DPI reference; multi-scale marker detection (±15%) handles typical printing variance
+6. Template coordinates are fixed-pixel at 300 DPI reference; ArUco markers use fixed size + inset padding for reliable detection
 
 ### 3.4 Constraints
 
@@ -123,7 +123,7 @@ We will build a **native Flutter OMR scanning engine** using `opencv_dart` for i
 | `opencv_dart` API stability | May need updates | Pin version, abstract interfaces |
 | Mobile processing power | Affects scan speed | Optimize algorithms, test on low-end devices |
 | Camera quality variance | Affects detection | Adaptive thresholds, user guidance |
-| Print DPI variance | May cause marker detection issues | Multi-scale matching at 85%, 100%, 115% handles ±15% variance; DPI-agnostic coordinates deferred to v2.0 |
+| Print DPI variance | May cause marker/bubble alignment issues | Standardize on 300 DPI templates and fixed marker size/padding; DPI-agnostic coordinates deferred to v2.0 |
 
 ---
 
@@ -256,11 +256,11 @@ TECHNICAL NOTES:
 
 | ID | Requirement | Priority | Notes |
 | --- | --- | --- | --- |
-| FR-TM-01 | System shall support 3 template types: 10, 20, 50 questions | P0 | Bundled as JSON + marker image |
+| FR-TM-01 | System shall support 3 template types: 10, 20, 50 questions | P0 | Bundled as JSON + ArUco marker config |
 | FR-TM-02 | Templates shall define bubble positions as pixel coordinates | P0 | Based on 300dpi reference |
 | FR-TM-03 | Templates shall define name region bounds | P0 | Top of sheet |
 | FR-TM-04 | System shall load templates from app assets | P0 | No network required |
-| FR-TM-05 | Each template shall include corner marker reference image | P0 | PNG format |
+| FR-TM-05 | Each template shall include corner marker configuration | P0 | ArUco dictionary, IDs, size/padding |
 
 ### 5.2 Image Capture
 
@@ -739,7 +739,7 @@ lib/
 │  │  // Methods                                                       │     │
 │  │  + Future<Uint8List> transform(                                  │     │
 │  │      Uint8List imageBytes,                                       │     │
-│  │      List<Point> sourcePoints,    // 4 marker centers            │     │
+│  │      List<Point> sourcePoints,    // 4 marker corners            │     │
 │  │      Size outputSize              // Template dimensions          │     │
 │  │    )                                                              │     │
 │  │                                                                   │     │
@@ -915,7 +915,9 @@ lib/
       "topRight": 1,
       "bottomRight": 2,
       "bottomLeft": 3
-    }
+    },
+    "sizePx": 180,
+    "paddingPx": 90
   },
 
   "nameRegion": {

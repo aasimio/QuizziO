@@ -97,3 +97,4 @@ flutter:
     - assets/templates/template_10q.json
     - assets/templates/template_20q.json
     - assets/templates/template_50q.json
+    - assets/sheets/

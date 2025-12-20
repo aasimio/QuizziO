@@ -15,6 +15,12 @@ class OmrConstants {
   static const int markerIdBottomRight = 2;
   static const int markerIdBottomLeft = 3;
 
+  /// Padding from the page edge to the outer edge of each marker (pixels @ 300 DPI)
+  static const int markerPaddingPx = 90;
+
+  /// Printed marker size (pixels @ 300 DPI)
+  static const int markerSizePx = 180;
+
   // --- Threshold Calculation Constants ---
 
   /// Minimum intensity jump required to identify a gap in histogram

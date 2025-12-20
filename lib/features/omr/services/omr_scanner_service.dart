@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'dart:ui';
 import 'package:injectable/injectable.dart';
 import 'package:opencv_dart/opencv_dart.dart' as cv;
+import '../../../core/constants/omr_constants.dart';
 import '../models/detection_result.dart';
 import 'image_preprocessor.dart';
 import 'marker_detector.dart';
@@ -105,12 +106,26 @@ class OmrPipeline {
         );
       }
 
+      final cornerPoints =
+          _markerDetector.getCornerPointsForTransform(processed);
+      if (cornerPoints == null) {
+        processed.dispose();
+        stopwatch.stop();
+        return OmrResult(
+          success: false,
+          errorMessage: 'Could not resolve marker corners for transform',
+          markerResult: markers,
+          processingTimeMs: stopwatch.elapsedMilliseconds,
+        );
+      }
+
       // Step 4: Transform perspective
       aligned = await _transformer.transform(
         processed,
-        markers.markerCenters,
+        cornerPoints,
         templateWidth,
         templateHeight,
+        edgePaddingPx: OmrConstants.markerPaddingPx,
       );
       processed.dispose(); // Dispose processed, we only need aligned version
       processed = null;

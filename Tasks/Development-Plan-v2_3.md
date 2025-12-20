@@ -162,7 +162,7 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 | `assets/templates/aruco_test_sheet.png` | Test sheet with all 4 ArUco markers | ✅ Created |
 | `assets/templates/template_{10q,20q,50q}.json` | Templates | ✅ Exists (verify schema) |
 | `assets/templates/marker.png` | (Legacy) Old solid black marker | ⚠️ Deprecated |
-| `assets/sheets/answer_sheet_{10q,20q,50q}.pdf` | Printable sheets with ArUco markers | 🆕 Create |
+| `assets/sheets/answer_sheet_{10q,20q,50q}.{png,pdf}` | Printable sheets with ArUco markers | 10q ✅, 20q/50q 🆕 |
 
 ### Notes
 
@@ -835,7 +835,7 @@ Week 5:   Phase 6 (Export + Polish) → Phase 7 (Testing)            [4-5 days]
   - Updated marker_detector.dart to use DICT_4X4_50 dictionary
   - Marker IDs: TL=0, TR=1, BR=2, BL=3
 - **Camera Integration**: Phase 0.6 complete with ~38 FPS detection on iOS
-- **Note**: Answer sheets must now use ArUco markers at corners
+- **Note**: Answer sheets must now use ArUco markers inset from edges (padding) at the corners
 
 ---
 

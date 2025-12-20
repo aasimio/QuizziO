@@ -19,7 +19,8 @@ QuizziO is building a Flutter application for OMR (Optical Mark Recognition) qui
 │   ├── injection.dart(.config.dart)  # get_it + injectable setup
 │   ├── main.dart            # Entry point (Hive init, CameraTestPage)
 │   └── app.dart             # Placeholder
-├── assets/templates/        # OMR template JSON + marker.png used by main app
+├── assets/templates/        # OMR template JSON + ArUco marker assets
+├── assets/sheets/           # Printable answer sheets (PNG/PDF)
 ├── omr_spike/               # Standalone spike with full OMR pipeline, assets, tests, SPIKE_RESULTS.md
 ├── Tasks/                   # PRD + planning docs
 └── test/                    # Root smoke test
@@ -146,6 +147,7 @@ features/<feature_name>/
    - Pages: `ScanPapersPage`, `ScanResultDetailPage`, `CameraTestPage`
    - Widgets: `AlignmentOverlay`, `ScanBottomBar`, `ProcessingOverlay`, `ScanResultPopup`
    - **ArUco markers** used for corner detection (DICT_4X4_50, IDs 0-3)
+   - Markers are inset from sheet edges; perspective warp uses marker corners + edge padding
    - DI via get_it/injectable (`configureDependencies`)
 
 2. **Spike** (`omr_spike/`)
@@ -426,8 +428,11 @@ Quiz templates are stored in `assets/templates/`:
 - `aruco_3.png` - ArUco marker ID 3 (Bottom-Left corner)
 - `aruco_test_sheet.png` - Test sheet with all 4 ArUco markers for testing
 - `marker.png` - (Legacy) Old solid black marker, no longer used
+- `assets/sheets/answer_sheet_10q.png` - Printable 10Q sheet (PNG)
+- `assets/sheets/answer_sheet_10q.pdf` - Printable 10Q sheet (PDF)
 
 When adding new assets, update `pubspec.yaml` under the `flutter.assets` section.
+Printable answer sheets are generated via `scripts/generate_answer_sheet.dart`.
 
 Spike-only assets for validation live under `omr_spike/assets/` (marker/test sheets/gallery variations).
 
