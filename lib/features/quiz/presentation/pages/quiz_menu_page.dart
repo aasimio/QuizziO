@@ -158,6 +158,7 @@ class _QuizMenuContent extends StatelessWidget {
                   arguments: GradedPapersArgs(
                     quizId: quiz.id,
                     quizName: quiz.name,
+                    quiz: quiz,
                   ),
                 );
               },

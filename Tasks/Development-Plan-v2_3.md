@@ -124,13 +124,13 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 | `features/omr/presentation/bloc/graded_papers_event.dart` | Results list events | ✅ Created |
 | `features/omr/presentation/bloc/graded_papers_state.dart` | Results list states | ✅ Created |
 | `features/omr/presentation/pages/scan_papers_page.dart` | Screen 5: Scan papers | ✅ Created |
-| `features/omr/presentation/pages/graded_papers_page.dart` | Screen 6: Results list | 🆕 Create |
+| `features/omr/presentation/pages/graded_papers_page.dart` | Screen 6: Results list | ✅ Created |
 | `features/omr/presentation/pages/scan_result_detail_page.dart` | Result detail view | ✅ Created (placeholder) |
 | `features/omr/presentation/widgets/alignment_overlay.dart` | 4-corner marker overlay | ✅ Created |
 | `features/omr/presentation/widgets/scan_bottom_bar.dart` | Scan count + capture button | ✅ Created |
 | `features/omr/presentation/widgets/processing_overlay.dart` | Processing spinner | ✅ Created |
 | `features/omr/presentation/widgets/scan_result_popup.dart` | Result summary popup | ✅ Created |
-| `features/omr/presentation/widgets/graded_paper_card.dart` | Result list card | 🆕 Create |
+| `features/omr/presentation/widgets/graded_paper_card.dart` | Result list card | ✅ Created |
 | `features/export/services/pdf_export_service.dart` | PDF generation | 🆕 Create |
 
 ### Core/Shared
@@ -552,24 +552,24 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 
 ---
 
-- [ ] **5.2 Screen 6: Graded Papers Page** — 🧠🧠
-  - [ ] 5.2.1 Create `features/omr/presentation/pages/graded_papers_page.dart` — 🧠
-  - [ ] 5.2.2 AppBar: Quiz name, back button, export icon (Phase 6) — 🧠
-  - [ ] 5.2.3 Load results on init: `context.read<GradedPapersBloc>().add(LoadResults(quizId))` — 🧠🧠
-  - [ ] 5.2.4 Empty state: "No papers scanned yet" — 🧠
-  - [ ] 5.2.5 Loaded state: `ListView` of `GradedPaperCard` widgets — 🧠
-  - [ ] 5.2.6 Card tap → Navigate to `/scan-result-detail` — 🧠
-  - **Done when:** List displays, navigation works
+- [x] **5.2 Screen 6: Graded Papers Page** — 🧠🧠
+  - [x] 5.2.1 Create `features/omr/presentation/pages/graded_papers_page.dart` — 🧠
+  - [x] 5.2.2 AppBar: Quiz name, back button, export icon (Phase 6) — 🧠
+  - [x] 5.2.3 Load results on init: `context.read<GradedPapersBloc>().add(LoadResults(quizId))` — 🧠🧠
+  - [x] 5.2.4 Empty state: "No papers scanned yet" — 🧠
+  - [x] 5.2.5 Loaded state: `ListView` of `GradedPaperCard` widgets — 🧠
+  - [x] 5.2.6 Card tap → Navigate to `/scan-result-detail` — 🧠
+  - **Done when:** List displays, navigation works ✅
 
 ---
 
-- [ ] **5.3 GradedPaperCard Widget** — 🧠
-  - [ ] 5.3.1 Create `features/omr/presentation/widgets/graded_paper_card.dart` — 🧠
-  - [ ] 5.3.2 Layout: Row([ Name image (thumbnail), Score, Date, Delete icon ]) — 🧠
-  - [ ] 5.3.3 Delete icon → Show confirmation dialog — 🧠
-  - [ ] 5.3.4 On confirm → Dispatch `DeleteResult` event — 🧠
-  - [ ] 5.3.5 Dismissible for swipe-to-delete (optional) — 🧠
-  - **Done when:** Card displays correctly, delete works
+- [x] **5.3 GradedPaperCard Widget** — 🧠
+  - [x] 5.3.1 Create `features/omr/presentation/widgets/graded_paper_card.dart` — 🧠
+  - [x] 5.3.2 Layout: Row([ Name image (thumbnail), Score, Date, Delete icon ]) — 🧠
+  - [x] 5.3.3 Delete icon → Show confirmation dialog — 🧠
+  - [x] 5.3.4 On confirm → Dispatch `DeleteResult` event — 🧠
+  - [x] 5.3.5 Dismissible for swipe-to-delete (optional) — 🧠 (skipped - using PopupMenu instead)
+  - **Done when:** Card displays correctly, delete works ✅
 
 ---
 
