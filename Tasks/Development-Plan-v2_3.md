@@ -120,7 +120,9 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 | `features/quiz/presentation/widgets/quiz_dialog.dart` | Create/edit dialog | ✅ Created |
 | `features/quiz/presentation/widgets/answer_key_row.dart` | Answer key row | ✅ Created |
 | `features/omr/presentation/bloc/scanner_bloc.dart` | Scanning state machine | ✅ Created |
-| `features/omr/presentation/bloc/graded_papers_bloc.dart` | Results list state | 🆕 Create |
+| `features/omr/presentation/bloc/graded_papers_bloc.dart` | Results list state | ✅ Created |
+| `features/omr/presentation/bloc/graded_papers_event.dart` | Results list events | ✅ Created |
+| `features/omr/presentation/bloc/graded_papers_state.dart` | Results list states | ✅ Created |
 | `features/omr/presentation/pages/scan_papers_page.dart` | Screen 5: Scan papers | ✅ Created |
 | `features/omr/presentation/pages/graded_papers_page.dart` | Screen 6: Results list | 🆕 Create |
 | `features/omr/presentation/pages/scan_result_detail_page.dart` | Result detail view | ✅ Created (placeholder) |
@@ -135,8 +137,14 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 | File | Purpose | Status |
 |------|---------|--------|
 | `main.dart`, `app.dart` | Entry point + MaterialApp | 📝 Update |
-| `injection.dart` | DI configuration | 🆕 Create |
+| `injection.dart` | DI configuration | ✅ Created |
+| `injection.config.dart` | DI generated config | ✅ Generated |
 | `core/constants/{hive_boxes,app_constants,omr_constants}.dart` | Constants | 🆕 Create all |
+
+### Tests
+| File | Purpose | Status |
+|------|---------|--------|
+| `test/features/omr/presentation/bloc/graded_papers_bloc_test.dart` | GradedPapersBloc tests | ✅ Created |
 
 ### Assets
 | File | Purpose | Status |
@@ -532,13 +540,14 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 **Est:** 2-3 days
 
 - [ ] **5.1 GradedPapersBloc** — 🧠🧠
-  - [ ] 5.1.1 Events: `LoadResults`, `UpdateResult`, `DeleteResult` — 🧠
-  - [ ] 5.1.2 States: `ResultsInitial`, `ResultsLoading`, `ResultsLoaded`, `ResultsError` — 🧠
-  - [ ] 5.1.3 Inject `ScanRepository` — 🧠
-  - [ ] 5.1.4 `LoadResults` → Fetch by quiz ID, sort by date — 🧠
-  - [ ] 5.1.5 `UpdateResult` → Update corrected answers, recalculate score, save — 🧠🧠
-  - [ ] 5.1.6 `DeleteResult` → Remove from repo — 🧠
-  - [ ] 5.1.7 Register in DI — 🧠
+  - [x] 5.1.1 Events: `LoadResults`, `UpdateResult`, `DeleteResult` — 🧠
+  - [x] 5.1.2 States: `ResultsInitial`, `ResultsLoading`, `ResultsLoaded`, `ResultsError` — 🧠
+  - [x] 5.1.3 Inject `ScanRepository` — 🧠
+  - [x] 5.1.4 `LoadResults` → Fetch by quiz ID, sort by date — 🧠
+  - [x] 5.1.5 `UpdateResult` → Update corrected answers, recalculate score, save — 🧠🧠
+  - [x] 5.1.6 `DeleteResult` → Remove from repo — 🧠
+  - [x] 5.1.7 Register in DI — 🧠
+  - [x] 5.1.8 MVP decisions: load answer key from `QuizRepository` by `quizId`; `correctedAnswers` uses `null` for blank and `'MULTIPLE_MARK'` sentinel for multi-mark; no schema changes — 🧠
   - **Done when:** BLoC tests pass
 
 ---

@@ -243,6 +243,8 @@ TECHNICAL NOTES:
 • Store both original_answer and corrected_answer
 • Track which questions were manually edited
 • Allow undo of corrections
+• MVP storage: corrected_answer uses "A"-"E" or null (blank); use sentinel "MULTIPLE_MARK" for multi-mark
+• Regrading uses the latest quiz answer key from local storage
 
 ```
 
@@ -980,6 +982,8 @@ lib/
 │  │                                          'q2': 'BLANK',          │       │
 │  │                                          'q5': 'MULTIPLE_MARK'}  │       │
 │  │  correctedAnswers: Map<String, String?> After manual edit       │       │
+│  │                                           (null=BLANK,           │       │
+│  │                                            "MULTIPLE_MARK"=multi)│       │
 │  │                                                                 │       │
 │  │  // Scores                                                      │       │
 │  │  score: int                             18                      │       │
@@ -1002,6 +1006,7 @@ lib/
 │  • "VALID"         → Single bubble marked, answer in detectedAnswers       │
 │  • "BLANK"         → No bubbles marked, detectedAnswers value = null       │
 │  • "MULTIPLE_MARK" → 2+ bubbles marked, detectedAnswers value = null       │
+│  • correctedAnswers may store "MULTIPLE_MARK" as a manual override         │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
