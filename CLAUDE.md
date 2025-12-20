@@ -141,6 +141,8 @@ features/<feature_name>/
    - Data: `ScanResultModel` (Hive), `ScanRepositoryImpl`
    - Services: Full OMR pipeline (preprocess → detect → transform → read → threshold via `OmrPipeline`)
    - Presentation: `ScannerBloc` (8-state machine for camera → capture → process → result flow)
+   - Scanner flow: frame processing throttled ~10 FPS and only during Previewing/Aligning; 500ms stable markers auto-capture
+   - Error mapping: name-region marker failures → `ScannerErrorType.markerDetection`, persistence failures → `ScannerErrorType.persistence`
    - Pages: `ScanPapersPage`, `ScanResultDetailPage`, `CameraTestPage`
    - Widgets: `AlignmentOverlay`, `ScanBottomBar`, `ProcessingOverlay`, `ScanResultPopup`
    - **ArUco markers** used for corner detection (DICT_4X4_50, IDs 0-3)
@@ -301,6 +303,7 @@ class CameraState extends State<CameraWidget> {
 - Validate 4 corner markers detected before grading — abort if not found
 - Use `adaptiveThreshold` for inconsistent lighting conditions
 - Handle exceptions when image processing fails
+- **Testing note:** `opencv_dart` native libs are not available in standard `flutter test` runs; performance benchmarks or pipeline validation must run on device/emulator.
 
 **ArUco Marker Detection** (preferred for corner detection):
 - Use `DICT_4X4_50` dictionary with marker IDs 0-3 for corners
