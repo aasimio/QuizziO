@@ -516,13 +516,13 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 ---
 
 - [ ] **4.6 High-Res Capture & Processing** — 🧠🧠🧠
-  - [ ] 4.6.1 On `Capturing` state → Call `CameraService.captureImage()` — 🧠🧠
-  - [ ] 4.6.2 Feed to `OmrScannerService.scanAnswerSheet(image, template)` — 🧠🧠
-  - [ ] 4.6.3 Get `ScanResult` with detected answers + statuses — 🧠🧠
-  - [ ] 4.6.4 Call `GradingService.grade(scanResult, answerKey)` — 🧠🧠
-  - [ ] 4.6.5 Get `GradedResult` with score — 🧠
-  - [ ] 4.6.6 Save to `ScanRepository` — 🧠
-  - [ ] 4.6.7 Emit `ProcessingComplete` event with result — 🧠
+  - [x] 4.6.1 On `Capturing` state → Call `CameraService.captureImage()` — 🧠🧠
+  - [x] 4.6.2 Feed to `OmrScannerService.scanAnswerSheet(image, template)` — 🧠🧠
+  - [x] 4.6.3 Get `ScanResult` with detected answers + statuses — 🧠🧠
+  - [x] 4.6.4 Call `GradingService.grade(scanResult, answerKey)` — 🧠🧠
+  - [x] 4.6.5 Get `GradedResult` with score — 🧠
+  - [x] 4.6.6 Save to `ScanRepository` — 🧠
+  - [x] 4.6.7 Emit `ProcessingComplete` event with result — 🧠
   - **Done when:** Full pipeline executes <500ms, result saved
 
 ---

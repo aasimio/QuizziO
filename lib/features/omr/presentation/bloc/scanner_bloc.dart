@@ -375,10 +375,29 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
       emit(const ScannerProcessing(status: 'Extracting name region...'));
 
       // Extract name region from captured image
-      final nameRegionImage = await _extractNameRegion(
-        event.imageBytes,
-        template,
-      );
+      Uint8List nameRegionImage;
+      try {
+        nameRegionImage = await _extractNameRegion(
+          event.imageBytes,
+          template,
+        );
+      } on _MarkerExtractionException catch (e) {
+        debugPrint('Name region marker error: $e');
+        if (isClosed) return;
+        add(ScannerErrorOccurred(
+          message: e.toString(),
+          type: ScannerErrorType.markerDetection,
+        ));
+        return;
+      } catch (e, stackTrace) {
+        debugPrint('Name region extraction error: $e\n$stackTrace');
+        if (isClosed) return;
+        add(ScannerErrorOccurred(
+          message: 'Failed to extract name region: ${e.toString()}',
+          type: ScannerErrorType.omrProcessing,
+        ));
+        return;
+      }
       if (isClosed) return;
 
       // Build scan result
@@ -398,7 +417,17 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
       emit(const ScannerProcessing(status: 'Saving result...'));
 
       // Save to repository
-      await _scanRepository.save(scanResult);
+      try {
+        await _scanRepository.save(scanResult);
+      } catch (e, stackTrace) {
+        debugPrint('Persistence error: $e\n$stackTrace');
+        if (isClosed) return;
+        add(ScannerErrorOccurred(
+          message: 'Failed to save scan: ${e.toString()}',
+          type: ScannerErrorType.persistence,
+        ));
+        return;
+      }
       if (isClosed) return;
 
       // Dispatch completion event
@@ -572,7 +601,9 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
         final markers = await _markerDetector.detect(processed);
 
         if (!markers.isValid) {
-          throw Exception('Markers not found for name region extraction');
+          throw const _MarkerExtractionException(
+            'Markers not found for name region extraction',
+          );
         }
 
         // Get corner points for transform
@@ -581,7 +612,9 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
         );
 
         if (cornerPoints == null) {
-          throw Exception('Could not extract corner points');
+          throw const _MarkerExtractionException(
+            'Could not extract corner points',
+          );
         }
 
         // Transform to aligned view
@@ -640,4 +673,13 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
     await _cleanup();
     return super.close();
   }
+}
+
+class _MarkerExtractionException implements Exception {
+  final String message;
+
+  const _MarkerExtractionException(this.message);
+
+  @override
+  String toString() => message;
 }
