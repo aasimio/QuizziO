@@ -174,7 +174,7 @@ ACCEPTANCE CRITERIA:
 TECHNICAL NOTES:
 ────────────────
 - Run marker detection at ~10 FPS on preview frames (minimum 5 FPS on low-end devices)
-- Show green overlay when marker confidence > 0.3
+- Show green overlay when all 4 markers are detected (ArUco is binary)
 - Debounce detection to avoid flicker
 
 ```
@@ -430,7 +430,7 @@ TECHNICAL NOTES:
 
 | ID | Requirement | Target | Notes |
 | --- | --- | --- | --- |
-| NFR-C-01 | Android version | 6.0+ (API 23) | ~95% market coverage |
+| NFR-C-01 | Android version | 7.0+ (API 24) | opencv_dart requirement |
 | NFR-C-02 | iOS version | 17.0+ | ~98% market coverage |
 | NFR-C-03 | Device camera | 8MP+ | Minimum resolution |
 | NFR-C-04 | Screen size | 4.7" - 12.9" | Phone and tablet |
@@ -711,8 +711,8 @@ lib/
 │  │  // Returns                                                       │     │
 │  │  MarkerDetectionResult {                                          │     │
 │  │    List<Point> markerCenters;  // 4 points (TL, TR, BR, BL)      │     │
-│  │    double avgConfidence;       // Proportion of markers found    │     │
-│  │    List<double> perMarkerConfidence; // 1.0 if found, 0.0 if not │     │
+│  │    int foundCount;             // 0-4 markers found              │     │
+│  │    List<int> foundMarkerIds;   // IDs found (0-3)                │     │
 │  │    bool allMarkersFound;       // true if all 4 ArUco IDs found  │     │
 │  │  }                                                                │     │
 │  │                                                                   │     │
@@ -1211,7 +1211,7 @@ lib/
 | **1.2** | Add dependencies (opencv_dart, camera, hive) | pubspec.yaml | 1 |
 | **1.3** | Verify opencv_dart builds on Android/iOS | Successful build | 4 |
 | **1.4** | Define data models (entities, models) | 8 model classes | 3 |
-| **1.5** | Create template JSON files (10q, 20q, 50q) | 3 JSON + marker.png | 3 |
+| **1.5** | Create template JSON files (10q, 20q, 50q) | 3 JSON + ArUco marker assets | 3 |
 | **1.6** | Implement TemplateManager (load from assets) | TemplateManager class | 2 |
 | **1.7** | Set up Hive database + Quiz repository | Database layer | 3 |
 |  |  | **Total:** | **18 hrs** |
@@ -1221,7 +1221,7 @@ lib/
 | Task | Description | Deliverable | Est. Hours |
 | --- | --- | --- | --- |
 | **2.1** | Implement ImagePreprocessor (grayscale, CLAHE, normalize) | ImagePreprocessor class | 3 |
-| **2.2** | Implement MarkerDetector (template matching, quadrants) | MarkerDetector class | 6 |
+| **2.2** | Implement MarkerDetector (ArUco detection) | MarkerDetector class | 6 |
 | **2.3** | Implement PerspectiveTransformer (point ordering, warp) | PerspectiveTransformer | 4 |
 | **2.4** | Implement BubbleReader (ROI extraction, mean calc) | BubbleReader class | 5 |
 | **2.5** | Implement ThresholdCalculator (gap-finding algorithm) | ThresholdCalculator | 3 |
@@ -1309,7 +1309,7 @@ lib/
 | **ThresholdCalculator** | Empty list, single value, no gap, clear gap, edge values | P0 |
 | **AnswerExtractor** | Single mark, no marks, multi marks, all options | P0 |
 | **GradingService** | All correct, all wrong, mixed, blank handling | P0 |
-| **MarkerDetector** | Valid markers, missing markers, low confidence | P0 |
+| **MarkerDetector** | Valid markers, missing markers, partial set | P0 |
 | **BubbleReader** | Valid positions, boundary check | P1 |
 | **PerspectiveTransformer** | Point ordering, various orientations | P1 |
 | **TemplateManager** | Load all templates, invalid JSON | P1 |
@@ -1394,7 +1394,7 @@ lib/
 │  │  ■                                                             ■    │   │
 │  │  ↑                                                             ↑    │   │
 │  │  Corner marker                                    Corner marker     │   │
-│  │  (solid black square, ~0.5" × 0.5")                                │   │
+│  │  (ArUco, ~0.5" × 0.5")                                          │   │
 │  │                                                                     │   │
 │  │  ┌─────────────────────────────────────────────────────────────┐   │   │
 │  │  │  Name: _________________________________                    │   │   │
@@ -1415,9 +1415,9 @@ lib/
 │  └─────────────────────────────────────────────────────────────────────┘   │
 │                                                                             │
 │  MARKER SPECIFICATIONS:                                                     │
-│  • Solid black (#000000) squares                                           │
+│  • ArUco markers (DICT_4X4_50), IDs 0-3                                   │
 │  • Size: 0.5" × 0.5" (150px × 150px at 300dpi)                            │
-│  • Position: 0.25" from page edges                                         │
+│  • Position: 0.25" from page edges (inset padding)                         │
 │  • Must be fully visible (no crop)                                         │
 │                                                                             │
 │  BUBBLE SPECIFICATIONS:                                                     │
@@ -1440,8 +1440,8 @@ The following OpenCV functions are used within our image processing services. Al
 | `cv.cvtColorAsync()` | ImagePreprocessor | Convert captured image to grayscale |
 | `cv.createCLAHE()` | ImagePreprocessor | Contrast Limited Adaptive Histogram Equalization |
 | `cv.normalizeAsync()` | ImagePreprocessor | Normalize pixel values to 0-255 range |
-| `cv.matchTemplateAsync()` | MarkerDetector | Find corner markers via template matching |
-| `cv.minMaxLocAsync()` | MarkerDetector | Locate best match position and confidence |
+| `cv.ArucoDictionary.predefined()` | MarkerDetector | Load DICT_4X4_50 dictionary |
+| `cv.ArucoDetector.create()` | MarkerDetector | Create ArUco detector (used for `detectMarkers`) |
 | `cv.getPerspectiveTransform()` | PerspectiveTransformer | Calculate 4-point transform matrix |
 | `cv.warpPerspectiveAsync()` | PerspectiveTransformer | Apply perspective correction to align sheet |
 | `cv.meanAsync()` | BubbleReader | Calculate mean pixel intensity of bubble ROI |
@@ -1498,7 +1498,7 @@ The following OpenCV functions are used within our image processing services. Al
 │            │           └──────┬──────┘                   │                 │
 │            │                  │                          │                 │
 │            │           Markers Detected                  │                 │
-│            │           (confidence > 0.3)                │                 │
+│            │           (all 4 IDs found)                 │                 │
 │            │                  │                          │                 │
 │            │                  ▼                          │                 │
 │            │           ┌─────────────┐                   │                 │
