@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../omr/domain/repositories/scan_repository.dart';
 import '../../domain/entities/quiz.dart';
 import '../../domain/repositories/quiz_repository.dart';
 import 'quiz_event.dart';
@@ -10,9 +11,10 @@ import 'quiz_state.dart';
 @injectable
 class QuizBloc extends Bloc<QuizEvent, QuizState> {
   final QuizRepository _repository;
+  final ScanRepository _scanRepository;
   final Uuid _uuid;
 
-  QuizBloc(this._repository, {Uuid? uuid})
+  QuizBloc(this._repository, this._scanRepository, {Uuid? uuid})
       : _uuid = uuid ?? const Uuid(),
         super(const QuizInitial()) {
     on<LoadQuizzes>(_onLoadQuizzes);
@@ -97,6 +99,7 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
     final currentState = state;
     emit(const QuizLoading());
     try {
+      await _scanRepository.deleteByQuizId(event.id);
       await _repository.delete(event.id);
       if (isClosed) return;
       final quizzes = await _repository.getAll();

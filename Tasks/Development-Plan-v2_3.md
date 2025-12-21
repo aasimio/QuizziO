@@ -601,9 +601,9 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 
 ---
 
-- [ ] **5.5 Cascade Delete: Quiz → Scan Results** — 🧠
-  - [ ] 5.5.1 Update `QuizBloc._onDeleteQuiz()` to delete associated scan results before deleting quiz — 🧠
-  - **Done when:** Deleting quiz removes all associated scan results, no orphans
+- [x] **5.5 Cascade Delete: Quiz → Scan Results** — 🧠
+  - [x] 5.5.1 Update `QuizBloc._onDeleteQuiz()` to delete associated scan results before deleting quiz — 🧠
+  - **Done when:** Deleting quiz removes all associated scan results, no orphans ✅
 
 ---
 

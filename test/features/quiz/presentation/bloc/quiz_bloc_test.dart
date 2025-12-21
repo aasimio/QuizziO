@@ -1,6 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:quizzio/features/omr/domain/repositories/scan_repository.dart';
 import 'package:quizzio/features/quiz/domain/entities/quiz.dart';
 import 'package:quizzio/features/quiz/domain/repositories/quiz_repository.dart';
 import 'package:quizzio/features/quiz/presentation/bloc/quiz_bloc.dart';
@@ -10,10 +11,13 @@ import 'package:uuid/uuid.dart';
 
 class MockQuizRepository extends Mock implements QuizRepository {}
 
+class MockScanRepository extends Mock implements ScanRepository {}
+
 class MockUuid extends Mock implements Uuid {}
 
 void main() {
   late QuizRepository repository;
+  late ScanRepository scanRepository;
   late Uuid uuid;
 
   final testQuiz1 = Quiz(
@@ -34,8 +38,10 @@ void main() {
 
   setUp(() {
     repository = MockQuizRepository();
+    scanRepository = MockScanRepository();
     uuid = MockUuid();
     when(() => uuid.v4()).thenReturn('new-quiz-id');
+    when(() => scanRepository.deleteByQuizId(any())).thenAnswer((_) async {});
   });
 
   setUpAll(() {
@@ -44,7 +50,7 @@ void main() {
 
   group('QuizBloc', () {
     test('initial state is QuizInitial', () {
-      final bloc = QuizBloc(repository, uuid: uuid);
+      final bloc = QuizBloc(repository, scanRepository, uuid: uuid);
       expect(bloc.state, const QuizInitial());
       bloc.close();
     });
@@ -55,7 +61,7 @@ void main() {
         setUp: () {
           when(() => repository.getAll()).thenAnswer((_) async => testQuizzes);
         },
-        build: () => QuizBloc(repository, uuid: uuid),
+        build: () => QuizBloc(repository, scanRepository, uuid: uuid),
         act: (bloc) => bloc.add(const LoadQuizzes()),
         expect: () => [
           const QuizLoading(),
@@ -71,7 +77,7 @@ void main() {
         setUp: () {
           when(() => repository.getAll()).thenAnswer((_) async => []);
         },
-        build: () => QuizBloc(repository, uuid: uuid),
+        build: () => QuizBloc(repository, scanRepository, uuid: uuid),
         act: (bloc) => bloc.add(const LoadQuizzes()),
         expect: () => [
           const QuizLoading(),
@@ -85,7 +91,7 @@ void main() {
           when(() => repository.getAll())
               .thenThrow(Exception('Database error'));
         },
-        build: () => QuizBloc(repository, uuid: uuid),
+        build: () => QuizBloc(repository, scanRepository, uuid: uuid),
         act: (bloc) => bloc.add(const LoadQuizzes()),
         expect: () => [
           const QuizLoading(),
@@ -110,7 +116,7 @@ void main() {
             return [newQuiz, ...testQuizzes];
           });
         },
-        build: () => QuizBloc(repository, uuid: uuid),
+        build: () => QuizBloc(repository, scanRepository, uuid: uuid),
         act: (bloc) => bloc.add(const CreateQuiz(
           name: 'New Quiz',
           templateId: 'template_20q',
@@ -135,7 +141,7 @@ void main() {
           when(() => repository.save(any()))
               .thenThrow(Exception('Save failed'));
         },
-        build: () => QuizBloc(repository, uuid: uuid),
+        build: () => QuizBloc(repository, scanRepository, uuid: uuid),
         act: (bloc) => bloc.add(const CreateQuiz(
           name: 'New Quiz',
           templateId: 'template_20q',
@@ -153,7 +159,7 @@ void main() {
           when(() => repository.save(any())).thenAnswer((_) async {});
           when(() => repository.getAll()).thenAnswer((_) async => []);
         },
-        build: () => QuizBloc(repository, uuid: uuid),
+        build: () => QuizBloc(repository, scanRepository, uuid: uuid),
         act: (bloc) => bloc.add(const CreateQuiz(
           name: 'Test',
           templateId: 'template_10q',
@@ -176,7 +182,7 @@ void main() {
           when(() => repository.getAll())
               .thenAnswer((_) async => [updatedQuiz, testQuiz2]);
         },
-        build: () => QuizBloc(repository, uuid: uuid),
+        build: () => QuizBloc(repository, scanRepository, uuid: uuid),
         act: (bloc) => bloc.add(UpdateQuiz(quiz: updatedQuiz)),
         expect: () => [
           const QuizLoading(),
@@ -194,7 +200,7 @@ void main() {
           when(() => repository.save(any()))
               .thenThrow(Exception('Update failed'));
         },
-        build: () => QuizBloc(repository, uuid: uuid),
+        build: () => QuizBloc(repository, scanRepository, uuid: uuid),
         act: (bloc) => bloc.add(UpdateQuiz(quiz: updatedQuiz)),
         expect: () => [
           const QuizLoading(),
@@ -211,13 +217,14 @@ void main() {
           when(() => repository.delete(any())).thenAnswer((_) async {});
           when(() => repository.getAll()).thenAnswer((_) async => [testQuiz2]);
         },
-        build: () => QuizBloc(repository, uuid: uuid),
+        build: () => QuizBloc(repository, scanRepository, uuid: uuid),
         act: (bloc) => bloc.add(const DeleteQuiz(id: 'quiz-1')),
         expect: () => [
           const QuizLoading(),
           QuizLoaded(quizzes: [testQuiz2]),
         ],
         verify: (_) {
+          verify(() => scanRepository.deleteByQuizId('quiz-1')).called(1);
           verify(() => repository.delete('quiz-1')).called(1);
           verify(() => repository.getAll()).called(1);
         },
@@ -229,7 +236,7 @@ void main() {
           when(() => repository.delete(any()))
               .thenThrow(Exception('Delete failed'));
         },
-        build: () => QuizBloc(repository, uuid: uuid),
+        build: () => QuizBloc(repository, scanRepository, uuid: uuid),
         act: (bloc) => bloc.add(const DeleteQuiz(id: 'quiz-1')),
         expect: () => [
           const QuizLoading(),
