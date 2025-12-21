@@ -77,6 +77,7 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 | Answer status as strings | DB compatibility per PRD 8.2 | PRD |
 | Single quiz dialog | Code reuse for create/edit | v2.2 |
 | **ArUco markers (not template matching)** | Template matching caused false positives on live camera; ArUco has built-in encoding | v0.6.5 |
+| **Portrait-only orientation** | Simplifies MVP; PRD FR-IC-05 marks landscape as P1 but deferred for complexity | v2.3.3 |
 
 ---
 
@@ -162,7 +163,9 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 | `assets/templates/aruco_test_sheet.png` | Test sheet with all 4 ArUco markers | ✅ Created |
 | `assets/templates/template_{10q,20q,50q}.json` | Templates | ✅ Exists (verify schema) |
 | `assets/templates/marker.png` | (Legacy) Old solid black marker | ⚠️ Deprecated |
-| `assets/sheets/answer_sheet_{10q,20q,50q}.{png,pdf}` | Printable sheets with ArUco markers | 10q ✅, 20q/50q 🆕 |
+| `assets/sheets/answer_sheet_10q.{png,pdf}` | Printable 10Q sheet with ArUco markers | ✅ Created |
+| `assets/sheets/answer_sheet_20q.{png,pdf}` | Printable 20Q sheet with ArUco markers | 🆕 Create (Phase 6.0) |
+| `assets/sheets/answer_sheet_50q.{png,pdf}` | Printable 50Q sheet with ArUco markers | 🆕 Create (Phase 6.0) |
 
 ### Notes
 
@@ -598,9 +601,23 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 
 ---
 
+- [ ] **5.5 Cascade Delete: Quiz → Scan Results** — 🧠
+  - [ ] 5.5.1 Update `QuizBloc._onDeleteQuiz()` to delete associated scan results before deleting quiz — 🧠
+  - **Done when:** Deleting quiz removes all associated scan results, no orphans
+
+---
+
 ### Phase 6: Export & Polish — 🧠🧠
 > PDF generation, final UI touches
 **Est:** 2-3 days
+
+- [ ] **6.0 Generate Missing Answer Sheets** — 🧠
+  - [ ] 6.0.1 Generate 20q sheets via `dart run scripts/generate_answer_sheet.dart assets/templates/template_20q.json assets/sheets/answer_sheet_20q` — 🧠
+  - [ ] 6.0.2 Generate 50q sheets via `dart run scripts/generate_answer_sheet.dart assets/templates/template_50q.json assets/sheets/answer_sheet_50q` — 🧠
+  - [ ] 6.0.3 Print sanity check: **US Letter**, **100% scale**, no “fit to page”; confirm markers not clipped — 🧠🧠
+  - **Done when:** All 3 template sizes (10q, 20q, 50q) have printable sheets in `assets/sheets/` and scan successfully
+
+---
 
 - [ ] **6.1 PdfExportService** — 🧠🧠🧠
   - [ ] 6.1.1 Create `features/export/services/pdf_export_service.dart` — 🧠
@@ -613,7 +630,8 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
   - [ ] 6.1.4 Use `pdf` package for generation — 🧠🧠
   - [ ] 6.1.5 Return PDF bytes — 🧠
   - [ ] 6.1.6 Register in DI — 🧠
-  - **Done when:** PDF generates with correct layout
+  - [ ] 6.1.7 Ensure **no branding/watermarks** (footer = page numbers only) — 🧠
+  - **Done when:** PDF generates with correct layout (per PRD; no branding/watermarks)
 
 ---
 
@@ -634,14 +652,13 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
   - [ ] 6.3.3 Empty states: Clear CTAs ("Create your first quiz", etc.) — 🧠
   - [ ] 6.3.4 Confirmation dialogs: Delete quiz, delete result — 🧠
   - [ ] 6.3.5 SnackBars: "Quiz created", "Answer key saved", "Result updated" — 🧠
-  - [ ] 6.3.6 Haptic feedback: On marker alignment, capture, errors — 🧠
-  - [ ] 6.3.7 Sound effects: Camera shutter sound on capture (optional) — 🧠
-  - [ ] 6.3.8 Theme consistency: Centralize scan feature color `Color(0xFF0D7377)` — add `kScanFeatureColor` to `app_constants.dart`, replace hardcoded instances in `quiz_menu_page.dart` (line 139), `scan_result_popup.dart`, `scan_bottom_bar.dart`, `scan_papers_page.dart` — 🧠
+  - [ ] 6.3.6 Haptic feedback: On capture, errors — 🧠
+  - [ ] 6.3.8 Theme consistency: Centralize scan feature color `Color(0xFF0D7377)` — add `kScanFeatureColor` to `app_constants.dart`, replace hardcoded instances — 🧠
   - **Done when:** App feels polished, feedback is clear
 
 ---
 
-- [ ] **6.4 Performance Optimization** — 🧠🧠🧠
+- [ ] **6.4 Performance Optimization (optional)** — 🧠🧠🧠
   - [ ] 6.4.1 Profile scan pipeline: Ensure <500ms total — 🧠🧠🧠
   - [ ] 6.4.2 Profile marker detection: Ensure <100ms per frame — 🧠🧠
   - [ ] 6.4.3 Use `Isolate` for heavy CV operations if needed — 🧠🧠🧠
@@ -652,8 +669,8 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 ---
 
 - [ ] **6.5 Error Handling** — 🧠🧠
-  - [ ] 6.5.1 Camera errors: Permission denied, camera unavailable → Show friendly message + settings button — 🧠🧠
-  - [ ] 6.5.2 Detection errors: Markers not found → "Ensure markers visible, adjust lighting" — 🧠
+  - [ ] 6.5.1 Camera errors: Permission denied → Show message + `openAppSettings()` button — 🧠🧠
+  - [ ] 6.5.2 Detection errors: Markers not found → "Ensure all 4 corner markers are visible (not clipped), sheet is printed at 100% scale, and adjust lighting" — 🧠
   - [ ] 6.5.3 Processing errors: Scan failed → "Could not read answers. Try again." — 🧠
   - [ ] 6.5.4 Repository errors: Save failed → "Could not save. Check storage." — 🧠
   - [ ] 6.5.5 Network-agnostic error messages (offline by design) — 🧠
@@ -801,8 +818,9 @@ Week 5:   Phase 6 (Export + Polish) → Phase 7 (Testing)            [4-5 days]
 - [ ] Tested on all P0 devices
 - [ ] Performance metrics met (PRD 6.1)
 - [ ] Golden tests confirm 98%+ accuracy
-- [ ] PDF export generates correct layout
+- [ ] PDF export generates correct layout (no branding/watermarks)
 - [ ] All error states have user-friendly messages
+- [ ] All 3 answer sheet templates (10q, 20q, 50q) available (print-tested at 100% scale)
 
 ### Release Artifacts
 - [ ] Release APK + IPA built and tested
@@ -810,12 +828,21 @@ Week 5:   Phase 6 (Export + Polish) → Phase 7 (Testing)            [4-5 days]
 
 ### Documentation
 - [ ] README updated
+- [ ] Printing guide added (US Letter, 100% scale, troubleshooting)
 - [ ] Known issues documented
 - [ ] PRD discrepancy noted (minSdk 24 vs 23)
 
 ---
 
 ## Change Log
+
+### v2.3.3 (2025-12-21)
+- **PRD Gap Analysis (MVP-focused)**: Added only critical missing items
+  - **Phase 5.5**: Cascade delete quiz → scan results (data integrity fix)
+  - **Phase 6.0**: Generate missing 20q/50q answer sheets with ArUco markers
+  - **Phase 6.5.1**: Camera permission denied → `openAppSettings()` button (UX fix)
+- **Decisions Log**: Added portrait-only orientation decision (FR-IC-05 deferred)
+- **Deferred to post-MVP**: Undo for corrections, PDF page size config, scan confidence display, accessibility audit, bright sunlight warning, enhanced haptic/sound
 
 ### v2.3.2 (2025-12-19)
 - **Task 4.2 Complete**: Screen 5 Scan Papers Page implemented
