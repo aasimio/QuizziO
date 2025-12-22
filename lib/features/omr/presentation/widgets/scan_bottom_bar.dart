@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/constants/app_constants.dart';
+
 /// Bottom bar for scan papers page showing scan count and capture button.
 class ScanBottomBar extends StatelessWidget {
   /// Number of papers scanned in this session
@@ -50,7 +52,7 @@ class ScanBottomBar extends StatelessWidget {
             children: [
               Icon(
                 Icons.check_circle_outline,
-                color: const Color(0xFF0D7377),
+                color: AppColors.scanFeature,
                 size: 24,
               ),
               const SizedBox(width: 8),
@@ -100,11 +102,11 @@ class _CaptureButton extends StatelessWidget {
         height: 64,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: enabled ? const Color(0xFF0D7377) : Colors.grey.shade400,
+          color: enabled ? AppColors.scanFeature : Colors.grey.shade400,
           boxShadow: enabled
               ? [
                   BoxShadow(
-                    color: const Color(0xFF0D7377).withValues(alpha: 0.4),
+                    color: AppColors.scanFeature.withValues(alpha: 0.4),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),

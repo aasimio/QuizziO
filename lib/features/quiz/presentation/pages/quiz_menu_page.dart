@@ -136,7 +136,7 @@ class _QuizMenuContent extends StatelessWidget {
               icon: Icons.camera_alt_outlined,
               title: 'Scan Papers',
               subtitle: 'Scan and grade answer sheets instantly',
-              iconColor: const Color(0xFF0D7377),
+              iconColor: AppColors.scanFeature,
               onTap: () {
                 Navigator.pushNamed(
                   context,

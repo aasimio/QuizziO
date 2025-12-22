@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/constants/app_constants.dart';
 import '../../domain/entities/scan_result.dart';
 import '../utils/score_utils.dart';
 
@@ -165,7 +166,7 @@ class ScanResultPopup extends StatelessWidget {
                 child: FilledButton(
                   onPressed: onContinue,
                   style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFF0D7377),
+                    backgroundColor: AppColors.scanFeature,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),

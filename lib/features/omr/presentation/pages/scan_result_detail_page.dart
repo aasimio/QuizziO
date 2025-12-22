@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/constants/app_constants.dart';
 import '../../../../injection.dart';
 import '../../../quiz/domain/entities/quiz.dart';
 import '../../../quiz/domain/repositories/quiz_repository.dart';
@@ -699,12 +700,12 @@ class _ScoreSummaryCard extends StatelessWidget {
               children: [
                 _StatChip(
                   label: '${scanResult.blankCount} blank',
-                  color: Colors.orange,
+                  color: AppColors.warning,
                 ),
                 const SizedBox(width: 12),
                 _StatChip(
                   label: '${scanResult.multipleMarkCount} multiple',
-                  color: Colors.red,
+                  color: AppColors.errorAlt,
                 ),
               ],
             ),
@@ -997,8 +998,8 @@ class _AnswerChip extends StatelessWidget {
       bgColor = colorScheme.surfaceContainerHighest;
       textColor = colorScheme.onSurfaceVariant;
     } else if (isMultipleMark) {
-      bgColor = const Color(0xFFF39C12).withValues(alpha: 0.15);
-      textColor = const Color(0xFFF39C12);
+      bgColor = AppColors.warning.withValues(alpha: 0.15);
+      textColor = AppColors.warning;
     } else if (hasCorrection) {
       bgColor = Colors.blue.withValues(alpha: 0.1);
       textColor = Colors.blue.shade700;
@@ -1043,16 +1044,16 @@ class _StatusIcon extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     if (isCorrect) {
-      return const Icon(
+      return Icon(
         Icons.check_circle,
         size: 22,
-        color: Color(0xFF2ECC71),
+        color: AppColors.success,
       );
     } else if (isIncorrect) {
-      return const Icon(
+      return Icon(
         Icons.cancel,
         size: 22,
-        color: Color(0xFFE74C3C),
+        color: AppColors.errorAlt,
       );
     } else if (isBlank) {
       return Icon(
@@ -1061,10 +1062,10 @@ class _StatusIcon extends StatelessWidget {
         color: colorScheme.onSurfaceVariant,
       );
     } else if (isMultipleMark) {
-      return const Icon(
+      return Icon(
         Icons.warning_amber,
         size: 22,
-        color: Color(0xFFF39C12),
+        color: AppColors.warning,
       );
     } else {
       return Icon(
@@ -1245,7 +1246,7 @@ class _EditAnswerSheetState extends State<_EditAnswerSheet> {
                     label: 'Multiple',
                     icon: Icons.warning_amber,
                     isSelected: _isMultipleMark,
-                    color: const Color(0xFFF39C12),
+                    color: AppColors.warning,
                     onTap: _selectMultipleMark,
                   ),
                 ),

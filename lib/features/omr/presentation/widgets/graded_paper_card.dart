@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/constants/app_constants.dart';
 import '../../domain/entities/scan_result.dart';
 
 /// A card widget displaying a graded paper result with score and actions.
@@ -25,9 +26,9 @@ class GradedPaperCard extends StatelessWidget {
   static const _amberThreshold = 50.0;
 
   // Semantic colors for score display
-  static const _greenSuccess = Color(0xFF2ECC71);
-  static const _amberWarning = Color(0xFFF39C12);
-  static const _redError = Color(0xFFE74C3C);
+  static const _greenSuccess = AppColors.success;
+  static const _amberWarning = AppColors.warning;
+  static const _redError = AppColors.errorAlt;
 
   @override
   Widget build(BuildContext context) {

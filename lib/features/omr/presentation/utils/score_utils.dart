@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
-const Color _scoreHighColor = Color(0xFF4ECDC4);
-const Color _scoreLowColor = Color(0xFFFF6B6B);
+import '../../../../core/constants/app_constants.dart';
+
+const Color _scoreHighColor = AppColors.detection;
+const Color _scoreLowColor = AppColors.error;
 
 Color getScoreColor(double percentage) {
   if (percentage >= 0.8) return _scoreHighColor;

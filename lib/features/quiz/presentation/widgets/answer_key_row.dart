@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AnswerKeyRow extends StatelessWidget {
@@ -83,7 +84,10 @@ class _OptionChip extends StatelessWidget {
       color: isSelected ? colorScheme.primaryContainer : Colors.transparent,
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
-        onTap: onTap,
+        onTap: () {
+          HapticFeedback.selectionClick();
+          onTap();
+        },
         borderRadius: BorderRadius.circular(8),
         child: Container(
           constraints: const BoxConstraints(

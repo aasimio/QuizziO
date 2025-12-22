@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/constants/app_constants.dart';
+
 /// Visual feedback overlay for ArUco marker detection during scanning.
 ///
 /// Displays 4 L-shaped corner brackets that change color based on
@@ -140,9 +142,9 @@ class _CornerBracket extends StatelessWidget {
   static const _size = 60.0;
   static const _strokeWidth = 4.0;
   static const _cornerRadius = 8.0;
-  static const _notDetectedColor = Color(0xFFFF6B6B);
-  static const _detectedColor = Color(0xFF4ECDC4);
-  static const _aligningColor = Color(0xFF2ECC71);
+  static const _notDetectedColor = AppColors.error;
+  static const _detectedColor = AppColors.detection;
+  static const _aligningColor = AppColors.success;
 
   const _CornerBracket({
     required this.corner,
@@ -308,8 +310,8 @@ class _StabilityProgressRing extends StatelessWidget {
         backgroundColor: Colors.white.withValues(alpha: 0.3),
         valueColor: AlwaysStoppedAnimation<Color>(
           Color.lerp(
-            const Color(0xFF4ECDC4),
-            const Color(0xFF2ECC71),
+            AppColors.detection,
+            AppColors.success,
             progress,
           )!,
         ),

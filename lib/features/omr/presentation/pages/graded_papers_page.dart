@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -350,7 +351,7 @@ class _EmptyState extends StatelessWidget {
                   style: GoogleFonts.dmSans(fontWeight: FontWeight.w600),
                 ),
                 style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFF0D7377),
+                  backgroundColor: AppColors.scanFeature,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 24,
@@ -502,6 +503,7 @@ class _ResultsList extends StatelessWidget {
     );
 
     if (confirmed == true && context.mounted) {
+      HapticFeedback.mediumImpact();
       onDeleteConfirmed(result);
     }
   }

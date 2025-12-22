@@ -311,13 +311,13 @@ class _ScanPapersContentState extends State<_ScanPapersContent>
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFF6B6B).withValues(alpha: 0.2),
+                  color: AppColors.error.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Icon(
                   Icons.error_outline,
                   size: 40,
-                  color: Color(0xFFFF6B6B),
+                  color: AppColors.error,
                 ),
               ),
               const SizedBox(height: 24),
@@ -348,7 +348,7 @@ class _ScanPapersContentState extends State<_ScanPapersContent>
                 icon: const Icon(Icons.refresh),
                 label: const Text('Try Again'),
                 style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFF0D7377),
+                  backgroundColor: AppColors.scanFeature,
                 ),
               ),
             ],
@@ -370,6 +370,14 @@ class _ScanPapersContentState extends State<_ScanPapersContent>
   }
 
   void _onStateChange(BuildContext context, ScannerState state) {
+    // Haptic when all 4 markers are detected (entering aligning state)
+    if (state is ScannerAligning && state.markersDetected == 4) {
+      HapticFeedback.selectionClick();
+    }
+    // Haptic on errors
+    if (state is ScannerError) {
+      HapticFeedback.heavyImpact();
+    }
     if (state is ScannerResult) {
       setState(() {
         _scannedCount++;

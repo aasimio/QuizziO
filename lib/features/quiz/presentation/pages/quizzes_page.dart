@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -27,46 +28,85 @@ class QuizzesPage extends StatelessWidget {
   }
 }
 
-class _QuizzesPageContent extends StatelessWidget {
+/// Tracks the type of operation for SnackBar feedback.
+enum _QuizOperation { none, create, update, delete }
+
+class _QuizzesPageContent extends StatefulWidget {
   const _QuizzesPageContent();
+
+  @override
+  State<_QuizzesPageContent> createState() => _QuizzesPageContentState();
+}
+
+class _QuizzesPageContentState extends State<_QuizzesPageContent> {
+  _QuizOperation _lastOperation = _QuizOperation.none;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Quizzes',
-          style: GoogleFonts.outfit(
-            fontSize: 24,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        centerTitle: false,
-        backgroundColor: colorScheme.surface,
-        surfaceTintColor: Colors.transparent,
-      ),
-      body: BlocBuilder<QuizBloc, QuizState>(
-        builder: (context, state) {
-          return switch (state) {
-            QuizInitial() || QuizLoading() => const _LoadingView(),
-            QuizLoaded(:final quizzes) => quizzes.isEmpty
-                ? const _EmptyState()
-                : _QuizList(quizzes: quizzes),
-            QuizError(:final message) => _ErrorView(message: message),
+    return BlocListener<QuizBloc, QuizState>(
+      listener: (context, state) {
+        if (state is QuizLoaded && _lastOperation != _QuizOperation.none) {
+          final message = switch (_lastOperation) {
+            _QuizOperation.create => 'Quiz created',
+            _QuizOperation.update => 'Quiz updated',
+            _QuizOperation.delete => 'Quiz deleted',
+            _QuizOperation.none => null,
           };
-        },
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showCreateDialog(context),
-        icon: const Icon(Icons.add),
-        label: Text(
-          'New Quiz',
-          style: GoogleFonts.dmSans(fontWeight: FontWeight.w600),
+          if (message != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(message, style: GoogleFonts.dmSans()),
+                behavior: SnackBarBehavior.floating,
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          }
+          _lastOperation = _QuizOperation.none;
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'Quizzes',
+            style: GoogleFonts.outfit(
+              fontSize: 24,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          centerTitle: false,
+          backgroundColor: colorScheme.surface,
+          surfaceTintColor: Colors.transparent,
+        ),
+        body: BlocBuilder<QuizBloc, QuizState>(
+          builder: (context, state) {
+            return switch (state) {
+              QuizInitial() || QuizLoading() => const _LoadingView(),
+              QuizLoaded(:final quizzes) => quizzes.isEmpty
+                  ? const _EmptyState()
+                  : _QuizList(
+                      quizzes: quizzes,
+                      onOperationStarted: _setOperation,
+                    ),
+              QuizError(:final message) => _ErrorView(message: message),
+            };
+          },
+        ),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () => _showCreateDialog(context),
+          icon: const Icon(Icons.add),
+          label: Text(
+            'New Quiz',
+            style: GoogleFonts.dmSans(fontWeight: FontWeight.w600),
+          ),
         ),
       ),
     );
+  }
+
+  void _setOperation(_QuizOperation operation) {
+    _lastOperation = operation;
   }
 
   Future<void> _showCreateDialog(BuildContext context) async {
@@ -74,6 +114,7 @@ class _QuizzesPageContent extends StatelessWidget {
 
     if (result != null && result is (String, String) && context.mounted) {
       final (name, templateId) = result;
+      _lastOperation = _QuizOperation.create;
       context.read<QuizBloc>().add(CreateQuiz(
             name: name,
             templateId: templateId,
@@ -162,9 +203,13 @@ class _EmptyState extends StatelessWidget {
 }
 
 class _QuizList extends StatelessWidget {
-  const _QuizList({required this.quizzes});
+  const _QuizList({
+    required this.quizzes,
+    required this.onOperationStarted,
+  });
 
   final List<Quiz> quizzes;
+  final ValueChanged<_QuizOperation> onOperationStarted;
 
   @override
   Widget build(BuildContext context) {
@@ -199,6 +244,7 @@ class _QuizList extends StatelessWidget {
     final result = await QuizDialog.show(context, quiz: quiz);
 
     if (result != null && result is Quiz && context.mounted) {
+      onOperationStarted(_QuizOperation.update);
       context.read<QuizBloc>().add(UpdateQuiz(quiz: result));
     }
   }
@@ -246,6 +292,8 @@ class _QuizList extends StatelessWidget {
     );
 
     if (confirmed == true && context.mounted) {
+      HapticFeedback.mediumImpact();
+      onOperationStarted(_QuizOperation.delete);
       context.read<QuizBloc>().add(DeleteQuiz(id: quiz.id));
     }
   }
