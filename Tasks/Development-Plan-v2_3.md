@@ -619,19 +619,19 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 
 ---
 
-- [ ] **6.1 PdfExportService** — 🧠🧠🧠
-  - [ ] 6.1.1 Create `features/export/services/pdf_export_service.dart` — 🧠
-  - [ ] 6.1.2 Method: `Future<Uint8List> generateResultsPdf(Quiz quiz, List<ScanResult> results)` — 🧠🧠
-  - [ ] 6.1.3 Layout (per PRD Appendix): — 🧠🧠🧠
+- [x] **6.1 PdfExportService** — 🧠🧠🧠
+  - [x] 6.1.1 Create `features/export/services/pdf_export_service.dart` — 🧠
+  - [x] 6.1.2 Method: `Future<Uint8List> generateResultsPdf(Quiz quiz, List<ScanResult> results)` — 🧠🧠
+  - [x] 6.1.3 Layout (per PRD Appendix): — 🧠🧠🧠
     - Header: Quiz name, date, student count, average
     - Table: # | Name image | Score
     - 8-10 students per page
     - Page numbers in footer
-  - [ ] 6.1.4 Use `pdf` package for generation — 🧠🧠
-  - [ ] 6.1.5 Return PDF bytes — 🧠
-  - [ ] 6.1.6 Register in DI — 🧠
-  - [ ] 6.1.7 Ensure **no branding/watermarks** (footer = page numbers only) — 🧠
-  - **Done when:** PDF generates with correct layout (per PRD; no branding/watermarks)
+  - [x] 6.1.4 Use `pdf` package for generation — 🧠🧠
+  - [x] 6.1.5 Return PDF bytes — 🧠
+  - [x] 6.1.6 Register in DI — 🧠
+  - [x] 6.1.7 Ensure **no branding/watermarks** (footer = page numbers only) — 🧠
+  - **Done when:** PDF generates with correct layout (per PRD; no branding/watermarks) ✅
 
 ---
 

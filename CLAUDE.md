@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-QuizziO is building a Flutter application for OMR (Optical Mark Recognition) quiz scanning and grading. The root app currently has an OMR prototype (camera test page + service pipeline scaffolding) with quiz/export features scaffolded but not implemented yet. A validated spike lives in `omr_spike/` with the full pipeline UI/tests/assets used for the results below.
+QuizziO is building a Flutter application for OMR (Optical Mark Recognition) quiz scanning and grading. The root app has the main OMR pipeline + quiz feature implemented, and a PDF export service implemented (UI wiring still in progress). A validated spike lives in `omr_spike/` with the full pipeline UI/tests/assets used for the results below.
 
 ## Repository Layout
 
@@ -15,7 +15,7 @@ QuizziO is building a Flutter application for OMR (Optical Mark Recognition) qui
 │   ├── features/
 │   │   ├── omr/             # Implemented services + camera_test_page; marker model
 │   │   ├── quiz/            # Quiz CRUD: BLoC, pages, widgets
-│   │   └── export/          # Stub widget/service for PDF export
+│   │   └── export/          # PDF export (service implemented; UI wiring pending)
 │   ├── injection.dart(.config.dart)  # get_it + injectable setup
 │   ├── main.dart            # Entry point (Hive init, CameraTestPage)
 │   └── app.dart             # Placeholder
@@ -99,7 +99,7 @@ lib/
 ├── features/                # Feature modules
 │   ├── omr/                 # OMR services, ScannerBloc, camera_test_page, detection_result model
 │   ├── quiz/                # Quiz CRUD: BLoC, pages (list, menu), widgets (card, dialog)
-│   └── export/              # PDF export stub (service/widget empty)
+│   └── export/              # PDF export (service implemented; UI wiring pending)
 ├── injection.dart(.config.dart)  # DI setup
 └── main.dart                # Entry point (uses CameraTestPage)
 ```
@@ -163,7 +163,8 @@ features/<feature_name>/
    - Widgets: `QuizCard`, `QuizDialog`, `AnswerKeyRow`
 
 4. **Export Feature** (`lib/features/export`)
-   - `pdf_export_service.dart` scaffolded but not implemented yet
+   - `services/pdf_export_service.dart` implemented (generate/save/share/exportAndShare)
+   - `presentation/widgets/export_button.dart` is still a stub (next: wire into `GradedPapersPage`)
 
 ### Key Architectural Patterns
 
@@ -349,7 +350,7 @@ final result = cv.matchTemplate(image, template, cv.TM_CCOEFF_NORMED);
 - Verify file exists after write before sharing
 - Handle PDF generation errors gracefully
 
-`lib/features/export/services/pdf_export_service.dart` is currently empty; implement per above when export is built.
+`lib/features/export/services/pdf_export_service.dart` is implemented; use it as the reference for PDF generation/saving/sharing.
 
 **Example Pattern**:
 ```dart
