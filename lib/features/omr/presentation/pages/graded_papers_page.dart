@@ -33,8 +33,13 @@ class GradedPapersArgs {
 /// Provides options to view details, delete results, and export.
 class GradedPapersPage extends StatelessWidget {
   final GradedPapersArgs? args;
+  final PdfExportService pdfExportService;
 
-  const GradedPapersPage({super.key, this.args});
+  GradedPapersPage({
+    super.key,
+    this.args,
+    PdfExportService? pdfExportService,
+  }) : pdfExportService = pdfExportService ?? getIt<PdfExportService>();
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +56,7 @@ class GradedPapersPage extends StatelessWidget {
         quizId: args!.quizId,
         quizName: args!.quizName,
         quiz: args!.quiz,
+        pdfExportService: pdfExportService,
       ),
     );
   }
@@ -60,11 +66,13 @@ class _GradedPapersContent extends StatefulWidget {
   final String quizId;
   final String quizName;
   final Quiz? quiz;
+  final PdfExportService pdfExportService;
 
   const _GradedPapersContent({
     required this.quizId,
     required this.quizName,
     this.quiz,
+    required this.pdfExportService,
   });
 
   @override
@@ -169,8 +177,7 @@ class _GradedPapersContentState extends State<_GradedPapersContent> {
     _showLoadingDialog(context);
 
     try {
-      final pdfExportService = getIt<PdfExportService>();
-      await pdfExportService.exportAndShare(widget.quiz!, state.results);
+      await widget.pdfExportService.exportAndShare(widget.quiz!, state.results);
 
       if (context.mounted) {
         Navigator.of(context).pop(); // Close loading dialog
@@ -416,7 +423,8 @@ class _ResultsList extends StatelessWidget {
     );
   }
 
-  Future<void> _navigateToDetail(BuildContext context, ScanResult result) async {
+  Future<void> _navigateToDetail(
+      BuildContext context, ScanResult result) async {
     final updatedResult = await Navigator.pushNamed(
       context,
       AppRoutes.scanResultDetail,
