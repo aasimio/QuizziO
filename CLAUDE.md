@@ -428,8 +428,9 @@ Quiz templates are stored in `assets/templates/`:
 - `aruco_3.png` - ArUco marker ID 3 (Bottom-Left corner)
 - `aruco_test_sheet.png` - Test sheet with all 4 ArUco markers for testing
 - `marker.png` - (Legacy) Old solid black marker, no longer used
-- `assets/sheets/answer_sheet_10q.png` - Printable 10Q sheet (PNG)
-- `assets/sheets/answer_sheet_10q.pdf` - Printable 10Q sheet (PDF)
+- `assets/sheets/answer_sheet_10q.{png,pdf}` - Printable 10Q sheet
+- `assets/sheets/answer_sheet_20q.{png,pdf}` - Printable 20Q sheet
+- `assets/sheets/answer_sheet_50q.{png,pdf}` - Printable 50Q sheet (uses horizontal layout: 2 columns × 25 rows)
 
 When adding new assets, update `pubspec.yaml` under the `flutter.assets` section.
 Printable answer sheets are generated via `scripts/generate_answer_sheet.dart`.

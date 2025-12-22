@@ -14,77 +14,47 @@
     "height": 40
   },
   "markerConfig": {
-    "imagePath": "marker.png",
-    "sheetToMarkerRatio": 17,
-    "scales": [0.85, 1.0, 1.15],
-    "minConfidence": 0.3
+    "type": "aruco",
+    "dictionary": "DICT_4X4_50",
+    "markerIds": {
+      "topLeft": 0,
+      "topRight": 1,
+      "bottomRight": 2,
+      "bottomLeft": 3
+    },
+    "sizePx": 180,
+    "paddingPx": 90
   },
   "nameRegion": {
-    "x": 100,
+    "x": 400,
     "y": 150,
     "width": 800,
     "height": 200
   },
   "fieldBlocks": [
     {
-      "name": "questions_1_10",
-      "origin": {
-        "x": 150,
-        "y": 500
-      },
-      "options": ["A", "B", "C", "D", "E"],
-      "bubblesGap": 60,
-      "labelsGap": 80,
-      "questionLabels": ["q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q10"],
-      "direction": "vertical"
-    },
-    {
-      "name": "questions_11_20",
+      "name": "questions_1_25",
       "origin": {
         "x": 400,
         "y": 500
       },
       "options": ["A", "B", "C", "D", "E"],
       "bubblesGap": 60,
-      "labelsGap": 80,
-      "questionLabels": ["q11", "q12", "q13", "q14", "q15", "q16", "q17", "q18", "q19", "q20"],
-      "direction": "vertical"
+      "labelsGap": 60,
+      "questionLabels": ["q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q10", "q11", "q12", "q13", "q14", "q15", "q16", "q17", "q18", "q19", "q20", "q21", "q22", "q23", "q24", "q25"],
+      "direction": "horizontal"
     },
     {
-      "name": "questions_21_30",
+      "name": "questions_26_50",
       "origin": {
-        "x": 650,
+        "x": 1350,
         "y": 500
       },
       "options": ["A", "B", "C", "D", "E"],
       "bubblesGap": 60,
-      "labelsGap": 80,
-      "questionLabels": ["q21", "q22", "q23", "q24", "q25", "q26", "q27", "q28", "q29", "q30"],
-      "direction": "vertical"
-    },
-    {
-      "name": "questions_31_40",
-      "origin": {
-        "x": 900,
-        "y": 500
-      },
-      "options": ["A", "B", "C", "D", "E"],
-      "bubblesGap": 60,
-      "labelsGap": 80,
-      "questionLabels": ["q31", "q32", "q33", "q34", "q35", "q36", "q37", "q38", "q39", "q40"],
-      "direction": "vertical"
-    },
-    {
-      "name": "questions_41_50",
-      "origin": {
-        "x": 1150,
-        "y": 500
-      },
-      "options": ["A", "B", "C", "D", "E"],
-      "bubblesGap": 60,
-      "labelsGap": 80,
-      "questionLabels": ["q41", "q42", "q43", "q44", "q45", "q46", "q47", "q48", "q49", "q50"],
-      "direction": "vertical"
+      "labelsGap": 60,
+      "questionLabels": ["q26", "q27", "q28", "q29", "q30", "q31", "q32", "q33", "q34", "q35", "q36", "q37", "q38", "q39", "q40", "q41", "q42", "q43", "q44", "q45", "q46", "q47", "q48", "q49", "q50"],
+      "direction": "horizontal"
     }
   ]
 }

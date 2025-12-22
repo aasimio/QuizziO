@@ -164,8 +164,8 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 | `assets/templates/template_{10q,20q,50q}.json` | Templates | ✅ Exists (verify schema) |
 | `assets/templates/marker.png` | (Legacy) Old solid black marker | ⚠️ Deprecated |
 | `assets/sheets/answer_sheet_10q.{png,pdf}` | Printable 10Q sheet with ArUco markers | ✅ Created |
-| `assets/sheets/answer_sheet_20q.{png,pdf}` | Printable 20Q sheet with ArUco markers | 🆕 Create (Phase 6.0) |
-| `assets/sheets/answer_sheet_50q.{png,pdf}` | Printable 50Q sheet with ArUco markers | 🆕 Create (Phase 6.0) |
+| `assets/sheets/answer_sheet_20q.{png,pdf}` | Printable 20Q sheet with ArUco markers | ✅ Created |
+| `assets/sheets/answer_sheet_50q.{png,pdf}` | Printable 50Q sheet with ArUco markers (horizontal layout) | ✅ Created |
 
 ### Notes
 
@@ -611,11 +611,11 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 > PDF generation, final UI touches
 **Est:** 2-3 days
 
-- [ ] **6.0 Generate Missing Answer Sheets** — 🧠
-  - [ ] 6.0.1 Generate 20q sheets via `dart run scripts/generate_answer_sheet.dart assets/templates/template_20q.json assets/sheets/answer_sheet_20q` — 🧠
-  - [ ] 6.0.2 Generate 50q sheets via `dart run scripts/generate_answer_sheet.dart assets/templates/template_50q.json assets/sheets/answer_sheet_50q` — 🧠
-  - [ ] 6.0.3 Print sanity check: **US Letter**, **100% scale**, no “fit to page”; confirm markers not clipped — 🧠🧠
-  - **Done when:** All 3 template sizes (10q, 20q, 50q) have printable sheets in `assets/sheets/` and scan successfully
+- [x] **6.0 Generate Missing Answer Sheets** — 🧠
+  - [x] 6.0.1 Generate 20q sheets via `dart run scripts/generate_answer_sheet.dart assets/templates/template_20q.json assets/sheets/answer_sheet_20q` — 🧠
+  - [x] 6.0.2 Generate 50q sheets via `dart run scripts/generate_answer_sheet.dart assets/templates/template_50q.json assets/sheets/answer_sheet_50q` — 🧠
+  - [x] 6.0.3 Print sanity check: **US Letter**, **100% scale**, no “fit to page”; confirm markers not clipped — 🧠🧠
+  - **Done when:** All 3 template sizes (10q, 20q, 50q) have printable sheets in `assets/sheets/` and scan successfully ✅
 
 ---
 
@@ -835,6 +835,13 @@ Week 5:   Phase 6 (Export + Polish) → Phase 7 (Testing)            [4-5 days]
 ---
 
 ## Change Log
+
+### v2.3.4 (2025-12-22)
+- **Task 6.0 Complete**: Generated missing 20q and 50q answer sheets
+  - Updated `template_20q.json` with ArUco marker config; fixed field block origins (x: 350, 1350)
+  - Redesigned `template_50q.json` to horizontal layout (2 columns × 25 rows) — original 5-column layout didn't fit
+  - Generated `answer_sheet_20q.{png,pdf}` and `answer_sheet_50q.{png,pdf}`
+  - All templates now use ArUco markers with proper spacing
 
 ### v2.3.3 (2025-12-21)
 - **PRD Gap Analysis (MVP-focused)**: Added only critical missing items

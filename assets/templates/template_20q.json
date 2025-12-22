@@ -14,13 +14,19 @@
     "height": 40
   },
   "markerConfig": {
-    "imagePath": "marker.png",
-    "sheetToMarkerRatio": 17,
-    "scales": [0.85, 1.0, 1.15],
-    "minConfidence": 0.3
+    "type": "aruco",
+    "dictionary": "DICT_4X4_50",
+    "markerIds": {
+      "topLeft": 0,
+      "topRight": 1,
+      "bottomRight": 2,
+      "bottomLeft": 3
+    },
+    "sizePx": 180,
+    "paddingPx": 90
   },
   "nameRegion": {
-    "x": 100,
+    "x": 400,
     "y": 150,
     "width": 800,
     "height": 200
@@ -29,7 +35,7 @@
     {
       "name": "questions_1_10",
       "origin": {
-        "x": 200,
+        "x": 350,
         "y": 500
       },
       "options": ["A", "B", "C", "D", "E"],
@@ -41,7 +47,7 @@
     {
       "name": "questions_11_20",
       "origin": {
-        "x": 700,
+        "x": 1350,
         "y": 500
       },
       "options": ["A", "B", "C", "D", "E"],
