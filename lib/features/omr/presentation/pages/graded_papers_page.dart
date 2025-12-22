@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../injection.dart';
+import '../../../export/services/pdf_export_service.dart';
 import '../../../quiz/domain/entities/quiz.dart';
 import '../../domain/entities/scan_result.dart';
 import '../bloc/graded_papers_bloc.dart';
@@ -90,11 +91,11 @@ class _GradedPapersContentState extends State<_GradedPapersContent> {
         backgroundColor: colorScheme.surface,
         surfaceTintColor: Colors.transparent,
         actions: [
-          // Export icon (placeholder for Phase 6)
+          // Export results as PDF
           IconButton(
             icon: const Icon(Icons.file_download_outlined),
             tooltip: 'Export results',
-            onPressed: () => _showExportComingSoon(context),
+            onPressed: () => _handleExport(context),
           ),
         ],
       ),
@@ -149,15 +150,77 @@ class _GradedPapersContentState extends State<_GradedPapersContent> {
     );
   }
 
-  void _showExportComingSoon(BuildContext context) {
+  Future<void> _handleExport(BuildContext context) async {
+    // Get current state from BLoC
+    final state = context.read<GradedPapersBloc>().state;
+
+    // Validate prerequisites
+    if (state is! ResultsLoaded || state.results.isEmpty) {
+      _showSnackBar(context, 'No results to export');
+      return;
+    }
+
+    if (widget.quiz == null) {
+      _showSnackBar(context, 'Quiz data unavailable for export');
+      return;
+    }
+
+    // Show loading dialog
+    _showLoadingDialog(context);
+
+    try {
+      final pdfExportService = getIt<PdfExportService>();
+      await pdfExportService.exportAndShare(widget.quiz!, state.results);
+
+      if (context.mounted) {
+        Navigator.of(context).pop(); // Close loading dialog
+        // Share sheet will show automatically via share_plus
+      }
+    } on PdfExportException catch (e) {
+      if (context.mounted) {
+        Navigator.of(context).pop(); // Close loading dialog
+        _showSnackBar(context, 'Export failed: ${e.message}');
+      }
+    } catch (e) {
+      if (context.mounted) {
+        Navigator.of(context).pop(); // Close loading dialog
+        _showSnackBar(context, 'Export failed. Please try again.');
+      }
+    }
+  }
+
+  void _showLoadingDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        content: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(width: 20),
+            Text(
+              'Generating PDF...',
+              style: GoogleFonts.dmSans(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showSnackBar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          'Export feature coming soon!',
+          message,
           style: GoogleFonts.dmSans(),
         ),
         behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 2),
+        duration: const Duration(seconds: 3),
       ),
     );
   }

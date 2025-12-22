@@ -635,14 +635,14 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 
 ---
 
-- [ ] **6.2 Export Functionality** — 🧠🧠
-  - [ ] 6.2.1 In `GradedPapersPage`: Add export icon to AppBar — 🧠
-  - [ ] 6.2.2 On tap → Show loading dialog — 🧠
-  - [ ] 6.2.3 Call `PdfExportService.generateResultsPdf()` — 🧠
-  - [ ] 6.2.4 Save to temp directory: `path_provider.getTemporaryDirectory()` — 🧠🧠
-  - [ ] 6.2.5 Share via `share_plus`: `Share.shareXFiles([XFile(pdfPath)])` — 🧠🧠
-  - [ ] 6.2.6 Handle errors gracefully — 🧠
-  - **Done when:** Share sheet opens with PDF, apps like Gmail receive it
+- [x] **6.2 Export Functionality** — 🧠🧠
+  - [x] 6.2.1 In `GradedPapersPage`: Add export icon to AppBar — 🧠
+  - [x] 6.2.2 On tap → Show loading dialog — 🧠
+  - [x] 6.2.3 Call `PdfExportService.generateResultsPdf()` — 🧠
+  - [x] 6.2.4 Save to temp directory: `path_provider.getTemporaryDirectory()` — 🧠🧠
+  - [x] 6.2.5 Share via `share_plus`: `Share.shareXFiles([XFile(pdfPath)])` — 🧠🧠
+  - [x] 6.2.6 Handle errors gracefully — 🧠
+  - **Done when:** Share sheet opens with PDF, apps like Gmail receive it ✅
 
 ---
 
@@ -835,6 +835,14 @@ Week 5:   Phase 6 (Export + Polish) → Phase 7 (Testing)            [4-5 days]
 ---
 
 ## Change Log
+
+### v2.3.5 (2025-12-22)
+- **Task 6.2 Complete**: Export Functionality wired into GradedPapersPage
+  - Added `_handleExport()` method to handle PDF export flow
+  - Added `_showLoadingDialog()` with "Generating PDF..." message during export
+  - Integrated `PdfExportService.exportAndShare()` for full pipeline (generate → save → share)
+  - Error handling with user-friendly snackbars for edge cases (no results, no quiz, export failure)
+  - Export button in AppBar now functional
 
 ### v2.3.4 (2025-12-22)
 - **Task 6.0 Complete**: Generated missing 20q and 50q answer sheets

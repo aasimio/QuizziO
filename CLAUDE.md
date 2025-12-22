@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-QuizziO is building a Flutter application for OMR (Optical Mark Recognition) quiz scanning and grading. The root app has the main OMR pipeline + quiz feature implemented, and a PDF export service implemented (UI wiring still in progress). A validated spike lives in `omr_spike/` with the full pipeline UI/tests/assets used for the results below.
+QuizziO is building a Flutter application for OMR (Optical Mark Recognition) quiz scanning and grading. The root app has the main OMR pipeline + quiz feature implemented, and PDF export fully wired into GradedPapersPage. A validated spike lives in `omr_spike/` with the full pipeline UI/tests/assets used for the results below.
 
 ## Repository Layout
 
@@ -15,7 +15,7 @@ QuizziO is building a Flutter application for OMR (Optical Mark Recognition) qui
 │   ├── features/
 │   │   ├── omr/             # Implemented services + camera_test_page; marker model
 │   │   ├── quiz/            # Quiz CRUD: BLoC, pages, widgets
-│   │   └── export/          # PDF export (service implemented; UI wiring pending)
+│   │   └── export/          # PDF export (fully implemented)
 │   ├── injection.dart(.config.dart)  # get_it + injectable setup
 │   ├── main.dart            # Entry point (Hive init, CameraTestPage)
 │   └── app.dart             # Placeholder
@@ -99,7 +99,7 @@ lib/
 ├── features/                # Feature modules
 │   ├── omr/                 # OMR services, ScannerBloc, camera_test_page, detection_result model
 │   ├── quiz/                # Quiz CRUD: BLoC, pages (list, menu), widgets (card, dialog)
-│   └── export/              # PDF export (service implemented; UI wiring pending)
+│   └── export/              # PDF export (fully implemented)
 ├── injection.dart(.config.dart)  # DI setup
 └── main.dart                # Entry point (uses CameraTestPage)
 ```
@@ -164,7 +164,7 @@ features/<feature_name>/
 
 4. **Export Feature** (`lib/features/export`)
    - `services/pdf_export_service.dart` implemented (generate/save/share/exportAndShare)
-   - `presentation/widgets/export_button.dart` is still a stub (next: wire into `GradedPapersPage`)
+   - Export wired into `GradedPapersPage` AppBar via `_handleExport()` with loading dialog and error handling
 
 ### Key Architectural Patterns
 
