@@ -646,35 +646,38 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 
 ---
 
-- [ ] **6.3 UI Polish** — 🧠
-  - [ ] 6.3.1 Loading states: Show `CircularProgressIndicator` when appropriate — 🧠
-  - [ ] 6.3.2 Error states: User-friendly messages, retry buttons — 🧠
-  - [ ] 6.3.3 Empty states: Clear CTAs ("Create your first quiz", etc.) — 🧠
-  - [ ] 6.3.4 Confirmation dialogs: Delete quiz, delete result — 🧠
-  - [ ] 6.3.5 SnackBars: "Quiz created", "Answer key saved", "Result updated" — 🧠
-  - [ ] 6.3.6 Haptic feedback: On capture, errors — 🧠
-  - [ ] 6.3.8 Theme consistency: Centralize scan feature color `Color(0xFF0D7377)` — add `kScanFeatureColor` to `app_constants.dart`, replace hardcoded instances — 🧠
+- [x] **6.3 UI Polish** — 🧠
+  - [x] 6.3.1 Loading states: Show `CircularProgressIndicator` when appropriate — 🧠
+  - [x] 6.3.2 Error states: User-friendly messages, retry buttons — 🧠
+  - [x] 6.3.3 Empty states: Clear CTAs ("Create your first quiz", etc.) — 🧠
+  - [x] 6.3.4 Confirmation dialogs: Delete quiz, delete result — 🧠
+  - [x] 6.3.5 SnackBars: "Quiz created", "Answer key saved", "Result updated" — 🧠
+  - [x] 6.3.6 Haptic feedback: On capture, errors — 🧠
+  - [x] 6.3.8 Theme consistency: Centralize scan feature color `Color(0xFF0D7377)` — add `kScanFeatureColor` to `app_constants.dart`, replace hardcoded instances — 🧠
   - **Done when:** App feels polished, feedback is clear
 
 ---
 
-- [ ] **6.4 Performance Optimization (optional)** — 🧠🧠🧠
-  - [ ] 6.4.1 Profile scan pipeline: Ensure <500ms total — 🧠🧠🧠
-  - [ ] 6.4.2 Profile marker detection: Ensure <100ms per frame — 🧠🧠
-  - [ ] 6.4.3 Use `Isolate` for heavy CV operations if needed — 🧠🧠🧠
-  - [ ] 6.4.4 Optimize image conversions (cache, reuse buffers) — 🧠🧠🧠
-  - [ ] 6.4.5 Test on low-end device, adjust if needed — 🧠🧠
-  - **Done when:** Performance targets met (per PRD 6.1)
+- [ ] **6.4 Performance Profiling & Optimization** — 🧠🧠🧠
+  - [ ] 6.4.1 Profile scan pipeline: Measure capture → result time, target <500ms — 🧠🧠
+  - [ ] 6.4.2 Profile marker detection: Measure per-frame time, target <100ms — 🧠🧠
+  - [ ] 6.4.3 Profile cold start: Measure app launch → camera ready, target <3s — 🧠🧠
+  - [ ] 6.4.4 Profile memory: Monitor peak allocation during scan, target <200MB — 🧠🧠
+  - [ ] 6.4.5 Optimize if targets missed (isolates, buffer reuse, lazy init) — 🧠🧠🧠
+  - [ ] 6.4.6 Validate on low-end device (Android API 24, 8MP camera) — 🧠🧠
+  - **Done when:** All NFR-P targets met (PRD 6.1)
 
 ---
 
 - [ ] **6.5 Error Handling** — 🧠🧠
-  - [ ] 6.5.1 Camera errors: Permission denied → Show message + `openAppSettings()` button — 🧠🧠
-  - [ ] 6.5.2 Detection errors: Markers not found → "Ensure all 4 corner markers are visible (not clipped), sheet is printed at 100% scale, and adjust lighting" — 🧠
-  - [ ] 6.5.3 Processing errors: Scan failed → "Could not read answers. Try again." — 🧠
-  - [ ] 6.5.4 Repository errors: Save failed → "Could not save. Check storage." — 🧠
-  - [ ] 6.5.5 Network-agnostic error messages (offline by design) — 🧠
-  - **Done when:** All error paths have user-facing messages
+  - [ ] 6.5.1 Audit existing error handling: Review `ScannerBloc` error types and current UI — 🧠
+  - [ ] 6.5.2 Camera permission denied: Show message + "Open Settings" button (`openAppSettings()`) — 🧠🧠
+  - [ ] 6.5.3 Camera unavailable: "Camera not available" with [Close] action — 🧠
+  - [ ] 6.5.4 Marker detection failed: "Ensure all 4 corner markers visible, printed at 100% scale" + [Retry] — 🧠
+  - [ ] 6.5.5 Processing failed: "Could not read answers. Try again." + [Retry] — 🧠
+  - [ ] 6.5.6 Storage/save failed: "Could not save. Check storage." — 🧠
+  - [ ] 6.5.7 Verify error UI: Manually trigger each error type, confirm message and actions display — 🧠🧠
+  - **Done when:** All error paths show user-friendly messages with appropriate actions
 
 ---
 
@@ -682,11 +685,17 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 > Unit, widget, integration, device testing
 **Est:** 3-4 days
 
+> ⚠️ **Testing Note:** `opencv_dart` native libraries are NOT available in standard `flutter test` runs. OMR pipeline tests (MarkerDetector, BubbleReader, PerspectiveTransformer, ImagePreprocessor) must run on device/emulator. Pure Dart services (ThresholdCalculator, AnswerExtractor, GradingService) can use regular unit tests.
+
 - [ ] **7.1 Service Unit Tests** — 🧠🧠
-  - [ ] 7.1.1 Test all migrated OMR services (from spike) — 🧠🧠
-  - [ ] 7.1.2 Test `GradingService` logic — 🧠🧠
-  - [ ] 7.1.3 Test `TemplateManager` JSON loading — 🧠🧠
-  - [ ] 7.1.4 Test `AnswerStatus` serialization — 🧠
+  - [ ] 7.1.1 Pure Dart services (no OpenCV dependency): — 🧠🧠
+    - `ThresholdCalculator`: empty list, single value, no gap, clear gap, edge values
+    - `AnswerExtractor`: single mark, no marks, multi marks, all options
+    - `GradingService`: all correct, all wrong, mixed, blank handling
+  - [ ] 7.1.2 `TemplateManager`: Load all templates, invalid JSON handling, caching — 🧠🧠
+  - [ ] 7.1.3 `AnswerStatus`: Serialization ("VALID"/"BLANK"/"MULTIPLE_MARK"), deserialization — 🧠
+  - [ ] 7.1.4 `PdfExportService`: PDF generation with mock quiz/results — 🧠🧠
+  - [ ] 7.1.5 Repositories: `QuizRepositoryImpl` and `ScanRepositoryImpl` CRUD operations — 🧠🧠
   - **Done when:** `flutter test test/features/*/services/` passes
 
 ---
@@ -695,7 +704,8 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
   - [ ] 7.2.1 `QuizBloc`: All events + state transitions — 🧠🧠
   - [ ] 7.2.2 `AnswerKeyCubit`: Load, select, save, debounce — 🧠🧠
   - [ ] 7.2.3 `ScannerBloc`: Full state machine — 🧠🧠🧠
-  - [ ] 7.2.4 `GradedPapersBloc`: Load, update, delete — 🧠🧠
+  - [ ] 7.2.4 `GradedPapersBloc`: Verify existing test coverage, add missing cases — 🧠🧠
+    - Note: Test file exists at `test/features/omr/presentation/bloc/graded_papers_bloc_test.dart`
   - **Done when:** All BLoC tests pass with `bloc_test`
 
 ---
@@ -707,17 +717,20 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 
 ---
 
-- [ ] **7.4 Golden Image Tests (OMR)** — 🧠🧠🧠
+- [ ] **7.4 OMR Pipeline Tests (On-Device)** — 🧠🧠🧠
+  > ⚠️ These tests require device/emulator — opencv_dart not available in `flutter test`
   - [ ] 7.4.1 Copy test images from spike: `omr_spike/assets/gallery/` → `test/fixtures/` — 🧠
-  - [ ] 7.4.2 Test scenarios: — 🧠🧠🧠
+  - [ ] 7.4.2 Create on-device test harness (integration_test or manual) — 🧠🧠
+  - [ ] 7.4.3 Test scenarios on device: — 🧠🧠🧠
     - Baseline filled sheet → 100% detection
-    - Rotated sheets → perspective correction
-    - Dim/bright lighting
-    - Noisy/photocopied sheets
+    - Rotated sheets (±10°, ±15°) → perspective correction
+    - Dim/bright lighting → CLAHE compensation
+    - Partial fill / light marks → correct threshold
     - Multi-mark detection
     - Blank detection
-  - [ ] 7.4.3 **Verify 98%+ overall accuracy** (per PRD success criteria) — 🧠🧠🧠
-  - **Done when:** Golden tests pass, accuracy documented
+    - Photocopied sheet (gray background)
+  - [ ] 7.4.4 **Verify 98%+ overall accuracy** — document results in test report — 🧠🧠🧠
+  - **Done when:** On-device tests pass, accuracy documented
 
 ---
 
@@ -745,7 +758,7 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
   | iPhone 12 | iOS 17 | 12MP | P0 | ⬜ |
   | Xiaomi Redmi Note 10 | Android 11 | 48MP | P1 | ⬜ |
   | iPhone SE (2020) | iOS 17 | 12MP | P1 | ⬜ |
-  | Low-end Android | Android 9+ | 8MP | P2 | ⬜ |
+  | Low-end Android | Android 7.0+ (API 24) | 8MP | P2 | ⬜ |
 
   - [ ] 7.6.1 Test core flows on all P0 devices — 🧠🧠
   - [ ] 7.6.2 Verify camera performance, scanning accuracy, UI rendering — 🧠🧠
@@ -754,7 +767,8 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
 
 ---
 
-- [ ] **7.7 Performance Validation** — 🧠🧠
+- [ ] **7.7 Performance Validation (Final Sign-off)** — 🧠🧠
+  > Note: Task 6.4 covers profiling during development. This task validates final metrics before release.
 
   | Metric | Target | Status |
   |--------|--------|--------|
@@ -779,7 +793,12 @@ This document uses a 3-level rating system to indicate thinking/planning effort 
   - [ ] 7.8.5 Build release: `flutter build apk --release` + `flutter build ipa --release` — 🧠
   - [ ] 7.8.6 Test release builds on physical devices — 🧠🧠
   - [ ] 7.8.7 Create app icons, splash screen, version number — 🧠
-  - **Done when:** Release builds ready for distribution
+  - [ ] 7.8.8 Verify PRD success metrics: — 🧠🧠
+    - Marker detection rate ≥ 95% (from 7.4 results)
+    - False positive rate < 1%
+    - False negative rate < 1%
+    - Crash rate < 0.1% (manual testing observation)
+  - **Done when:** Release builds ready for distribution, PRD metrics verified
 
 ---
 
@@ -836,6 +855,32 @@ Week 5:   Phase 6 (Export + Polish) → Phase 7 (Testing)            [4-5 days]
 
 ## Change Log
 
+### v2.3.7 (2025-12-23)
+- **Phase 7 Restructured**: Comprehensive improvements to Testing & QA phase
+  - Added testing note about `opencv_dart` native library limitations (requires device/emulator)
+  - **Task 7.1 Expanded**: Detailed pure Dart service tests (ThresholdCalculator, AnswerExtractor, GradingService)
+  - **Task 7.1.4 Added**: PdfExportService tests
+  - **Task 7.1.5 Added**: Repository tests (QuizRepositoryImpl, ScanRepositoryImpl)
+  - **Task 7.2.4 Updated**: Note existing GradedPapersBloc test file
+  - **Task 7.4 Renamed**: "Golden Image Tests" → "OMR Pipeline Tests (On-Device)" with device requirement warning
+  - **Task 7.4.2 Added**: Create on-device test harness
+  - **Task 7.4.3 Expanded**: More detailed test scenarios (rotation angles, CLAHE, partial fills, photocopies)
+  - **Task 7.6 Fixed**: Low-end Android version corrected from "9+" to "7.0+ (API 24)" per minSdk
+  - **Task 7.7 Clarified**: Renamed "(Final Sign-off)" to distinguish from 6.4 profiling
+  - **Task 7.8.8 Added**: PRD success metrics verification (marker rate ≥95%, false positive/negative <1%, crash <0.1%)
+
+### v2.3.6 (2025-12-23)
+- **Task 6.4 Restructured**: Renamed from "Performance Optimization (optional)" to "Performance Profiling & Optimization"
+  - Removed "(optional)" — these are PRD NFR requirements
+  - Added cold start profiling (target <3s) per NFR-P-03
+  - Added memory profiling (target <200MB) per NFR-P-04
+  - Reordered: profile first (6.4.1–6.4.4), then optimize (6.4.5), then validate (6.4.6)
+- **Task 6.5 Restructured**: Improved error handling subtasks
+  - Added 6.5.1 audit step to review existing `ScannerBloc` error handling
+  - Separated camera permission (6.5.2) and camera unavailable (6.5.3) per PRD Appendix C
+  - Removed network-agnostic task (implicit in offline-first design)
+  - Added 6.5.7 verification step to manually test error UI displays
+
 ### v2.3.5 (2025-12-22)
 - **Task 6.2 Complete**: Export Functionality wired into GradedPapersPage
   - Added `_handleExport()` method to handle PDF export flow
@@ -881,5 +926,5 @@ Week 5:   Phase 6 (Export + Polish) → Phase 7 (Testing)            [4-5 days]
 
 ---
 
-*QuizziO Development Plan v2.3.1 (Condensed) — Streamlined for implementation*
-*Reference: QuizziO-PRD.md, QuizziO-Tech-Stack.md*
+*QuizziO Development Plan v2.3.7 (Condensed) — Streamlined for implementation*
+*Reference: PRD.md, Tech-Stack.md*
