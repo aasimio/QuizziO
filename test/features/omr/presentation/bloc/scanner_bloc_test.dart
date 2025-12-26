@@ -4,9 +4,11 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:quizzio/core/services/camera_service.dart';
+import 'package:quizzio/core/services/performance_profiler.dart';
 import 'package:quizzio/features/omr/domain/entities/answer_status.dart';
 import 'package:quizzio/features/omr/domain/entities/omr_template.dart';
 import 'package:quizzio/features/omr/domain/entities/scan_result.dart';
+import 'package:quizzio/features/omr/domain/repositories/scan_repository.dart';
 import 'package:quizzio/features/omr/models/detection_result.dart';
 import 'package:quizzio/features/omr/presentation/bloc/scanner_bloc.dart';
 import 'package:quizzio/features/omr/presentation/bloc/scanner_event.dart';
@@ -16,9 +18,8 @@ import 'package:quizzio/features/omr/services/image_preprocessor.dart';
 import 'package:quizzio/features/omr/services/marker_detector.dart';
 import 'package:quizzio/features/omr/services/omr_scanner_service.dart';
 import 'package:quizzio/features/omr/services/perspective_transformer.dart';
-import 'package:quizzio/features/quiz/domain/entities/quiz.dart';
-import 'package:quizzio/features/omr/domain/repositories/scan_repository.dart';
 import 'package:quizzio/features/omr/services/template_manager.dart';
+import 'package:quizzio/features/quiz/domain/entities/quiz.dart';
 import 'package:uuid/uuid.dart';
 
 // Mock classes
@@ -39,7 +40,14 @@ class MockTemplateManager extends Mock implements TemplateManager {}
 class MockPerspectiveTransformer extends Mock
     implements PerspectiveTransformer {}
 
+class MockPerformanceProfiler extends Mock implements PerformanceProfiler {}
+
 void main() {
+  // Register fallback values for custom types used with any() matcher
+  setUpAll(() {
+    registerFallbackValue(MetricType.pipelineTotal);
+  });
+
   group('ScannerBloc', () {
     late MockCameraService mockCameraService;
     late MockMarkerDetector mockMarkerDetector;
@@ -49,6 +57,7 @@ void main() {
     late MockScanRepository mockScanRepository;
     late MockTemplateManager mockTemplateManager;
     late MockPerspectiveTransformer mockPerspectiveTransformer;
+    late MockPerformanceProfiler mockPerformanceProfiler;
 
     final testUuid = const Uuid();
     late Quiz testQuiz;
@@ -62,9 +71,17 @@ void main() {
       mockScanRepository = MockScanRepository();
       mockTemplateManager = MockTemplateManager();
       mockPerspectiveTransformer = MockPerspectiveTransformer();
+      mockPerformanceProfiler = MockPerformanceProfiler();
 
       // Default stub for cleanup - called on bloc close
       when(() => mockCameraService.stopImageStream()).thenAnswer((_) async {});
+
+      // Default stubs for performance profiler
+      when(() => mockPerformanceProfiler.isEnabled).thenReturn(false);
+      when(() => mockPerformanceProfiler.sampleMemory(
+          context: any(named: 'context'))).thenReturn(null);
+      when(() => mockPerformanceProfiler.startTimer(any())).thenAnswer((_) {});
+      when(() => mockPerformanceProfiler.stopTimer(any())).thenReturn(0);
 
       testQuiz = Quiz(
         id: 'test-quiz-id',
@@ -100,6 +117,7 @@ void main() {
           mockScanRepository,
           mockTemplateManager,
           mockPerspectiveTransformer,
+          mockPerformanceProfiler,
           uuid: testUuid,
         ),
         act: (bloc) => bloc.add(ScannerInitCamera(quiz: testQuiz)),
@@ -124,6 +142,7 @@ void main() {
           mockScanRepository,
           mockTemplateManager,
           mockPerspectiveTransformer,
+          mockPerformanceProfiler,
           uuid: testUuid,
         ),
         act: (bloc) => bloc.add(ScannerInitCamera(quiz: testQuiz)),
@@ -150,6 +169,7 @@ void main() {
           mockScanRepository,
           mockTemplateManager,
           mockPerspectiveTransformer,
+          mockPerformanceProfiler,
           uuid: testUuid,
         ),
         seed: () =>
@@ -181,6 +201,7 @@ void main() {
           mockScanRepository,
           mockTemplateManager,
           mockPerspectiveTransformer,
+          mockPerformanceProfiler,
           uuid: testUuid,
         ),
         seed: () =>
@@ -221,6 +242,7 @@ void main() {
           mockScanRepository,
           mockTemplateManager,
           mockPerspectiveTransformer,
+          mockPerformanceProfiler,
           uuid: testUuid,
         ),
         act: (bloc) async {
@@ -263,6 +285,7 @@ void main() {
           mockScanRepository,
           mockTemplateManager,
           mockPerspectiveTransformer,
+          mockPerformanceProfiler,
           uuid: testUuid,
         ),
         seed: () => const ScannerAligning(
@@ -299,6 +322,7 @@ void main() {
           mockScanRepository,
           mockTemplateManager,
           mockPerspectiveTransformer,
+          mockPerformanceProfiler,
           uuid: testUuid,
         ),
         seed: () => ScannerResult(
@@ -322,6 +346,7 @@ void main() {
           mockScanRepository,
           mockTemplateManager,
           mockPerspectiveTransformer,
+          mockPerformanceProfiler,
           uuid: testUuid,
         ),
         act: (bloc) => bloc.add(ScannerProcessingComplete(
@@ -355,6 +380,7 @@ void main() {
           mockScanRepository,
           mockTemplateManager,
           mockPerspectiveTransformer,
+          mockPerformanceProfiler,
           uuid: testUuid,
         );
 

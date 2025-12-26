@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:injectable/injectable.dart';
 import 'package:opencv_dart/opencv_dart.dart' as cv;
 import '../../../core/constants/omr_constants.dart';
+import '../../../core/services/performance_profiler.dart';
 import '../models/detection_result.dart';
 import 'image_preprocessor.dart';
 import 'marker_detector.dart';
@@ -19,6 +20,7 @@ class OmrResult {
   final Map<String, ExtractedAnswer>? answers;
   final ThresholdResult? thresholdResult;
   final int processingTimeMs;
+  final Map<String, dynamic>? stepTimings;
 
   const OmrResult({
     required this.success,
@@ -27,6 +29,7 @@ class OmrResult {
     this.answers,
     this.thresholdResult,
     required this.processingTimeMs,
+    this.stepTimings,
   });
 
   @override
@@ -46,6 +49,7 @@ class OmrPipeline {
   final PerspectiveTransformer _transformer;
   final BubbleReader _bubbleReader;
   final ThresholdCalculator _thresholdCalculator;
+  final PerformanceProfiler _profiler;
 
   OmrPipeline(
     this._preprocessor,
@@ -53,6 +57,7 @@ class OmrPipeline {
     this._transformer,
     this._bubbleReader,
     this._thresholdCalculator,
+    this._profiler,
   );
 
   /// Process an answer sheet image through the complete OMR pipeline
@@ -78,24 +83,35 @@ class OmrPipeline {
     required Map<String, List<Rect>> bubblePositions,
   }) async {
     final stopwatch = Stopwatch()..start();
+    _profiler.startSession('omr_pipeline_${DateTime.now().millisecondsSinceEpoch}');
+    _profiler.startTimer(MetricType.pipelineTotal);
 
     cv.Mat? mat;
     cv.Mat? processed;
     cv.Mat? aligned;
 
     try {
-      // Step 1: Convert bytes to Mat
-      mat = _preprocessor.decodeImage(imageBytes);
+      // Step 1: Decode image bytes to Mat
+      mat = _profiler.measure(MetricType.pipelineDecode, () {
+        return _preprocessor.decodeImage(imageBytes);
+      });
 
-      // Step 2: Preprocess image
-      processed = await _preprocessor.preprocess(mat);
-      mat.dispose(); // Dispose original, we only need processed version
+      // Step 2: Preprocess image (grayscale, CLAHE, normalize)
+      processed = await _profiler.measureAsync(MetricType.pipelinePreprocess, () {
+        return _preprocessor.preprocess(mat!);
+      });
+      mat?.dispose();
       mat = null;
 
-      // Step 3: Detect markers
-      final markers = await _markerDetector.detect(processed);
+      // Step 3: Detect ArUco markers
+      final markers = await _profiler.measureAsync(MetricType.pipelineDetectMarkers, () {
+        return _markerDetector.detect(processed!);
+      });
+
       if (!markers.isValid) {
-        processed.dispose();
+        processed?.dispose();
+        _profiler.stopTimer(MetricType.pipelineTotal);
+        final session = _profiler.endSession();
         stopwatch.stop();
         return OmrResult(
           success: false,
@@ -103,59 +119,78 @@ class OmrPipeline {
               'Markers not detected. Found ${markers.markerCenters.length}/4 markers with avg confidence ${markers.avgConfidence.toStringAsFixed(2)}',
           markerResult: markers,
           processingTimeMs: stopwatch.elapsedMilliseconds,
+          stepTimings: session?.exportStepTimings(),
         );
       }
 
-      final cornerPoints =
-          _markerDetector.getCornerPointsForTransform(processed);
+      // Step 4: Get corner points from cached detection (optimization: avoids duplicate detectMarkers call)
+      final cornerPoints = _profiler.measure(MetricType.pipelineGetCorners, () {
+        return _markerDetector.getCornerPointsFromCachedDetection();
+      });
+
       if (cornerPoints == null) {
-        processed.dispose();
+        processed?.dispose();
+        _profiler.stopTimer(MetricType.pipelineTotal);
+        final session = _profiler.endSession();
         stopwatch.stop();
         return OmrResult(
           success: false,
           errorMessage: 'Could not resolve marker corners for transform',
           markerResult: markers,
           processingTimeMs: stopwatch.elapsedMilliseconds,
+          stepTimings: session?.exportStepTimings(),
         );
       }
 
-      // Step 4: Transform perspective
-      aligned = await _transformer.transform(
-        processed,
-        cornerPoints,
-        templateWidth,
-        templateHeight,
-        edgePaddingPx: OmrConstants.markerPaddingPx,
-      );
-      processed.dispose(); // Dispose processed, we only need aligned version
+      // Step 5: Perspective transform to aligned template
+      aligned = await _profiler.measureAsync(MetricType.pipelineTransform, () {
+        return _transformer.transform(
+          processed!,
+          cornerPoints,
+          templateWidth,
+          templateHeight,
+          edgePaddingPx: OmrConstants.markerPaddingPx,
+        );
+      });
+      processed?.dispose();
       processed = null;
 
-      // Step 5: Read bubbles
-      final bubbleResult = _bubbleReader.readAllBubbles(
-        aligned,
-        bubblePositions,
-      );
-      aligned.dispose(); // Dispose aligned, we're done with image processing
+      // Step 6: Read bubble intensity values
+      final bubbleResult = _profiler.measure(MetricType.pipelineReadBubbles, () {
+        return _bubbleReader.readAllBubbles(aligned!, bubblePositions);
+      });
+      aligned?.dispose();
       aligned = null;
 
-      // Step 6: Calculate threshold
-      final thresholdResult = _thresholdCalculator.calculate(
-        bubbleResult.allValues,
-      );
+      // Step 7: Calculate filled/unfilled threshold
+      final thresholdResult = _profiler.measure(MetricType.pipelineThreshold, () {
+        return _thresholdCalculator.calculate(bubbleResult.allValues);
+      });
 
-      // Step 7: Extract answers
-      final answers = _thresholdCalculator.extractAnswers(
-        bubbleResult.bubbleValues,
-        thresholdResult.threshold,
-      );
+      // Step 8: Extract answers based on threshold
+      final answers = _profiler.measure(MetricType.pipelineExtractAnswers, () {
+        return _thresholdCalculator.extractAnswers(
+          bubbleResult.bubbleValues,
+          thresholdResult.threshold,
+        );
+      });
 
+      final totalMs = _profiler.stopTimer(MetricType.pipelineTotal);
+      final session = _profiler.endSession();
       stopwatch.stop();
+
+      developer.log(
+        'Pipeline completed in ${totalMs}ms',
+        name: 'OmrPipeline',
+      );
+
       return OmrResult(
         success: true,
         markerResult: markers,
         answers: answers,
         thresholdResult: thresholdResult,
         processingTimeMs: stopwatch.elapsedMilliseconds,
+        stepTimings: session?.exportStepTimings(),
       );
     } catch (e, stackTrace) {
       // Clean up any remaining Mats on error
@@ -171,6 +206,8 @@ class OmrPipeline {
         stackTrace: stackTrace,
       );
 
+      _profiler.stopTimer(MetricType.pipelineTotal);
+      _profiler.endSession();
       stopwatch.stop();
       return OmrResult(
         success: false,

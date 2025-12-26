@@ -8,7 +8,9 @@ import 'package:opencv_dart/opencv_dart.dart' as cv;
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/constants/omr_constants.dart';
+import '../../../../core/constants/performance_constants.dart';
 import '../../../../core/services/camera_service.dart';
+import '../../../../core/services/performance_profiler.dart';
 import '../../domain/entities/answer_status.dart';
 import '../../domain/entities/omr_template.dart';
 import '../../domain/entities/scan_result.dart';
@@ -24,6 +26,20 @@ import '../../services/template_manager.dart';
 import 'scanner_event.dart';
 import 'scanner_state.dart';
 
+// Error messages
+const _kPermissionDeniedMessage = 'Camera access is required to scan papers.';
+const _kPermissionPermanentlyDeniedMessage =
+    'Camera access was denied. Please enable it in Settings to scan papers.';
+const _kCameraUnavailableMessage = 'No camera found on this device.';
+const _kCameraInitFailedMessage = 'Could not start camera. Please try again.';
+const _kMarkerDetectionMessage =
+    'Could not detect all 4 corner markers. Ensure the sheet is fully visible and printed at 100% scale.';
+const _kProcessingFailedMessage =
+    'Could not read answers. Please try again with better lighting.';
+const _kCaptureFailedMessage = 'Could not capture image. Please try again.';
+const _kSaveFailedMessage =
+    'Could not save result. Check device storage and try again.';
+
 @injectable
 class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
   final CameraService _cameraService;
@@ -34,6 +50,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
   final ScanRepository _scanRepository;
   final TemplateManager _templateManager;
   final PerspectiveTransformer _perspectiveTransformer;
+  final PerformanceProfiler _profiler;
   final Uuid _uuid;
 
   // Internal state for frame processing
@@ -44,6 +61,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
   DateTime? _stabilityStartTime;
   DateTime? _lastAllMarkersSeenAt;
   Quiz? _currentQuiz;
+  int _frameCount = 0;
 
   static const _stabilityDuration = Duration(milliseconds: 500);
   static const _stabilityGrace = Duration(milliseconds: 75);
@@ -58,6 +76,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
       this._scanRepository,
       this._templateManager,
       this._perspectiveTransformer,
+      this._profiler,
       {Uuid? uuid})
       : _uuid = uuid ?? const Uuid(),
         super(const ScannerIdle()) {
@@ -84,9 +103,12 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
       // Store quiz context
       _currentQuiz = event.quiz;
 
-      // Initialize camera
+      // Initialize camera (handles permission check internally)
       await _cameraService.initialize();
       if (isClosed) return;
+
+      // Sample memory after camera initialization
+      _profiler.sampleMemory(context: 'after_camera_init');
 
       // Initialize marker detector
       await _markerDetector.initialize();
@@ -104,10 +126,25 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
         markersDetected: 0,
         avgConfidence: 0.0,
       ));
-    } catch (e) {
+    } on CameraPermissionDeniedException catch (e) {
       if (isClosed) return;
       add(ScannerErrorOccurred(
-        message: 'Failed to initialize camera: ${e.toString()}',
+        message: e.permanentlyDenied
+            ? _kPermissionPermanentlyDeniedMessage
+            : _kPermissionDeniedMessage,
+        type: ScannerErrorType.cameraPermission,
+        isPermanentlyDenied: e.permanentlyDenied,
+      ));
+    } on CameraUnavailableException {
+      if (isClosed) return;
+      add(const ScannerErrorOccurred(
+        message: _kCameraUnavailableMessage,
+        type: ScannerErrorType.cameraUnavailable,
+      ));
+    } catch (e) {
+      if (isClosed) return;
+      add(const ScannerErrorOccurred(
+        message: _kCameraInitFailedMessage,
         type: ScannerErrorType.cameraInitialization,
       ));
     }
@@ -124,20 +161,34 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
       return;
     }
 
+    // Profile every Nth frame to minimize overhead
+    final shouldProfile = _profiler.isEnabled &&
+        (_frameCount++ % PerformanceConstants.frameSampleInterval == 0);
+
+    if (shouldProfile) {
+      _profiler.startTimer(MetricType.frameTotal);
+    }
+
     try {
-      // Convert camera image to bytes
-      final bytes = CameraService.convertCameraImageToBytes(image);
+      // Step 1: Convert camera image to bytes
+      Uint8List bytes;
+      if (shouldProfile) _profiler.startTimer(MetricType.frameConversion);
+      bytes = CameraService.convertCameraImageToBytes(image);
+      if (shouldProfile) _profiler.stopTimer(MetricType.frameConversion);
 
       // Determine format (BGRA on iOS, YUV420 on Android)
       final isBGRA = image.format.group == ImageFormatGroup.bgra8888;
 
-      // Create Mat from pixels
-      final mat = _preprocessor.createMatFromPixels(
+      // Step 2: Create Mat from pixels
+      cv.Mat mat;
+      if (shouldProfile) _profiler.startTimer(MetricType.frameMatCreation);
+      mat = _preprocessor.createMatFromPixels(
         bytes,
         image.width,
         image.height,
         isBGRA,
       );
+      if (shouldProfile) _profiler.stopTimer(MetricType.frameMatCreation);
 
       if (mat.isEmpty) {
         mat.dispose();
@@ -145,12 +196,17 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
       }
 
       try {
-        // Preprocess to grayscale
-        final grayscale = await _preprocessor.preprocess(mat);
+        // Step 3: Preprocess to grayscale (lightweight for preview - no CLAHE)
+        cv.Mat grayscale;
+        if (shouldProfile) _profiler.startTimer(MetricType.framePreprocess);
+        grayscale = await _preprocessor.preprocessForPreview(mat);
+        if (shouldProfile) _profiler.stopTimer(MetricType.framePreprocess);
 
         try {
-          // Detect markers
+          // Step 4: Detect markers
+          if (shouldProfile) _profiler.startTimer(MetricType.frameMarkerDetection);
           final result = await _markerDetector.detect(grayscale);
+          if (shouldProfile) _profiler.stopTimer(MetricType.frameMarkerDetection);
 
           // Dispatch event (don't emit state directly)
           if (!isClosed) {
@@ -166,6 +222,9 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
       // Silent error - just continue processing next frame
       debugPrint('Frame processing error: $e');
     } finally {
+      if (shouldProfile) {
+        _profiler.stopTimer(MetricType.frameTotal);
+      }
       _isProcessingFrame = false;
     }
   }
@@ -294,8 +353,8 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
       add(ScannerImageCaptured(imageBytes: imageBytes));
     } catch (e) {
       if (isClosed) return;
-      add(ScannerErrorOccurred(
-        message: 'Failed to capture image: ${e.toString()}',
+      add(const ScannerErrorOccurred(
+        message: _kCaptureFailedMessage,
         type: ScannerErrorType.imageCapture,
       ));
     }
@@ -332,6 +391,9 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
 
     emit(const ScannerProcessing(status: 'Detecting markers...'));
 
+    // Sample memory before pipeline processing
+    _profiler.sampleMemory(context: 'before_pipeline');
+
     try {
       // Load template for bubble positions
       final template =
@@ -350,10 +412,15 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
       );
       if (isClosed) return;
 
+      // Sample memory after pipeline processing
+      _profiler.sampleMemory(context: 'after_pipeline');
+
       // Check if OMR succeeded
       if (!omrResult.success) {
         add(ScannerErrorOccurred(
-          message: omrResult.errorMessage ?? 'OMR processing failed',
+          message: omrResult.markerResult?.allMarkersFound == false
+              ? _kMarkerDetectionMessage
+              : _kProcessingFailedMessage,
           type: omrResult.markerResult?.allMarkersFound == false
               ? ScannerErrorType.markerDetection
               : ScannerErrorType.omrProcessing,
@@ -385,21 +452,24 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
       } on _MarkerExtractionException catch (e) {
         debugPrint('Name region marker error: $e');
         if (isClosed) return;
-        add(ScannerErrorOccurred(
-          message: e.toString(),
+        add(const ScannerErrorOccurred(
+          message: _kMarkerDetectionMessage,
           type: ScannerErrorType.markerDetection,
         ));
         return;
       } catch (e, stackTrace) {
         debugPrint('Name region extraction error: $e\n$stackTrace');
         if (isClosed) return;
-        add(ScannerErrorOccurred(
-          message: 'Failed to extract name region: ${e.toString()}',
+        add(const ScannerErrorOccurred(
+          message: _kProcessingFailedMessage,
           type: ScannerErrorType.omrProcessing,
         ));
         return;
       }
       if (isClosed) return;
+
+      // Sample memory after name region extraction
+      _profiler.sampleMemory(context: 'after_name_extraction');
 
       // Build scan result
       final scanResult = ScanResult(
@@ -423,13 +493,16 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
       } catch (e, stackTrace) {
         debugPrint('Persistence error: $e\n$stackTrace');
         if (isClosed) return;
-        add(ScannerErrorOccurred(
-          message: 'Failed to save scan: ${e.toString()}',
+        add(const ScannerErrorOccurred(
+          message: _kSaveFailedMessage,
           type: ScannerErrorType.persistence,
         ));
         return;
       }
       if (isClosed) return;
+
+      // Sample memory after save
+      _profiler.sampleMemory(context: 'after_save');
 
       // Dispatch completion event
       add(ScannerProcessingComplete(
@@ -439,8 +512,8 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
     } catch (e, stackTrace) {
       debugPrint('Processing error: $e\n$stackTrace');
       if (isClosed) return;
-      add(ScannerErrorOccurred(
-        message: 'Failed to process scan: ${e.toString()}',
+      add(const ScannerErrorOccurred(
+        message: _kProcessingFailedMessage,
         type: ScannerErrorType.omrProcessing,
       ));
     }
@@ -490,8 +563,8 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
         avgConfidence: 0.0,
       ));
     } catch (e) {
-      add(ScannerErrorOccurred(
-        message: 'Failed to restart preview: ${e.toString()}',
+      add(const ScannerErrorOccurred(
+        message: _kCameraInitFailedMessage,
         type: ScannerErrorType.cameraInitialization,
       ));
     }
@@ -528,6 +601,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
     emit(ScannerError(
       message: event.message,
       type: event.type,
+      isPermanentlyDenied: event.isPermanentlyDenied,
     ));
   }
 
@@ -607,10 +681,8 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
           );
         }
 
-        // Get corner points for transform
-        final cornerPoints = _markerDetector.getCornerPointsForTransform(
-          processed,
-        );
+        // Get corner points from cached detection (optimization: avoids duplicate detectMarkers call)
+        final cornerPoints = _markerDetector.getCornerPointsFromCachedDetection();
 
         if (cornerPoints == null) {
           throw const _MarkerExtractionException(

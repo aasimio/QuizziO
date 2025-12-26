@@ -101,11 +101,15 @@ class ScannerErrorOccurred extends ScannerEvent {
   /// Type of error that occurred
   final ScannerErrorType type;
 
+  /// Whether permission was permanently denied (for cameraPermission type)
+  final bool isPermanentlyDenied;
+
   const ScannerErrorOccurred({
     required this.message,
     required this.type,
+    this.isPermanentlyDenied = false,
   });
 
   @override
-  List<Object?> get props => [message, type];
+  List<Object?> get props => [message, type, isPermanentlyDenied];
 }

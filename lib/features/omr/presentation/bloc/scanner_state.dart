@@ -97,18 +97,29 @@ class ScannerError extends ScannerState {
   /// Type of error that occurred
   final ScannerErrorType type;
 
+  /// Whether permission was permanently denied (for cameraPermission type)
+  /// When true, user must go to settings to grant permission
+  final bool isPermanentlyDenied;
+
   const ScannerError({
     required this.message,
     required this.type,
+    this.isPermanentlyDenied = false,
   });
 
   @override
-  List<Object?> get props => [message, type];
+  List<Object?> get props => [message, type, isPermanentlyDenied];
 }
 
 /// Error types for the scanning process
 enum ScannerErrorType {
-  /// Camera failed to initialize
+  /// Camera permission was denied by user
+  cameraPermission,
+
+  /// Camera hardware not available on device
+  cameraUnavailable,
+
+  /// Camera failed to initialize (other reasons)
   cameraInitialization,
 
   /// Could not detect all 4 markers in captured image
@@ -125,4 +136,7 @@ enum ScannerErrorType {
 
   /// Failed to save scan result to repository
   persistence,
+
+  /// Unexpected error (fallback)
+  unknown,
 }

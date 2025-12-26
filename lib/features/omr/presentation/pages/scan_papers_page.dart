@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/services/camera_service.dart';
@@ -183,8 +184,8 @@ class _ScanPapersContentState extends State<_ScanPapersContent>
       ScannerProcessing(:final status) => _buildProcessingView(status),
       ScannerResult(:final scanResult, :final processingTimeMs) =>
         _buildResultView(scanResult, processingTimeMs),
-      ScannerError(:final message, :final type) =>
-        _buildErrorView(message, type),
+      ScannerError(:final message, :final type, :final isPermanentlyDenied) =>
+        _buildErrorView(message, type, isPermanentlyDenied),
     };
   }
 
@@ -298,7 +299,11 @@ class _ScanPapersContentState extends State<_ScanPapersContent>
     );
   }
 
-  Widget _buildErrorView(String message, ScannerErrorType type) {
+  Widget _buildErrorView(
+    String message,
+    ScannerErrorType type,
+    bool isPermanentlyDenied,
+  ) {
     return Container(
       color: Colors.black87,
       child: Center(
@@ -314,8 +319,8 @@ class _ScanPapersContentState extends State<_ScanPapersContent>
                   color: AppColors.error.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Icon(
-                  Icons.error_outline,
+                child: Icon(
+                  _getErrorIcon(type),
                   size: 40,
                   color: AppColors.error,
                 ),
@@ -339,18 +344,7 @@ class _ScanPapersContentState extends State<_ScanPapersContent>
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
-              FilledButton.icon(
-                onPressed: () {
-                  context
-                      .read<ScannerBloc>()
-                      .add(const ScannerRetryRequested());
-                },
-                icon: const Icon(Icons.refresh),
-                label: const Text('Try Again'),
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.scanFeature,
-                ),
-              ),
+              _buildErrorActions(type, isPermanentlyDenied),
             ],
           ),
         ),
@@ -358,15 +352,113 @@ class _ScanPapersContentState extends State<_ScanPapersContent>
     );
   }
 
+  IconData _getErrorIcon(ScannerErrorType type) {
+    return switch (type) {
+      ScannerErrorType.cameraPermission => Icons.no_photography_outlined,
+      ScannerErrorType.cameraUnavailable => Icons.videocam_off_outlined,
+      ScannerErrorType.markerDetection => Icons.crop_free,
+      _ => Icons.error_outline,
+    };
+  }
+
   String _getErrorTitle(ScannerErrorType type) {
     return switch (type) {
+      ScannerErrorType.cameraPermission => 'Camera Access Required',
+      ScannerErrorType.cameraUnavailable => 'Camera Not Available',
       ScannerErrorType.cameraInitialization => 'Camera Error',
-      ScannerErrorType.markerDetection => 'Markers Not Found',
+      ScannerErrorType.markerDetection => 'Sheet Not Detected',
       ScannerErrorType.imageCapture => 'Capture Failed',
       ScannerErrorType.omrProcessing => 'Processing Error',
       ScannerErrorType.grading => 'Grading Error',
       ScannerErrorType.persistence => 'Save Error',
+      ScannerErrorType.unknown => 'Error',
     };
+  }
+
+  Widget _buildErrorActions(ScannerErrorType type, bool isPermanentlyDenied) {
+    switch (type) {
+      case ScannerErrorType.cameraPermission:
+        if (isPermanentlyDenied) {
+          // Permission permanently denied - show Open Settings button
+          return Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              OutlinedButton(
+                onPressed: () => Navigator.pop(context),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white70,
+                  side: const BorderSide(color: Colors.white30),
+                ),
+                child: const Text('Close'),
+              ),
+              const SizedBox(width: 12),
+              FilledButton.icon(
+                onPressed: () async {
+                  final messenger = ScaffoldMessenger.of(context);
+                  try {
+                    final opened = await openAppSettings();
+                    if (!opened) {
+                      messenger.showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                              'Could not open settings. Please open settings manually.'),
+                          backgroundColor: Colors.orange,
+                        ),
+                      );
+                    }
+                  } catch (e) {
+                    messenger.showSnackBar(
+                      const SnackBar(
+                        content: Text('Error opening settings'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                },
+                icon: const Icon(Icons.settings),
+                label: const Text('Open Settings'),
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.scanFeature,
+                ),
+              ),
+            ],
+          );
+        }
+        // Not permanently denied - show retry to re-request permission
+        return FilledButton.icon(
+          onPressed: () {
+            context.read<ScannerBloc>().add(const ScannerRetryRequested());
+          },
+          icon: const Icon(Icons.camera_alt),
+          label: const Text('Allow Camera'),
+          style: FilledButton.styleFrom(
+            backgroundColor: AppColors.scanFeature,
+          ),
+        );
+
+      case ScannerErrorType.cameraUnavailable:
+        // Camera not available - only Close action (retry is pointless)
+        return FilledButton(
+          onPressed: () => Navigator.pop(context),
+          style: FilledButton.styleFrom(
+            backgroundColor: AppColors.scanFeature,
+          ),
+          child: const Text('Close'),
+        );
+
+      default:
+        // All other errors - show Retry button
+        return FilledButton.icon(
+          onPressed: () {
+            context.read<ScannerBloc>().add(const ScannerRetryRequested());
+          },
+          icon: const Icon(Icons.refresh),
+          label: const Text('Try Again'),
+          style: FilledButton.styleFrom(
+            backgroundColor: AppColors.scanFeature,
+          ),
+        );
+    }
   }
 
   void _onStateChange(BuildContext context, ScannerState state) {

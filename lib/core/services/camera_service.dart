@@ -2,14 +2,41 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'package:camera/camera.dart';
 import 'package:injectable/injectable.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'performance_profiler.dart';
+
+/// Exception thrown when camera permission is denied
+class CameraPermissionDeniedException implements Exception {
+  /// Whether the permission was permanently denied (requires settings)
+  final bool permanentlyDenied;
+
+  const CameraPermissionDeniedException({this.permanentlyDenied = false});
+
+  @override
+  String toString() => permanentlyDenied
+      ? 'Camera permission permanently denied'
+      : 'Camera permission denied';
+}
+
+/// Exception thrown when no camera is available on the device
+class CameraUnavailableException implements Exception {
+  const CameraUnavailableException();
+
+  @override
+  String toString() => 'No camera available on this device';
+}
 
 /// Service for managing camera lifecycle and providing camera frames
 @lazySingleton
 class CameraService {
+  final PerformanceProfiler _profiler;
+
   CameraController? _controller;
   List<CameraDescription> _cameras = [];
   final StreamController<CameraImage> _imageStreamController =
       StreamController<CameraImage>.broadcast();
+
+  CameraService(this._profiler);
 
   /// Stream of camera preview frames
   Stream<CameraImage> get imageStream => _imageStreamController.stream;
@@ -24,16 +51,43 @@ class CameraService {
   ///
   /// Uses the first back-facing camera if available, otherwise first camera
   /// Sets resolution to high (not max) for OMR scanning per CLAUDE.md
+  ///
+  /// Throws:
+  /// - [CameraPermissionDeniedException] if camera permission is denied
+  /// - [CameraUnavailableException] if no camera is available
+  /// - [CameraException] for other initialization failures
   Future<void> initialize() async {
+    _profiler.startTimer(MetricType.coldStartCameraInit);
     try {
-      // Get available cameras
+      // Step 1: Check camera permission
+      final status = await Permission.camera.status;
+
+      // iOS: Check if camera is restricted (parental controls, MDM, etc.)
+      if (status.isRestricted) {
+        throw const CameraPermissionDeniedException(permanentlyDenied: true);
+      }
+
+      if (status.isDenied) {
+        // Request permission
+        final result = await Permission.camera.request();
+        if (result.isRestricted) {
+          throw const CameraPermissionDeniedException(permanentlyDenied: true);
+        }
+        if (result.isDenied) {
+          throw const CameraPermissionDeniedException(permanentlyDenied: false);
+        }
+        if (result.isPermanentlyDenied) {
+          throw const CameraPermissionDeniedException(permanentlyDenied: true);
+        }
+      } else if (status.isPermanentlyDenied) {
+        throw const CameraPermissionDeniedException(permanentlyDenied: true);
+      }
+
+      // Step 2: Get available cameras
       _cameras = await availableCameras();
 
       if (_cameras.isEmpty) {
-        throw CameraException(
-          'noCameras',
-          'No cameras available on this device',
-        );
+        throw const CameraUnavailableException();
       }
 
       // Prefer back camera for OMR scanning
@@ -55,11 +109,17 @@ class CameraService {
 
       // Lock to portrait orientation for consistency
       await _controller!.lockCaptureOrientation();
+    } on CameraPermissionDeniedException {
+      rethrow;
+    } on CameraUnavailableException {
+      rethrow;
     } catch (e) {
       throw CameraException(
         'initializationFailed',
         'Failed to initialize camera: $e',
       );
+    } finally {
+      _profiler.stopTimer(MetricType.coldStartCameraInit);
     }
   }
 
